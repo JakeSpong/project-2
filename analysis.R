@@ -27,8 +27,6 @@ individual <- readr::read_csv(
 # leaflet uses the viewer panel to display its output.
 # Works when called from RStudio but no longer from the 
 # R console.
-
-
 background <- addTiles(leaflet())
 all_field_sites <-
   addMarkers(
@@ -66,7 +64,7 @@ example_NMDS <- metaMDS(spe, distance = "bray", k = 2, maxit = 999, trymax = 500
 #Shephard plot shows scatter around the regession between the interpoint distances in the final configuration (i.e. the distances between each pair of communities) against their original dissimilarities.  Large scatter around the line suggests the original dissimilarities are not well preserved in the reduced number of dimensions
 stressplot(example_NMDS)
 #set dimensions of new graphics window
-dev.new(width = 719, height = 412, unit = "px")
+#dev.new(width = 719, height = 412, unit = "px")
 #plot the NMDS
 plot(example_NMDS, col = "white")
 #change width of axes and surroundng box
