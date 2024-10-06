@@ -1,4 +1,4 @@
-",",Date Sampled,OS Conference,Bracken/Heather,Altitude (m),Pteridium aquilinium,Calunna vulgaris,Vaccinium vitis-idaea,Vaccinium mytrilus,Grass,Empetrum nigrum,Cladonia arbuscula,Moss,Galium saxatile,Erica cinaerea,Oxalis stricta,Fern,Tormentil,Thistle,Unknown3,Latitude,Longitude
+SampleID,Date Sampled,OS Conference,Land,Altitude (m),Pteridium aquilinium,Calunna vulgaris,Vaccinium vitis-idaea,Vaccinium mytrilus,Grass,Empetrum nigrum,Cladonia arbuscula,Moss,Galium saxatile,Erica cinaerea,Oxalis stricta,Fern,Tormentil,Thistle,Unknown3,LatitudeN,LongitudeE
 BRI-H-1,08/08/2024,SE8746591982,Heather,219,,100,13,13,,,,,,,,,,,,54.315944,-0.65696797
 BRI-H-2,08/08/2024,SE8745891955,Heather,227,,100,,10,,,,,,,,,,,,54.315703,-0.65708344
 BRI-B-1,08/08/2024,SE8735791881,Bracken,223,100,,,3,,,,,,,,,,,,54.315055,-0.65865718
@@ -102,7 +102,7 @@ WHI-B-10,11/09/2024,NY1659021287,Bracken,411,90,0,,0,,,,16,,,16,,,,,54.579881,-3
 WDY-H-1,03/10/2024,NY8373329606,Heather,395,,100,,,4,,,1,,,,,,,,54.661274,-2.2536877
 WDY-H-2,03/10/2024,NY8370929586,Heather,395,,100,,,,,,5,1,,,,,,,54.661093,-2.2540586
 WDY-H-3,03/10/2024,NY8370329547,Heather,399,,98,,,1,,,20,,,,,,,,54.660743,-2.2541494
-WDY-H-1,03/10/2024,NY8370429496,Heather,406,,98,,,,,,6,,,,,,,,54.660284,-2.2541311
+WDY-H-4,03/10/2024,NY8370429496,Heather,406,,98,,,,,,6,,,,,,,,54.660284,-2.2541311
 WDY-B-1,03/10/2024,NY8372229478,Bracken,420,47,24,,2,,,,26,1,,,,,,,54.660123,-2.253851
 WDY-B-2,03/10/2024,NY8372729456,Bracken,429,55,20,,13,,,,11,3,,1,,,,,54.659926,-2.2537723
 WDY-B-3,03/10/2024,NY8372829436,Bracken,434,61,14,,,20,,,,,,1,4,,,,54.659746,-2.2537557

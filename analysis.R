@@ -38,6 +38,21 @@ all_field_sites <-
   )
 #map of our sampling locations
 all_field_sites
+library(htmlwidgets)
+
+#a fix so that saveWidget saves the html to our working directory
+saveWidgetFix <- function (widget,file,...) {
+  ## A wrapper to saveWidget which compensates for arguable BUG in
+  ## saveWidget which requires `file` to be in current working
+  ## directory.
+  wd<-getwd()
+  on.exit(setwd(wd))
+  outDir<-dirname(file)
+  file<-basename(file)
+  setwd(outDir);
+  saveWidget(widget,file=file,...)
+}
+saveWidget(all_field_sites, file="all_field_sites.html")
 
 #### Beta diversity analysis of vegetation survey data ----
 #### Load vegetation abundance data
@@ -56,7 +71,7 @@ d[is.na(d)] <- 0
 d$Land <- factor(d$Land, levels = c("Bracken", "Heather"), labels = c("Bracken", "Heather"))
 #just the species counts
 spe <- d[,-(1:5)]
-spe <- spe[,-(13:14)]
+spe <- spe[,-(16:17)]
 
 #k is the number of reduced dimensions
 #trymax sets the default number of iterations
@@ -64,7 +79,7 @@ example_NMDS <- metaMDS(spe, distance = "bray", k = 2, maxit = 999, trymax = 500
 #Shephard plot shows scatter around the regession between the interpoint distances in the final configuration (i.e. the distances between each pair of communities) against their original dissimilarities.  Large scatter around the line suggests the original dissimilarities are not well preserved in the reduced number of dimensions
 stressplot(example_NMDS)
 #set dimensions of new graphics window
-#dev.new(width = 719, height = 412, unit = "px")
+dev.new(width = 719, height = 412, unit = "px")
 #plot the NMDS
 plot(example_NMDS, col = "white")
 #change width of axes and surroundng box
@@ -73,15 +88,15 @@ axis(side = 2, lwd = 2)
 box(lwd = 2)
 
 #assign the treatments to relevant rows of the dataframe
-treat=c(rep("Bracken",50),rep("Heather",50))
+treat=c(rep("Bracken",60),rep("Heather",60))
 #set the colour for each treatment
-colors=c(rep("#117733",50), rep("#AA4499", 50))
-text(-1.2,1.05, paste("Stress = ", round(example_NMDS$stress, 3)))
+colors=c(rep("#117733",60), rep("#AA4499", 60))
+text(-1.2,2, paste("Stress = ", round(example_NMDS$stress, 3)))
 
 for(i in unique(treat)) {
   #we have added an if statement so we can chose which points and ellipses to plot at a time e.g. i == "Grassland Bracken".  If we want to plot all ellipses simultaneously, set i == i
   if(i == i){
-    #change the colour of each site name so samples from the s  Eame treatment have the same colour
+    #change the colour of each site name so samples from the same treatment have the same colour
     orditorp(example_NMDS$point[grep(i,treat),],display="sites", col=colors, cex=0.7,air=0.01)
     #plots ellipse with ellipse centered on the centroid of the samples from the same treatment (and thus encapsulating 95% of the variance)
     ordiellipse(example_NMDS$point[grep(i,treat),],draw="polygon",
