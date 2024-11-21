@@ -105,3 +105,4 @@ for(i in unique(treat)) {
 legend(1.25,-0.65, legend = c("Bracken", "Heather"), fill = c("#117733",  "#AA4499"))
 
 #### Soil Moisture analysis ----
+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
