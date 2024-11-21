@@ -103,3 +103,5 @@ for(i in unique(treat)) {
                 groups=treat[treat==i],col=colors[grep(i,treat)],label=F) } }
 #specify legend manually
 legend(1.25,-0.65, legend = c("Bracken", "Heather"), fill = c("#117733",  "#AA4499"))
+
+#### Soil Moisture analysis ----
