@@ -105,4 +105,59 @@ for(i in unique(treat)) {
 legend(1.25,-0.65, legend = c("Bracken", "Heather"), fill = c("#117733",  "#AA4499"))
 
 #### Soil Moisture analysis ----
-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
+#read in the data
+d <- readr::read_csv(
+  here::here("data-raw", "project-2-data-master", "individual", "1) Gravimetric Soil Moisture Content.csv")
+) 
+#boxplot the data. Use aes() with backticks (``) so avoid an error with our column name
+gsmc_bxp <- ggboxplot(d, x = "Site", aes(y = `Gravimetric Soil Moisture Content (%)`), color = "Vegetation", palette = c("limegreen", "#AA4499"), lwd = 0.75)  +
+  labs(x = "Site",
+       y = "Gravimetric Soil \n Moisture Content (%)") + theme(
+         # Remove panel border
+         panel.border = element_blank(),  
+         # Remove panel grid lines
+         panel.grid.major = element_blank(),
+         panel.grid.minor = element_blank(),
+         # Remove panel background
+         panel.background = element_blank(),
+         # Add axis line
+         axis.line = element_line(colour = "black", linewidth = 0.75),
+         #change colour and thickness of axis ticks
+         axis.ticks = element_line(colour = "black", linewidth = 0.5),
+         #change axis labels colour
+         axis.title.x = element_text(colour = "black", face = "bold"),
+         axis.title.y = element_text(colour = "black", face = "bold"),
+         #change tick labels colour
+         axis.text.x = element_text(colour = "black", face = "bold"),
+         axis.text.y = element_text(colour = "black", face = "bold"),
+       ) 
+
+show(gsmc_bxp)  
+#save our plot
+ggsave(path = "figures", paste0(Sys.Date(), "_gravimetric-soil-moisture-content.svg"), width = 10, height= 5, gsmc_bxp)
+
+
+#nested anova
+anova <- aov(d$`Gravimetric Soil Moisture Content (%)` ~ d$Site / factor(d$Vegetation))
+summary(anova)
+#tukey's test to identify significant interactions
+tukey <- TukeyHSD(anova)
+print(tukey)
+#compact letter display
+cld <- multcompLetters4(anova, tukey)
+print(cld)
+
+
+#check homogeneity of variance
+plot(anova, 1)
+#levene test.  if p value < 0.05, there is evidence to suggest that the variance across groups is statistically significantly different.
+leveneTest(d$GSMC ~ d$Vegetation*d$Site)
+#check normality.  
+plot(anova, 2)
+#conduct shapiro-wilk test on ANOVA residuals to test for normality
+#extract the residuals
+aov_residuals <- residuals(object = anova)
+#run shapiro-wilk test.  if p > 0.05 the data is normal
+shapiro.test(x = aov_residuals)
+
+
