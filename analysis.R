@@ -11,6 +11,7 @@ library(tidyverse)
 library(car) #for levene test
 library(dataspice) #for creating metadata files
 library(multcompView) #for significant difference letters
+library(gitcreds)
 
 #### Plot a map of our sample locations ----
 
@@ -160,4 +161,47 @@ aov_residuals <- residuals(object = anova)
 #run shapiro-wilk test.  if p > 0.05 the data is normal
 shapiro.test(x = aov_residuals)
 
+
+
+#### Soil pH analysis ----
+d <- readr::read_csv(
+  here::here("data-raw", "project-2-data-master", "individual", "2) Soil pH.csv")
+) 
+#boxplot the data. Use aes() with backticks (``) so avoid an error with our column name
+pH_bxp <- ggboxplot(d, x = "Site", aes(y = `pH`), color = "Vegetation", palette = c("limegreen", "#AA4499"), lwd = 0.75)  + 
+  labs(x = "Site",
+       y = "pH") + theme(
+         # Remove panel border
+         panel.border = element_blank(),  
+         # Remove panel grid lines
+         panel.grid.major = element_blank(),
+         panel.grid.minor = element_blank(),
+         # Remove panel background
+         panel.background = element_blank(),
+         # Add axis line
+         axis.line = element_line(colour = "black", linewidth = 0.75),
+         #change colour and thickness of axis ticks
+         axis.ticks = element_line(colour = "black", linewidth = 0.5),
+         #change axis labels colour
+         axis.title.x = element_text(colour = "black", face = "bold"),
+         axis.title.y = element_text(colour = "black", face = "bold"),
+         #change tick labels colour
+         axis.text.x = element_text(colour = "black", face = "bold"),
+         axis.text.y = element_text(colour = "black", face = "bold"),
+       ) 
+
+show(pH_bxp)  
+#save our plot
+ggsave(path = "figures", paste0(Sys.Date(), "_pH.svg"), width = 10, height= 5, pH_bxp)
+
+
+#nested anova
+anova <- aov(d$`pH` ~ d$Site / factor(d$Vegetation))
+summary(anova)
+#tukey's test to identify significant interactions
+tukey <- TukeyHSD(anova)
+print(tukey)
+#compact letter display
+cld <- multcompLetters4(anova, tukey)
+print(cld)
 
