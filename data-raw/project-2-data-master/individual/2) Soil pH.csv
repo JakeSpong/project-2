@@ -1,107 +1,7 @@
 SampleID,Site,Vegetation,Soil Mass (g),Water added (ml),Notes,Dry soil:water ratio,Temperature (oC),pH,Date
-BRI-B-1,Bridestones,Bracken,5.0233,25,,5,19,3.61,06/12/2024
-BRI-B-2,Bridestones,Bracken,5.0520,25,,5,19,3.67,06/12/2024
-BRI-B-3,Bridestones,Bracken,5.0568,25,,5,19,3.54,06/12/2024
-BRI-B-4,Bridestones,Bracken,5.0983,25,,5,19,3.50,06/12/2024
-BRI-B-5,Bridestones,Bracken,5.0355,25,,5,19,3.36,06/12/2024
-BRI-B-6,Bridestones,Bracken,5.0450,25,,5,19,3.41,06/12/2024
-BRI-B-7,Bridestones,Bracken,5.0417,25,,5,19,3.32,06/12/2024
-BRI-B-8,Bridestones,Bracken,5.0850,25,,5,19,3.56,06/12/2024
-BRI-B-9,Bridestones,Bracken,2.7121,25,,9,19,3.20,06/12/2024
-BRI-B-10,Bridestones,Bracken,2.7711,25,,9,19,3.43,06/12/2024
-BRI-H-1,Bridestones,Heath,5.0903,25,,5,19,3.62,06/12/2024
-BRI-H-2,Bridestones,Heath,5.0586,25,,5,19,3.59,06/12/2024
-BRI-H-3,Bridestones,Heath,0.9059,25,,28,19,3.39,06/12/2024
-BRI-H-4,Bridestones,Heath,4.9986,25,,5,19,3.72,06/12/2024
-BRI-H-5,Bridestones,Heath,4.9543,25,,5,19,3.80,06/12/2024
-BRI-H-6,Bridestones,Heath,5.0747,25,,5,19,3.66,06/12/2024
-BRI-H-7,Bridestones,Heath,5.0482,25,,5,19,3.41,06/12/2024
-BRI-H-8,Bridestones,Heath,1.9789,25,,13,19,3.48,06/12/2024
-BRI-H-9,Bridestones,Heath,2.5706,25,,10,19,3.51,06/12/2024
-BRI-H-10,Bridestones,Heath,5.0787,25,,5,19,3.41,06/12/2024
-SWM-B-1,Scarth Wood Moor,Bracken,5.0922,25,,5,19,5.45,06/12/2024
-SWM-B-2,Scarth Wood Moor,Bracken,4.9689,25,,5,19,3.03,06/12/2024
-SWM-B-3,Scarth Wood Moor,Bracken,1.3576,25,,18,19,3.42,06/12/2024
-SWM-B-4,Scarth Wood Moor,Bracken,4.9566,25,,5,19,3.27,06/12/2024
-SWM-B-5,Scarth Wood Moor,Bracken,4.9976,25,,5,19,3.36,06/12/2024
-SWM-B-6,Scarth Wood Moor,Bracken,4.9213,25,,5,19,3.42,06/12/2024
-SWM-B-7,Scarth Wood Moor,Bracken,4.9770,25,,5,19,3.52,06/12/2024
-SWM-B-8,Scarth Wood Moor,Bracken,5.0759,25,,5,19,3.81,06/12/2024
-SWM-B-9,Scarth Wood Moor,Bracken,5.0170,25,,5,19,3.49,06/12/2024
-SWM-B-10,Scarth Wood Moor,Bracken,5.0197,25,,5,19,3.64,06/12/2024
-SWM-H-1,Scarth Wood Moor,Heath,0.9266,25,,27,19,3.98,06/12/2024
-SWM-H-2,Scarth Wood Moor,Heath,5.0846,25,,5,19,3.52,06/12/2024
-SWM-H-3,Scarth Wood Moor,Heath,5.0833,25,,5,19,3.51,06/12/2024
-SWM-H-4,Scarth Wood Moor,Heath,5.0123,25,,5,19,3.49,06/12/2024
-SWM-H-5,Scarth Wood Moor,Heath,5.0273,25,,5,19,3.70,06/12/2024
-SWM-H-6,Scarth Wood Moor,Heath,5.0390,25,,5,19,3.41,06/12/2024
-SWM-H-7,Scarth Wood Moor,Heath,4.9465,25,,5,19,3.64,06/12/2024
-SWM-H-8,Scarth Wood Moor,Heath,5.0408,25,,5,19,3.53,06/12/2024
-SWM-H-9,Scarth Wood Moor,Heath,4.9451,25,,5,19,3.70,06/12/2024
-SWM-H-10,Scarth Wood Moor,Heath,4.9961,25,,5,19,3.55,06/12/2024
-BRM-B-1,Brimham Rocks,Bracken,4.9389,25,,5,19,3.70,06/12/2024
-BRM-B-2,Brimham Rocks,Bracken,5.0668,25,,5,19,3.42,06/12/2024
-BRM-B-3,Brimham Rocks,Bracken,5.0066,25,,5,19,3.62,06/12/2024
-BRM-B-4,Brimham Rocks,Bracken,4.9439,25,,5,19,3.79,06/12/2024
-BRM-B-5,Brimham Rocks,Bracken,5.0243,25,,5,19,3.19,06/12/2024
-BRM-B-6,Brimham Rocks,Bracken,4.9102,25,,5,19,3.75,06/12/2024
-BRM-B-7,Brimham Rocks,Bracken,4.9874,25,,5,19,4.40,06/12/2024
-BRM-B-8,Brimham Rocks,Bracken,4.9964,25,,5,19,3.73,06/12/2024
-BRM-B-9,Brimham Rocks,Bracken,5.0036,25,,5,19,3.65,06/12/2024
-BRM-B-10,Brimham Rocks,Bracken,5.0743,25,,5,19,3.58,06/12/2024
-BRM-H-1,Brimham Rocks,Heath,4.9223,25,,5,19,3.73,06/12/2024
-BRM-H-2,Brimham Rocks,Heath,5.0583,25,,5,19,3.52,06/12/2024
-BRM-H-3,Brimham Rocks,Heath,5.0484,25,,5,19,3.76,06/12/2024
-BRM-H-4,Brimham Rocks,Heath,4.9136,25,,5,19,3.85,06/12/2024
-BRM-H-5,Brimham Rocks,Heath,5.0949,25,,5,19,3.69,06/12/2024
-BRM-H-6,Brimham Rocks,Heath,4.9565,25,,5,19,3.90,06/12/2024
-BRM-H-7,Brimham Rocks,Heath,5.0640,25,,5,19,3.83,06/12/2024
-BRM-H-8,Brimham Rocks,Heath,5.0406,25,,5,19,3.85,06/12/2024
-BRM-H-9,Brimham Rocks,Heath,4.9954,25,,5,19,3.63,06/12/2024
-BRM-H-10,Brimham Rocks,Heath,4.9289,25,,5,19,3.67,06/12/2024
-WDY-B-1,Widdybanks,Bracken,5.0422,25,,5,19,4.23,06/12/2024
-WDY-B-2,Widdybanks,Bracken,4.9460,25,,5,19,3.80,06/12/2024
-WDY-B-3,Widdybanks,Bracken,5.0327,25,,5,19,4.26,06/12/2024
-WDY-B-4,Widdybanks,Bracken,4.9837,25,,5,19,4.24,06/12/2024
-WDY-B-5,Widdybanks,Bracken,4.9701,25,,5,19,3.85,06/12/2024
-WDY-B-6,Widdybanks,Bracken,5.0833,25,,5,19,5.24,06/12/2024
-WDY-B-7,Widdybanks,Bracken,4.9373,25,,5,19,5.45,06/12/2024
-WDY-B-8,Widdybanks,Bracken,4.9966,25,,5,19,4.23,06/12/2024
-WDY-B-9,Widdybanks,Bracken,5.0812,25,,5,19,3.77,04/12/2024
-WDY-B-10,Widdybanks,Bracken,4.9695,25,,5,19,4.36,04/12/2024
-WDY-H-1,Widdybanks,Heath,4.9933,25,,5,19,4.23,06/12/2024
-WDY-H-2,Widdybanks,Heath,5.0254,25,,5,19,3.90,06/12/2024
-WDY-H-3,Widdybanks,Heath,5.0283,25,,5,19,5.01,06/12/2024
-WDY-H-4,Widdybanks,Heath,5.0291,25,,5,19,5.47,06/12/2024
-WDY-H-5,Widdybanks,Heath,4.9219,25,,5,19,4.32,06/12/2024
-WDY-H-6,Widdybanks,Heath,5.0089,25,,5,19,4.37,06/12/2024
-WDY-H-7,Widdybanks,Heath,4.9739,25,,5,19,3.61,06/12/2024
-WDY-H-8,Widdybanks,Heath,4.9266,25,,5,19,3.98,06/12/2024
-WDY-H-9,Widdybanks,Heath,5.0675,25,,5,19,3.93,06/12/2024
-WDY-H-10,Widdybanks,Heath,5.0505,25,,5,19,5.57,06/12/2024
-HAW-B-1,Haweswater,Bracken,4.8959,25,,5,19,3.83,06/12/2024
-HAW-B-2,Haweswater,Bracken,5.0469,25,,5,19,3.54,06/12/2024
-HAW-B-3,Haweswater,Bracken,5.0928,25,,5,19,3.70,06/12/2024
-HAW-B-4,Haweswater,Bracken,5.0409,25,,5,19,3.50,06/12/2024
-HAW-B-5,Haweswater,Bracken,4.9147,25,,5,19,3.47,06/12/2024
-HAW-B-6,Haweswater,Bracken,5.0960,25,,5,19,3.63,06/12/2024
-HAW-B-7,Haweswater,Bracken,4.9255,25,,5,19,3.52,04/12/2024
-HAW-B-8,Haweswater,Bracken,5.0320,25,,5,19,3.87,04/12/2024
-HAW-B-9,Haweswater,Bracken,5.0561,25,,5,19,3.60,04/12/2024
-HAW-B-10,Haweswater,Bracken,5.0344,25,,5,19,3.87,04/12/2024
-HAW-H-1,Haweswater,Heath,1.5561,25,,16,19,3.82,04/12/2024
-HAW-H-2,Haweswater,Heath,1.7509,25,,14,19,3.90,04/12/2024
-HAW-H-3,Haweswater,Heath,4.9864,25,,5,19,3.57,04/12/2024
-HAW-H-4,Haweswater,Heath,4.9977,25,,5,19,3.83,04/12/2024
-HAW-H-5,Haweswater,Heath,4.9524,25,,5,19,3.72,04/12/2024
-HAW-H-6,Haweswater,Heath,1.7595,25,,14,19,3.67,04/12/2024
-HAW-H-7,Haweswater,Heath,5.0549,25,,5,19,3.68,04/12/2024
-HAW-H-8,Haweswater,Heath,5.0619,25,,5,19,3.61,04/12/2024
-HAW-H-9,Haweswater,Heath,4.8929,25,,5,19,3.72,04/12/2024
-HAW-H-10,Haweswater,Heath,4.9932,25,,5,19,3.68,04/12/2024
 WHI-B-1,Whiteside,Bracken,5.0336,25,"lid split when shaking, meaning a ml or two of water and soil particles suspended therein were lost.  Otherwise sample was used as normal as loss likely of negligible impact",5,19,4.24,04/12/2024
 WHI-B-2,Whiteside,Bracken,4.9756,25,,5,19,4.16,04/12/2024
-WHI-B-3,Whiteside,Bracken,5.0870,25,,5,19,4.28,04/12/2024
+WHI-B-3,Whiteside,Bracken,5.087,25,,5,19,4.28,04/12/2024
 WHI-B-4,Whiteside,Bracken,4.9329,25,,5,19,3.85,04/12/2024
 WHI-B-5,Whiteside,Bracken,4.9323,25,,5,19,3.77,04/12/2024
 WHI-B-6,Whiteside,Bracken,4.9898,25,,5,19,3.88,04/12/2024
@@ -117,5 +17,105 @@ WHI-H-5,Whiteside,Heath,4.9636,25,,5,19,3.87,04/12/2024
 WHI-H-6,Whiteside,Heath,4.9507,25,,5,19,3.91,04/12/2024
 WHI-H-7,Whiteside,Heath,4.9566,25,,5,19,4.17,04/12/2024
 WHI-H-8,Whiteside,Heath,5.0648,25,,5,19,4.04,04/12/2024
-WHI-H-9,Whiteside,Heath,5.0030,25,,5,19,3.95,04/12/2024
+WHI-H-9,Whiteside,Heath,5.003,25,,5,19,3.95,04/12/2024
 WHI-H-10,Whiteside,Heath,5.0021,25,,5,19,4.11,04/12/2024
+HAW-B-1,Haweswater,Bracken,4.8959,25,,5,19,3.83,06/12/2024
+HAW-B-2,Haweswater,Bracken,5.0469,25,,5,19,3.54,06/12/2024
+HAW-B-3,Haweswater,Bracken,5.0928,25,,5,19,3.7,06/12/2024
+HAW-B-4,Haweswater,Bracken,5.0409,25,,5,19,3.5,06/12/2024
+HAW-B-5,Haweswater,Bracken,4.9147,25,,5,19,3.47,06/12/2024
+HAW-B-6,Haweswater,Bracken,5.096,25,,5,19,3.63,06/12/2024
+HAW-B-7,Haweswater,Bracken,4.9255,25,,5,19,3.52,04/12/2024
+HAW-B-8,Haweswater,Bracken,5.032,25,,5,19,3.87,04/12/2024
+HAW-B-9,Haweswater,Bracken,5.0561,25,,5,19,3.6,04/12/2024
+HAW-B-10,Haweswater,Bracken,5.0344,25,,5,19,3.87,04/12/2024
+HAW-H-1,Haweswater,Heath,1.5561,25,,16,19,3.82,04/12/2024
+HAW-H-2,Haweswater,Heath,1.7509,25,,14,19,3.9,04/12/2024
+HAW-H-3,Haweswater,Heath,4.9864,25,,5,19,3.57,04/12/2024
+HAW-H-4,Haweswater,Heath,4.9977,25,,5,19,3.83,04/12/2024
+HAW-H-5,Haweswater,Heath,4.9524,25,,5,19,3.72,04/12/2024
+HAW-H-6,Haweswater,Heath,1.7595,25,,14,19,3.67,04/12/2024
+HAW-H-7,Haweswater,Heath,5.0549,25,,5,19,3.68,04/12/2024
+HAW-H-8,Haweswater,Heath,5.0619,25,,5,19,3.61,04/12/2024
+HAW-H-9,Haweswater,Heath,4.8929,25,,5,19,3.72,04/12/2024
+HAW-H-10,Haweswater,Heath,4.9932,25,,5,19,3.68,04/12/2024
+WDY-B-1,Widdybanks,Bracken,5.0422,25,,5,19,4.23,06/12/2024
+WDY-B-2,Widdybanks,Bracken,4.946,25,,5,19,3.8,06/12/2024
+WDY-B-3,Widdybanks,Bracken,5.0327,25,,5,19,4.26,06/12/2024
+WDY-B-4,Widdybanks,Bracken,4.9837,25,,5,19,4.24,06/12/2024
+WDY-B-5,Widdybanks,Bracken,4.9701,25,,5,19,3.85,06/12/2024
+WDY-B-6,Widdybanks,Bracken,5.0833,25,,5,19,5.24,06/12/2024
+WDY-B-7,Widdybanks,Bracken,4.9373,25,,5,19,5.45,06/12/2024
+WDY-B-8,Widdybanks,Bracken,4.9966,25,,5,19,4.23,06/12/2024
+WDY-B-9,Widdybanks,Bracken,5.0812,25,,5,19,3.77,04/12/2024
+WDY-B-10,Widdybanks,Bracken,4.9695,25,,5,19,4.36,04/12/2024
+WDY-H-1,Widdybanks,Heath,4.9933,25,,5,19,4.23,06/12/2024
+WDY-H-2,Widdybanks,Heath,5.0254,25,,5,19,3.9,06/12/2024
+WDY-H-3,Widdybanks,Heath,5.0283,25,,5,19,5.01,06/12/2024
+WDY-H-4,Widdybanks,Heath,5.0291,25,,5,19,5.47,06/12/2024
+WDY-H-5,Widdybanks,Heath,4.9219,25,,5,19,4.32,06/12/2024
+WDY-H-6,Widdybanks,Heath,5.0089,25,,5,19,4.37,06/12/2024
+WDY-H-7,Widdybanks,Heath,4.9739,25,,5,19,3.61,06/12/2024
+WDY-H-8,Widdybanks,Heath,4.9266,25,,5,19,3.98,06/12/2024
+WDY-H-9,Widdybanks,Heath,5.0675,25,,5,19,3.93,06/12/2024
+WDY-H-10,Widdybanks,Heath,5.0505,25,,5,19,5.57,06/12/2024
+BRM-B-1,Brimham Rocks,Bracken,4.9389,25,,5,19,3.7,06/12/2024
+BRM-B-2,Brimham Rocks,Bracken,5.0668,25,,5,19,3.42,06/12/2024
+BRM-B-3,Brimham Rocks,Bracken,5.0066,25,,5,19,3.62,06/12/2024
+BRM-B-4,Brimham Rocks,Bracken,4.9439,25,,5,19,3.79,06/12/2024
+BRM-B-5,Brimham Rocks,Bracken,5.0243,25,,5,19,3.19,06/12/2024
+BRM-B-6,Brimham Rocks,Bracken,4.9102,25,,5,19,3.75,06/12/2024
+BRM-B-7,Brimham Rocks,Bracken,4.9874,25,,5,19,4.4,06/12/2024
+BRM-B-8,Brimham Rocks,Bracken,4.9964,25,,5,19,3.73,06/12/2024
+BRM-B-9,Brimham Rocks,Bracken,5.0036,25,,5,19,3.65,06/12/2024
+BRM-B-10,Brimham Rocks,Bracken,5.0743,25,,5,19,3.58,06/12/2024
+BRM-H-1,Brimham Rocks,Heath,4.9223,25,,5,19,3.73,06/12/2024
+BRM-H-2,Brimham Rocks,Heath,5.0583,25,,5,19,3.52,06/12/2024
+BRM-H-3,Brimham Rocks,Heath,5.0484,25,,5,19,3.76,06/12/2024
+BRM-H-4,Brimham Rocks,Heath,4.9136,25,,5,19,3.85,06/12/2024
+BRM-H-5,Brimham Rocks,Heath,5.0949,25,,5,19,3.69,06/12/2024
+BRM-H-6,Brimham Rocks,Heath,4.9565,25,,5,19,3.9,06/12/2024
+BRM-H-7,Brimham Rocks,Heath,5.064,25,,5,19,3.83,06/12/2024
+BRM-H-8,Brimham Rocks,Heath,5.0406,25,,5,19,3.85,06/12/2024
+BRM-H-9,Brimham Rocks,Heath,4.9954,25,,5,19,3.63,06/12/2024
+BRM-H-10,Brimham Rocks,Heath,4.9289,25,,5,19,3.67,06/12/2024
+SWM-B-1,Scarth Wood Moor,Bracken,5.0922,25,,5,19,5.45,06/12/2024
+SWM-B-2,Scarth Wood Moor,Bracken,4.9689,25,,5,19,3.03,06/12/2024
+SWM-B-3,Scarth Wood Moor,Bracken,1.3576,25,,18,19,3.42,06/12/2024
+SWM-B-4,Scarth Wood Moor,Bracken,4.9566,25,,5,19,3.27,06/12/2024
+SWM-B-5,Scarth Wood Moor,Bracken,4.9976,25,,5,19,3.36,06/12/2024
+SWM-B-6,Scarth Wood Moor,Bracken,4.9213,25,,5,19,3.42,06/12/2024
+SWM-B-7,Scarth Wood Moor,Bracken,4.977,25,,5,19,3.52,06/12/2024
+SWM-B-8,Scarth Wood Moor,Bracken,5.0759,25,,5,19,3.81,06/12/2024
+SWM-B-9,Scarth Wood Moor,Bracken,5.017,25,,5,19,3.49,06/12/2024
+SWM-B-10,Scarth Wood Moor,Bracken,5.0197,25,,5,19,3.64,06/12/2024
+SWM-H-1,Scarth Wood Moor,Heath,0.9266,25,,27,19,3.98,06/12/2024
+SWM-H-2,Scarth Wood Moor,Heath,5.0846,25,,5,19,3.52,06/12/2024
+SWM-H-3,Scarth Wood Moor,Heath,5.0833,25,,5,19,3.51,06/12/2024
+SWM-H-4,Scarth Wood Moor,Heath,5.0123,25,,5,19,3.49,06/12/2024
+SWM-H-5,Scarth Wood Moor,Heath,5.0273,25,,5,19,3.7,06/12/2024
+SWM-H-6,Scarth Wood Moor,Heath,5.039,25,,5,19,3.41,06/12/2024
+SWM-H-7,Scarth Wood Moor,Heath,4.9465,25,,5,19,3.64,06/12/2024
+SWM-H-8,Scarth Wood Moor,Heath,5.0408,25,,5,19,3.53,06/12/2024
+SWM-H-9,Scarth Wood Moor,Heath,4.9451,25,,5,19,3.7,06/12/2024
+SWM-H-10,Scarth Wood Moor,Heath,4.9961,25,,5,19,3.55,06/12/2024
+BRI-B-1,Bridestones,Bracken,5.0233,25,,5,19,3.61,06/12/2024
+BRI-B-2,Bridestones,Bracken,5.052,25,,5,19,3.67,06/12/2024
+BRI-B-3,Bridestones,Bracken,5.0568,25,,5,19,3.54,06/12/2024
+BRI-B-4,Bridestones,Bracken,5.0983,25,,5,19,3.5,06/12/2024
+BRI-B-5,Bridestones,Bracken,5.0355,25,,5,19,3.36,06/12/2024
+BRI-B-6,Bridestones,Bracken,5.045,25,,5,19,3.41,06/12/2024
+BRI-B-7,Bridestones,Bracken,5.0417,25,,5,19,3.32,06/12/2024
+BRI-B-8,Bridestones,Bracken,5.085,25,,5,19,3.56,06/12/2024
+BRI-B-9,Bridestones,Bracken,2.7121,25,,9,19,3.2,06/12/2024
+BRI-B-10,Bridestones,Bracken,2.7711,25,,9,19,3.43,06/12/2024
+BRI-H-1,Bridestones,Heath,5.0903,25,,5,19,3.62,06/12/2024
+BRI-H-2,Bridestones,Heath,5.0586,25,,5,19,3.59,06/12/2024
+BRI-H-3,Bridestones,Heath,0.9059,25,,28,19,3.39,06/12/2024
+BRI-H-4,Bridestones,Heath,4.9986,25,,5,19,3.72,06/12/2024
+BRI-H-5,Bridestones,Heath,4.9543,25,,5,19,3.8,06/12/2024
+BRI-H-6,Bridestones,Heath,5.0747,25,,5,19,3.66,06/12/2024
+BRI-H-7,Bridestones,Heath,5.0482,25,,5,19,3.41,06/12/2024
+BRI-H-8,Bridestones,Heath,1.9789,25,,13,19,3.48,06/12/2024
+BRI-H-9,Bridestones,Heath,2.5706,25,,10,19,3.51,06/12/2024
+BRI-H-10,Bridestones,Heath,5.0787,25,,5,19,3.41,06/12/2024

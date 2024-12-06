@@ -167,6 +167,8 @@ shapiro.test(x = aov_residuals)
 d <- readr::read_csv(
   here::here("data-raw", "project-2-data-master", "individual", "2) Soil pH.csv")
 ) 
+
+
 #boxplot the data. Use aes() with backticks (``) so avoid an error with our column name
 pH_bxp <- ggboxplot(d, x = "Site", aes(y = `pH`), color = "Vegetation", palette = c("limegreen", "#AA4499"), lwd = 0.75)  + 
   labs(x = "Site",
@@ -202,6 +204,18 @@ summary(anova)
 tukey <- TukeyHSD(anova)
 print(tukey)
 #compact letter display
-cld <- multcompLetters4(anova, tukey)
 print(cld)
+
+
+#check homogeneity of variance
+plot(anova, 1)
+#levene test.  if p value < 0.05, there is evidence to suggest that the variance across groups is statistically significantly different.
+leveneTest(d$pH ~ d$Vegetation*d$Site)
+#check normality.  
+plot(anova, 2)
+#conduct shapiro-wilk test on ANOVA residuals to test for normality
+#extract the residuals
+aov_residuals <- residuals(object = anova)
+#run shapiro-wilk test.  if p > 0.05 the data is normal
+shapiro.test(x = aov_residuals)
 
