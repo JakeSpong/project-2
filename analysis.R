@@ -304,8 +304,8 @@ table <- readr::read_csv(
   here::here("data", "5) e2w alpha paramater of DOM curve fitting.csv")) 
 
 #boxplot the alpha, which describes the curve ie how quicky we go from low wavelength (high mass C compounds) to high wavelength (low mass C compounds)
-alpha_bxp <- ggboxplot(table, x = "Site", y = 'alpha', color = "Vegetation", palette = c("black", "limegreen"), lwd = 0.75)  +
-  labs(x = "Habitat x Vegetation",
+alpha_bxp <- ggboxplot(table, x = "Site", y = 'alpha', color = "Vegetation", palette = c("limegreen", "#AA4499"), lwd = 0.75)  +
+  labs(x = "Site",
        y = "DOM fitted curve alpha parameter") + theme(
          # Remove panel border
          panel.border = element_blank(),  
@@ -328,9 +328,7 @@ alpha_bxp <- ggboxplot(table, x = "Site", y = 'alpha', color = "Vegetation", pal
 show(alpha_bxp)
 
 #save our plot
-ggsave(path = "C:/Users/jakef/Documents/York/Project 2 Analysis/project-2/figures", paste0(Sys.Date(), "_DOM-curve-alpha-paramter_black-green.svg"), alpha_bxp)
-
-
+ggsave(path = "C:/Users/jakef/Documents/York/Project 2 Analysis/project-2/figures", paste0(Sys.Date(), "_DOM-curve-alpha-paramter_green-purple.svg"), alpha_bxp)
 
 #nested anova
 anova <- aov(table$alpha ~ table$Site / factor(table$Vegetation))
@@ -340,3 +338,81 @@ summary(anova)
 tukey <- TukeyHSD(anova)
 print(tukey)
 
+
+#### DOM Specific Wavelength of Interest boxplots ----
+
+#read in the processed absorbance data
+d <- readr::read_csv(
+  here::here("data", "4) Processed Undiluted DOM Spectra.csv")
+) 
+# repeat at wavelengths of 250 (aromaticity, apparent molecular weight), 254 (aromaticity), 260 (hydrophobic C content), 265 (relative abundance of functional groups), 272 (aromaticity), 280 (hydrophobic C content, humification index, apparent molecular size), 285 (humification index), 300 (characterization of humic substances), 340 (colour), 350 (apparent molecular size), 365 (aromaticity, apparent molecular weight), 400 (humic substances characterization), 436 (quality indicator), 465 (relative abundance of functional groups)
+
+#list of wavelengths of interest
+wavelength_of_interest <- list(250, 254, 260, 265, 272, 280, 285, 300, 340, 350, 365, 400, 436, 465)
+
+
+#function to plot data for DOM, requires dataframe d (with columns `Sample ID`, `Wavelength (nm)`, Absorbance) and wavelenth of interest
+DOMboxplotter <- function(d, wavelength){
+  #define the wavelength of interest
+  wavelength_of_interest <- wavelength
+  #filter data to extract absorbance at wavelength of interest
+  abs <- d %>%
+    filter(`Wavelength (nm)` == wavelength_of_interest) %>% #filter for specific wavelength
+    select(`Sample ID`, Absorbance) #select the relevant columns
+  
+  #add in habitat and vegetation factors
+  abs$Site <- c(rep("Whiteside",20), rep("Haweswater",20), rep("Widdybanks",20), rep("Brimham Rocks",20), rep("Scarth Wood",20), rep("Bridestones",20))
+  
+  abs$Vegetation <- c(rep("Bracken",10), rep("Heathland", 10),rep("Bracken",10), rep("Heathland", 10),rep("Bracken",10), rep("Heathland", 10),rep("Bracken",10), rep("Heathland", 10),rep("Bracken",10), rep("Heathland", 10),rep("Bracken",10), rep("Heathland", 10))
+  
+  abs <- as.data.frame(abs)
+  
+  #rename Nonbracken so that it is plotted first, and bracken second
+#  abs$Vegetation[abs$Vegetation == 'Non-Bracken'] <- ''
+  #create string for y axis label
+  yaxis_label <- paste("Absorbance at ", wavelength_of_interest, "nm")
+  
+  
+  #plot absorbance
+  abs_bxp <- ggboxplot(abs, x = "Site", y = 'Absorbance', color = "Vegetation", palette = c("limegreen", "#AA4499"), lwd = 0.75)  +
+    labs(x = "Site",
+         y = yaxis_label) + theme(
+           # Remove panel border
+           panel.border = element_blank(),  
+           # Remove panel grid lines
+           panel.grid.major = element_blank(),
+           panel.grid.minor = element_blank(),
+           # Remove panel background
+           panel.background = element_blank(),
+           # Add axis line
+           axis.line = element_line(colour = "black", linewidth = 0.75),
+           #change colour and thickness of axis ticks
+           axis.ticks = element_line(colour = "black", linewidth = 0.5),
+           #change axis labels colour
+           axis.title.x = element_text(colour = "black", face = "bold"),
+           axis.title.y = element_text(colour = "black", face = "bold"),
+           #change tick labels colour
+           axis.text.x = element_text(colour = "black", face = "bold"),
+           axis.text.y = element_text(colour = "black", face = "bold"),
+         ) 
+  
+  show(abs_bxp)
+  #create file name for our plot.  Use paste0 so there are no spaces between each item in the list
+  filename <- paste0(Sys.Date(), "_absorbance_at_", wavelength_of_interest, ".svg")
+  #save our plot.  As this is a function, we need specify the entire file path
+  ggsave(path = "C:/Users/jakef/Documents/York/Project 2 Analysis/project-2/figures", filename, abs_bxp)
+  
+  #statistical analysis
+  #nested anova
+  anova <- aov(abs$Absorbance ~ abs$Site / factor(abs$Vegetation))
+  print(wavelength_of_interest)
+  summary(anova)
+  #tukey's test to identify significant interactions
+  tukey <- TukeyHSD(anova)
+  print(tukey)
+  
+}
+#plot the absorbance boxplot at the following given wavelengths
+for (wavelength in wavelength_of_interest){
+  DOMboxplotter(d, wavelength)
+}
