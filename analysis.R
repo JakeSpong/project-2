@@ -12,6 +12,7 @@ library(car) #for levene test
 library(dataspice) #for creating metadata files
 library(multcompView) #for significant difference letters
 library(gitcreds)
+library(broom)
 
 #### Plot a map of our sample locations ----
 
@@ -218,4 +219,124 @@ plot(anova, 2)
 aov_residuals <- residuals(object = anova)
 #run shapiro-wilk test.  if p > 0.05 the data is normal
 shapiro.test(x = aov_residuals)
+
+
+
+#### Soil DOM Quality Data formatting ----
+
+#load the raw data
+d <- readr::read_csv(
+  here::here("data-raw", "project-2-data-master", "individual", "3) Undiluted DOM Spectra.csv")
+) 
+#transpose the dataframe, and convert to matrix
+d <- as.data.frame(t(d))
+# Set the first row as column names
+colnames(d) <- as.character(d[1, ])
+# Remove the first row from the dataframe
+d <- d[-1, ]
+#make a column containg the sample ID names
+# Assuming your dataframe is named 'df'
+d <- cbind(`Sample ID` = rownames(d), d)
+#reset the row names to default
+rownames(d) <- NULL
+#order samples by ID alphabetically
+d <- arrange(d, d["Sample ID"])
+#add character to column names else we can't covnert from wide to long
+# adding suffix to column names  
+colnames(d) <- paste("new",sep="_",colnames(d)) 
+#convert the numbers (which are datatype character for some reason) to integers
+d[,2:582] <- sapply(d[,2:582],as.numeric)
+#add wavelength (nm) as a column
+d_long <- pivot_longer(d, cols = new_220:new_800, names_to = "Wavelength (nm)", values_to = "Absorbance")
+#remove the characters we added so we can plot the data
+d_long$`Wavelength (nm)` <- gsub("new_","",d_long$`Wavelength (nm)`)
+colnames(d_long)[1] <- "Sample ID"
+#convert the wavelength numbers (which are datatype character for some reason) to integers
+d_long[,2] <- sapply(d_long[,2],as.numeric)
+#save our processed data file
+write.csv(d_long, "4) Processed Undiluted DOM Spectra.csv", row.names =FALSE)
+
+#### Soil DOM Quality Data Analysis ----
+
+#read in the processed absorbance data
+d <- readr::read_csv(
+  here::here("data", "4) Processed Undiluted DOM Spectra.csv")
+) 
+#eliminate all absorbance values above 600 nm
+d <- d %>% filter(`Wavelength (nm)`<= 600)
+
+#let's remove all rows which have an absorbance value <= to 0, just to see if this makes the code work
+#eliminate all absorbance values above 600 nm
+d <- d %>% filter(`Absorbance` > 0)
+
+# Fit a two-component exponential decay curve through the data for all our curves
+fitted <- d %>%
+  nest(-`Sample ID`) %>%
+  mutate(
+    fit = map(data, ~nls(Absorbance ~ SSasymp(`Wavelength (nm)`, yf, y0, log_alpha), data = .)),
+    tidied = map(fit, tidy),
+    augmented = map(fit, augment),
+  )
+
+# Produce a table of fit parameters: y0, yf, alpha
+table <- fitted %>% 
+  unnest(tidied) %>% 
+  select(`Sample ID`, term, estimate) %>% 
+  spread(term, estimate) %>% 
+  mutate(alpha = exp(log_alpha))
+#display table of fit parameters
+table
+#plot each absorbance curve along with the line of best fit
+augmented <- fitted %>% 
+  unnest(augmented)
+qplot(`Wavelength (nm)`, Absorbance, data = augmented, geom = 'point', colour = `Sample ID`) +
+  geom_line(aes(y=.fitted))
+#add columns to our new table
+table$Site <- c(rep("Brimham Rocks",20), rep("Bridestones",20), rep("Haweswater",20), rep("Scarth Wood",20), rep("Widdybanks",20), rep("Whiteside",20))
+
+table$Vegetation <- c(rep("Bracken",10), rep("Heather", 10), rep("Bracken",10), rep("Heather", 10),rep("Bracken",10), rep("Heather", 10),rep("Bracken",10), rep("Heather", 10),rep("Bracken",10), rep("Heather", 10),rep("Bracken",10), rep("Heather", 10))
+
+#save our processed data file
+write.csv(table, "5) alpha paramater of DOM curve fitting.csv", row.names =FALSE)
+
+#read in the processed absorbance data
+table <- readr::read_csv(
+  here::here("data", "5) e2w alpha paramater of DOM curve fitting.csv")) 
+
+#boxplot the alpha, which describes the curve ie how quicky we go from low wavelength (high mass C compounds) to high wavelength (low mass C compounds)
+alpha_bxp <- ggboxplot(table, x = "Site", y = 'alpha', color = "Vegetation", palette = c("black", "limegreen"), lwd = 0.75)  +
+  labs(x = "Habitat x Vegetation",
+       y = "DOM fitted curve alpha parameter") + theme(
+         # Remove panel border
+         panel.border = element_blank(),  
+         # Remove panel grid lines
+         panel.grid.major = element_blank(),
+         panel.grid.minor = element_blank(),
+         # Remove panel background
+         panel.background = element_blank(),
+         # Add axis line
+         axis.line = element_line(colour = "black", linewidth = 0.75),
+         #change colour and thickness of axis ticks
+         axis.ticks = element_line(colour = "black", linewidth = 0.5),
+         #change axis labels colour
+         axis.title.x = element_text(colour = "black", face = "bold"),
+         axis.title.y = element_text(colour = "black", face = "bold"),
+         #change tick labels colour
+         axis.text.x = element_text(colour = "black", face = "bold"),
+         axis.text.y = element_text(colour = "black", face = "bold"),
+       ) 
+show(alpha_bxp)
+
+#save our plot
+ggsave(path = "C:/Users/jakef/Documents/York/Project 2 Analysis/project-2/figures", paste0(Sys.Date(), "_DOM-curve-alpha-paramter_black-green.svg"), alpha_bxp)
+
+
+
+#nested anova
+anova <- aov(table$alpha ~ table$Site / factor(table$Vegetation))
+
+summary(anova)
+#tukey's test to identify significant interactions
+tukey <- TukeyHSD(anova)
+print(tukey)
 
