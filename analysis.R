@@ -338,6 +338,38 @@ summary(anova)
 tukey <- TukeyHSD(anova)
 print(tukey)
 
+#now plot the DOM fitted curve alpha parameter against longitude
+
+individual <- readr::read_csv(
+  here::here("data", "all-sites_field-data.csv"), show_col_types = FALSE
+) 
+#rename the common column
+colnames(individual)[1] <- "Sample ID"
+#replqce BRM with BHM
+individual$`Sample ID` <- gsub("BRM", "BHM", individual$`Sample ID`)
+
+# copy "LongitudeE" over to the "table" dataframe
+result <- merge(table, individual[, c("Sample ID", "LongitudeE")], by = "Sample ID", all.x = TRUE)
+
+# Create the scatterplot with a linear regression line
+scatter <- ggplot(result, aes(x = `LongitudeE`, y = `alpha`)) +
+  geom_point() +                            # Scatterplot points
+  geom_smooth(method = "lm", se = FALSE) +   # Linear regression line
+  labs(x = "Longitude",
+       y = "DOM fitted curve alpha parameter") +
+  theme_minimal()                            # Minimal theme for better aesthetics
+
+#save our plot
+ggsave(path = "C:/Users/jakef/Documents/York/Project 2 Analysis/project-2/figures", paste0(Sys.Date(), "_longitude-vs-DOM-curve-alpha-paramter.svg"), scatter)
+
+# Fit a linear model to the data
+model <- lm(alpha ~ LongitudeE, data = result)
+# Get the summary of the model
+summary_model <- summary(model)
+# Extract the R-squared value
+r_squared <- summary_model$r.squared
+# Print the R-squared value
+print(r_squared)
 
 #### DOM Specific Wavelength of Interest boxplots ----
 
