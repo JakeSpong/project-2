@@ -459,3 +459,112 @@ averaged_df <- d %>%
   summarise(`NPOC (mg/l)` = mean(`NPOC [mg/l]`), `TNb (mg/l)` = mean(`TNb [mg/l]`) )
 #save our processed data file.  Once we have the data for all samples, we can pool into one file and add Site and Vegetation columns
 write.csv(averaged_df, file =  "C:/Users/jakef/Documents/York/Project 2 Analysis/project-2/data/6) Averaged-WHI-HAWB-TOC-Data.csv", row.names =FALSE)
+
+#### DOM Quantity Data Analysis ----
+d <- readr::read_csv(
+  here::here("data", "10) Averaged-TOC-Data.csv"))
+  
+#boxplot the data. Use aes() with backticks (``) so avoid an error with our column name
+dom_bxp <- ggboxplot(d, x = "Site", aes(y = `NPOC (mg/l)`), color = "Vegetation", palette = c("limegreen", "#AA4499"), lwd = 0.75)  + 
+  labs(x = "Site",
+       y = "NPOC (mg/l)") + theme(
+         # Remove panel border
+         panel.border = element_blank(),  
+         # Remove panel grid lines
+         panel.grid.major = element_blank(),
+         panel.grid.minor = element_blank(),
+         # Remove panel background
+         panel.background = element_blank(),
+         # Add axis line
+         axis.line = element_line(colour = "black", linewidth = 0.75),
+         #change colour and thickness of axis ticks
+         axis.ticks = element_line(colour = "black", linewidth = 0.5),
+         #change axis labels colour
+         axis.title.x = element_text(colour = "black", face = "bold"),
+         axis.title.y = element_text(colour = "black", face = "bold"),
+         #change tick labels colour
+         axis.text.x = element_text(colour = "black", face = "bold"),
+         axis.text.y = element_text(colour = "black", face = "bold"),
+       ) 
+
+show(dom_bxp)  
+#save our plot
+ggsave(path = "figures", paste0(Sys.Date(), "_DOM.svg"), width = 10, height= 5, dom_bxp)
+
+
+#nested anova
+anova <- aov(d$`NPOC (mg/l)` ~ d$Site / factor(d$Vegetation))
+summary(anova)
+#tukey's test to identify significant interactions
+tukey <- TukeyHSD(anova)
+print(tukey)
+#compact letter display
+print(cld)
+
+
+#check homogeneity of variance
+plot(anova, 1)
+#levene test.  if p value < 0.05, there is evidence to suggest that the variance across groups is statistically significantly different.
+leveneTest(d$`NPOC (mg/l)` ~ d$Vegetation*d$Site)
+#check normality.  
+plot(anova, 2)
+#conduct shapiro-wilk test on ANOVA residuals to test for normality
+#extract the residuals
+aov_residuals <- residuals(object = anova)
+#run shapiro-wilk test.  if p > 0.05 the data is normal
+shapiro.test(x = aov_residuals)
+
+#### TNb Quantity Data Analysis ----
+d <- readr::read_csv(
+  here::here("data", "10) Averaged-TOC-Data.csv"))
+
+#boxplot the data. Use aes() with backticks (``) so avoid an error with our column name
+tnb_bxp <- ggboxplot(d, x = "Site", aes(y = `TNb (mg/l)`), color = "Vegetation", palette = c("limegreen", "#AA4499"), lwd = 0.75)  + 
+  labs(x = "Site",
+       y = "TNb (mg/l)") + theme(
+         # Remove panel border
+         panel.border = element_blank(),  
+         # Remove panel grid lines
+         panel.grid.major = element_blank(),
+         panel.grid.minor = element_blank(),
+         # Remove panel background
+         panel.background = element_blank(),
+         # Add axis line
+         axis.line = element_line(colour = "black", linewidth = 0.75),
+         #change colour and thickness of axis ticks
+         axis.ticks = element_line(colour = "black", linewidth = 0.5),
+         #change axis labels colour
+         axis.title.x = element_text(colour = "black", face = "bold"),
+         axis.title.y = element_text(colour = "black", face = "bold"),
+         #change tick labels colour
+         axis.text.x = element_text(colour = "black", face = "bold"),
+         axis.text.y = element_text(colour = "black", face = "bold"),
+       ) 
+
+show(tnb_bxp)  
+#save our plot
+ggsave(path = "figures", paste0(Sys.Date(), "_TNb.svg"), width = 10, height= 5, dom_bxp)
+
+
+#nested anova
+anova <- aov(d$`TNb (mg/l)` ~ d$Site / factor(d$Vegetation))
+summary(anova)
+#tukey's test to identify significant interactions
+tukey <- TukeyHSD(anova)
+print(tukey)
+#compact letter display
+print(cld)
+
+
+#check homogeneity of variance
+plot(anova, 1)
+#levene test.  if p value < 0.05, there is evidence to suggest that the variance across groups is statistically significantly different.
+leveneTest(d$`TNb (mg/l)` ~ d$Vegetation*d$Site)
+#check normality.  
+plot(anova, 2)
+#conduct shapiro-wilk test on ANOVA residuals to test for normality
+#extract the residuals
+aov_residuals <- residuals(object = anova)
+#run shapiro-wilk test.  if p > 0.05 the data is normal
+shapiro.test(x = aov_residuals)
+
