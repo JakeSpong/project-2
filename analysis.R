@@ -448,3 +448,5 @@ DOMboxplotter <- function(d, wavelength){
 for (wavelength in wavelength_of_interest){
   DOMboxplotter(d, wavelength)
 }
+
+#### DOM Quantity Data Formatting ----
