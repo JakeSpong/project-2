@@ -451,14 +451,14 @@ for (wavelength in wavelength_of_interest){
 
 #### DOM Quantity Data Formatting ----
 d <- readr::read_csv(
-  here::here("data-raw", "project-2-data-master", "individual", "4) 2025-01-16_WHI-HAWB_Jake-Vario-TOC.csv")
+  here::here("data-raw", "project-2-data-master", "individual", "Project-2_all-sites_Jake-Vario-TOC.csv")
 ) 
 # Group by 'Sample ID' and calculate the mean of 'concentration', putting the output in a new dataframe
 averaged_df <- d %>%
   group_by(`Sample ID`) %>%
   summarise(`NPOC (mg/l)` = mean(`NPOC [mg/l]`), `TNb (mg/l)` = mean(`TNb [mg/l]`) )
 #save our processed data file.  Once we have the data for all samples, we can pool into one file and add Site and Vegetation columns
-write.csv(averaged_df, file =  "C:/Users/jakef/Documents/York/Project 2 Analysis/project-2/data/6) Averaged-WHI-HAWB-TOC-Data.csv", row.names =FALSE)
+write.csv(averaged_df, file =  "C:/Users/jakef/Documents/York/Project 2 Analysis/project-2/data/6) Averaged-TOC-Data.csv", row.names =FALSE)
 
 #### DOM Quantity Data Analysis ----
 d <- readr::read_csv(
