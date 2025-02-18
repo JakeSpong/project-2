@@ -1,6 +1,6 @@
 usethis::use_git()
 
-## Setup ----
+3## Setup ----
 # Load libraries
 library(nlme)
 library(dplyr) #for manipulating data
@@ -450,24 +450,40 @@ for (wavelength in wavelength_of_interest){
 }
 
 #### DOM Quantity Data Formatting ----
+#read in the raw data
 d <- readr::read_csv(
-  here::here("data-raw", "project-2-data-master", "individual", "Project-2_all-sites_Jake-Vario-TOC.csv")
+  here::here("data-raw", "project-2-data-master", "individual", "04) Project-2_all-sites_Vario-TOC.csv")
 ) 
 # Group by 'Sample ID' and calculate the mean of 'concentration', putting the output in a new dataframe
 averaged_df <- d %>%
-  group_by(`Sample ID`) %>%
+  group_by(`Name`) %>%
   summarise(`NPOC (mg/l)` = mean(`NPOC [mg/l]`), `TNb (mg/l)` = mean(`TNb [mg/l]`) )
+#change the name of column 1
+names(averaged_df)[1] <- "Sample ID"
+
 #save our processed data file.  Once we have the data for all samples, we can pool into one file and add Site and Vegetation columns
 write.csv(averaged_df, file =  "C:/Users/jakef/Documents/York/Project 2 Analysis/project-2/data/6) Averaged-TOC-Data.csv", row.names =FALSE)
+#in this spreadsheet, standardize all sample names and add in the Site and Vegetation columns, and save it as 7) Formatted-Averaged-TOC-Data.csv
 
-#### DOM Quantity Data Analysis ----
+#### WEOC and TNb Quantity Data Analysis ----
+#read in the formatted data
 d <- readr::read_csv(
-  here::here("data", "10) Averaged-TOC-Data.csv"))
-  
+  here::here("data", "7) Formatted-Averaged-TOC-Data.csv"))
+#Convert mg per L to mg C per g dry soil
+d_pH <- readr::read_csv(
+  here::here("data-raw", "project-2-data-master", "individual", "2) Soil pH.csv")
+) 
+#add dry soil mass and water added columns from d_pH to d
+d <- merge(d, d_pH[, c("Sample ID", "Soil Mass (g)", "Water added (ml)")], by = "Sample ID", all.x = TRUE)
+#standardise NPOC and TNb by multiplying by volume of extract (in liters), and dividing by grams of dry soil added
+d$`NPOC (mg C g-1)` <- (d$`NPOC (mg/l)`*(d$`Water added (ml)`/1000))/d$`Soil Mass (g)`
+d$`TNb (mg N g-1)` <- (d$`TNb (mg/l)`*(d$`Water added (ml)`/1000))/d$`Soil Mass (g)`
+#reorder the sites so they show up on the plot from west (LHS) to east (RHS)
+d$Site <- factor(d$Site, levels = c("Whiteside", "Haweswater", "Widdybanks", "Brimham Moor", "Scarth Wood Moor", "Bridestones"))
 #boxplot the data. Use aes() with backticks (``) so avoid an error with our column name
-dom_bxp <- ggboxplot(d, x = "Site", aes(y = `NPOC (mg/l)`), color = "Vegetation", palette = c("limegreen", "#AA4499"), lwd = 0.75)  + 
+dom_bxp <- ggboxplot(d, x = "Site", aes(y = `NPOC (mg C g-1)`), color = "Vegetation", palette = c("limegreen", "#AA4499"), lwd = 0.75)  + 
   labs(x = "Site",
-       y = "NPOC (mg/l)") + theme(
+       y = expression("NPOC (mg C g"^-1*")")) + theme(
          # Remove panel border
          panel.border = element_blank(),  
          # Remove panel grid lines
@@ -476,15 +492,15 @@ dom_bxp <- ggboxplot(d, x = "Site", aes(y = `NPOC (mg/l)`), color = "Vegetation"
          # Remove panel background
          panel.background = element_blank(),
          # Add axis line
-         axis.line = element_line(colour = "black", linewidth = 0.75),
+         axis.line = element_line(colour = "black", linewidth = 0.5),
          #change colour and thickness of axis ticks
          axis.ticks = element_line(colour = "black", linewidth = 0.5),
          #change axis labels colour
-         axis.title.x = element_text(colour = "black", face = "bold"),
-         axis.title.y = element_text(colour = "black", face = "bold"),
+         axis.title.x = element_text(colour = "black"),
+         axis.title.y = element_text(colour = "black"),
          #change tick labels colour
-         axis.text.x = element_text(colour = "black", face = "bold"),
-         axis.text.y = element_text(colour = "black", face = "bold"),
+         axis.text.x = element_text(colour = "black"),
+         axis.text.y = element_text(colour = "black"),
        ) 
 
 show(dom_bxp)  
@@ -493,7 +509,7 @@ ggsave(path = "figures", paste0(Sys.Date(), "_DOM.svg"), width = 10, height= 5, 
 
 
 #nested anova
-anova <- aov(d$`NPOC (mg/l)` ~ d$Site / factor(d$Vegetation))
+anova <- aov(d$`NPOC (mg C g-1)` ~ d$Site / factor(d$Vegetation))
 summary(anova)
 #tukey's test to identify significant interactions
 tukey <- TukeyHSD(anova)
@@ -514,14 +530,10 @@ aov_residuals <- residuals(object = anova)
 #run shapiro-wilk test.  if p > 0.05 the data is normal
 shapiro.test(x = aov_residuals)
 
-#### TNb Quantity Data Analysis ----
-d <- readr::read_csv(
-  here::here("data", "10) Averaged-TOC-Data.csv"))
-
 #boxplot the data. Use aes() with backticks (``) so avoid an error with our column name
-tnb_bxp <- ggboxplot(d, x = "Site", aes(y = `TNb (mg/l)`), color = "Vegetation", palette = c("limegreen", "#AA4499"), lwd = 0.75)  + 
+tnb_bxp <- ggboxplot(d, x = "Site", aes(y = `TNb (mg N g-1)`), color = "Vegetation", palette = c("limegreen", "#AA4499"), lwd = 0.75)  + 
   labs(x = "Site",
-       y = "TNb (mg/l)") + theme(
+       y = expression("TNb (mg N g"^-1*")")) + theme(
          # Remove panel border
          panel.border = element_blank(),  
          # Remove panel grid lines
@@ -530,24 +542,24 @@ tnb_bxp <- ggboxplot(d, x = "Site", aes(y = `TNb (mg/l)`), color = "Vegetation",
          # Remove panel background
          panel.background = element_blank(),
          # Add axis line
-         axis.line = element_line(colour = "black", linewidth = 0.75),
+         axis.line = element_line(colour = "black", linewidth = 0.5),
          #change colour and thickness of axis ticks
          axis.ticks = element_line(colour = "black", linewidth = 0.5),
          #change axis labels colour
-         axis.title.x = element_text(colour = "black", face = "bold"),
-         axis.title.y = element_text(colour = "black", face = "bold"),
+         axis.title.x = element_text(colour = "black"),
+         axis.title.y = element_text(colour = "black"),
          #change tick labels colour
-         axis.text.x = element_text(colour = "black", face = "bold"),
-         axis.text.y = element_text(colour = "black", face = "bold"),
+         axis.text.x = element_text(colour = "black"),
+         axis.text.y = element_text(colour = "black"),
        ) 
 
 show(tnb_bxp)  
 #save our plot
-ggsave(path = "figures", paste0(Sys.Date(), "_TNb.svg"), width = 10, height= 5, dom_bxp)
+ggsave(path = "figures", paste0(Sys.Date(), "_TNb.svg"), width = 10, height= 5, tnb_bxp)
 
 
 #nested anova
-anova <- aov(d$`TNb (mg/l)` ~ d$Site / factor(d$Vegetation))
+anova <- aov(d$`TNb (mg N g-1)` ~ d$Site / factor(d$Vegetation))
 summary(anova)
 #tukey's test to identify significant interactions
 tukey <- TukeyHSD(anova)
@@ -559,7 +571,7 @@ print(cld)
 #check homogeneity of variance
 plot(anova, 1)
 #levene test.  if p value < 0.05, there is evidence to suggest that the variance across groups is statistically significantly different.
-leveneTest(d$`TNb (mg/l)` ~ d$Vegetation*d$Site)
+leveneTest(d$`TNb (mg N g-1)` ~ d$Vegetation*d$Site)
 #check normality.  
 plot(anova, 2)
 #conduct shapiro-wilk test on ANOVA residuals to test for normality
