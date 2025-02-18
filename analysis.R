@@ -109,12 +109,15 @@ legend(1.25,-0.65, legend = c("Bracken", "Heather"), fill = c("#117733",  "#AA44
 #### Soil Moisture analysis ----
 #read in the data
 d <- readr::read_csv(
-  here::here("data-raw", "project-2-data-master", "individual", "1) Gravimetric Soil Moisture Content.csv")
+  here::here("data-raw", "project-2-data-master", "individual", "1) Soil Moisture Content.csv")
 ) 
+#order the sites as they should appear on the graph from west to east
+d$Site <- factor(d$Site, levels = c("Whiteside", "Haweswater", "Widdybanks", "Brimham Moor", "Scarth Wood Moor", "Bridestones"))
+
 #boxplot the data. Use aes() with backticks (``) so avoid an error with our column name
-gsmc_bxp <- ggboxplot(d, x = "Site", aes(y = `Gravimetric Soil Moisture Content (%)`), color = "Vegetation", palette = c("limegreen", "#AA4499"), lwd = 0.75)  +
+gsmc_bxp <- ggboxplot(d, x = "Site", aes(y = `Soil Moisture (% fresh soil mass)`), color = "Vegetation", palette = c("limegreen", "#AA4499"), lwd = 0.75)  +
   labs(x = "Site",
-       y = "Gravimetric Soil \n Moisture Content (%)") + theme(
+       y = "Water Content (%)") + theme(
          # Remove panel border
          panel.border = element_blank(),  
          # Remove panel grid lines
@@ -123,24 +126,24 @@ gsmc_bxp <- ggboxplot(d, x = "Site", aes(y = `Gravimetric Soil Moisture Content 
          # Remove panel background
          panel.background = element_blank(),
          # Add axis line
-         axis.line = element_line(colour = "black", linewidth = 0.75),
+         axis.line = element_line(colour = "black", linewidth = 0.5),
          #change colour and thickness of axis ticks
          axis.ticks = element_line(colour = "black", linewidth = 0.5),
          #change axis labels colour
-         axis.title.x = element_text(colour = "black", face = "bold"),
-         axis.title.y = element_text(colour = "black", face = "bold"),
+         axis.title.x = element_text(colour = "black"),
+         axis.title.y = element_text(colour = "black"),
          #change tick labels colour
-         axis.text.x = element_text(colour = "black", face = "bold"),
-         axis.text.y = element_text(colour = "black", face = "bold"),
+         axis.text.x = element_text(colour = "black"),
+         axis.text.y = element_text(colour = "black"),
        ) 
 
 show(gsmc_bxp)  
 #save our plot
-ggsave(path = "figures", paste0(Sys.Date(), "_gravimetric-soil-moisture-content.svg"), width = 10, height= 5, gsmc_bxp)
+ggsave(path = "figures", paste0(Sys.Date(), "_water-content.svg"), width = 10, height= 5, gsmc_bxp)
 
 
 #nested anova
-anova <- aov(d$`Gravimetric Soil Moisture Content (%)` ~ d$Site / factor(d$Vegetation))
+anova <- aov(d$`Soil Moisture (% fresh soil mass)` ~ d$Site / factor(d$Vegetation))
 summary(anova)
 #tukey's test to identify significant interactions
 tukey <- TukeyHSD(anova)
@@ -153,7 +156,7 @@ print(cld)
 #check homogeneity of variance
 plot(anova, 1)
 #levene test.  if p value < 0.05, there is evidence to suggest that the variance across groups is statistically significantly different.
-leveneTest(d$GSMC ~ d$Vegetation*d$Site)
+leveneTest(d$`Soil Moisture (% fresh soil mass)` ~ d$Site / d$Vegetation)
 #check normality.  
 plot(anova, 2)
 #conduct shapiro-wilk test on ANOVA residuals to test for normality
@@ -167,7 +170,9 @@ shapiro.test(x = aov_residuals)
 #### Soil pH analysis ----
 d <- readr::read_csv(
   here::here("data-raw", "project-2-data-master", "individual", "2) Soil pH.csv")
-) 
+)
+#reorder sites
+d$Site <- factor(d$Site, levels = c("Whiteside", "Haweswater", "Widdybanks", "Brimham Moor", "Scarth Wood Moor", "Bridestones"))
 
 
 #boxplot the data. Use aes() with backticks (``) so avoid an error with our column name
@@ -182,15 +187,15 @@ pH_bxp <- ggboxplot(d, x = "Site", aes(y = `pH`), color = "Vegetation", palette 
          # Remove panel background
          panel.background = element_blank(),
          # Add axis line
-         axis.line = element_line(colour = "black", linewidth = 0.75),
+         axis.line = element_line(colour = "black", linewidth = 0.5),
          #change colour and thickness of axis ticks
          axis.ticks = element_line(colour = "black", linewidth = 0.5),
          #change axis labels colour
-         axis.title.x = element_text(colour = "black", face = "bold"),
-         axis.title.y = element_text(colour = "black", face = "bold"),
+         axis.title.x = element_text(colour = "black"),
+         axis.title.y = element_text(colour = "black"),
          #change tick labels colour
-         axis.text.x = element_text(colour = "black", face = "bold"),
-         axis.text.y = element_text(colour = "black", face = "bold"),
+         axis.text.x = element_text(colour = "black"),
+         axis.text.y = element_text(colour = "black"),
        ) 
 
 show(pH_bxp)  
@@ -571,7 +576,7 @@ print(cld)
 #check homogeneity of variance
 plot(anova, 1)
 #levene test.  if p value < 0.05, there is evidence to suggest that the variance across groups is statistically significantly different.
-leveneTest(d$`TNb (mg N g-1)` ~ d$Vegetation*d$Site)
+leveneTest(d$`TNb (mg N g-1)` ~ d$Site / d$Vegetation)
 #check normality.  
 plot(anova, 2)
 #conduct shapiro-wilk test on ANOVA residuals to test for normality
