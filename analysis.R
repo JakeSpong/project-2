@@ -57,6 +57,128 @@ saveWidgetFix <- function (widget,file,...) {
 saveWidget(all_field_sites, file="all_field_sites.html")
 
 #### Alpha diversity analysis of vegetation survey data ----
+#### Load vegetation abundance data
+d <- readr::read_csv(
+  here::here("data", "all-sites_field-data.csv"), show_col_types = FALSE
+) 
+#add in site names
+d$Site <- c(rep("Bridestones",20), rep("Scarth Wood Moor",20), rep("Brimham Moor",20), rep("Haweswater",20), rep("Whiteside", 20), rep("Widdybanks",20))
+#rename "Land" column to "Vegetation"
+names(d)[4] <- "Vegetation"
+#order samples by bracken or heather
+d <- arrange(d, d["Vegetation"])
+#ensure d is a dataframe
+d <- as.data.frame(d)
+#reorder the sites so they show up on the plot from west (LHS) to east (RHS)
+d$Site <- factor(d$Site, levels = c("Whiteside", "Haweswater", "Widdybanks", "Brimham Moor", "Scarth Wood Moor", "Bridestones"))
+#replace null (empty excell cell) with "0"
+d[is.na(d)] <- 0
+#create a subset containing only species abundance values
+#just the species counts
+spe <- d[,-(1:5)]
+spe <- spe[,-(16:18)]
+
+#species richness
+d$richness <- apply(spe[,]>0,1,sum)
+#calculate diversity
+d$shannon <- diversity(spe[,], "shannon")
+d$simpson <- diversity(spe[,], "simpson")
+d$evenness <- d$shannon / log(d$richness)
+
+
+#boxplot of grassland vs heathland, species richness
+richness_bxp <- ggboxplot(d, x = "Site", y = "richness", color = "Vegetation", ylab = "Species Richness", palette = c("limegreen", "#AA4499"), lwd = 0.75) + theme(
+  #remove x axis label
+  axis.title.x=element_blank(),
+  axis.text.x=element_blank(),
+  axis.ticks.x=element_blank(),
+  # Remove panel border
+  panel.border = element_blank(),  
+  # Remove panel grid lines
+  panel.grid.major = element_blank(),
+  panel.grid.minor = element_blank(),
+  # Remove panel background
+  panel.background = element_blank(),
+  # Add axis line
+  axis.line = element_line(colour = "black", linewidth = 0.5),
+  #change colour and thickness of axis ticks
+  axis.ticks = element_line(colour = "black", linewidth = 0.5),
+  #change axis labels colour
+  axis.title.y = element_text(colour = "black"),
+  #change tick labels colour
+  axis.text.y = element_text(colour = "black"),
+) 
+#graphing boxplots with bracken split from nonbracken
+shannon_bxp <-ggboxplot(d, x = "Site", y = "shannon", color = "Vegetation", ylab = "Shannon Diversity", palette = c("limegreen", "#AA4499"), lwd = 0.75) + theme(
+  #remove x axis label
+  axis.title.x=element_blank(),
+  # Remove panel border
+  panel.border = element_blank(),  
+  # Remove panel grid lines
+  panel.grid.major = element_blank(),
+  panel.grid.minor = element_blank(),
+  # Remove panel background
+  panel.background = element_blank(),
+  # Add axis line
+  axis.line = element_line(colour = "black", linewidth = 0.5),
+  #change colour and thickness of axis ticks
+  axis.ticks = element_line(colour = "black", linewidth = 0.5),
+  #change axis labels colour
+  axis.title.y = element_text(colour = "black"),
+  #change tick labels colour
+  axis.text.y = element_text(colour = "black"),
+) 
+#graphing boxplots with bracken split from nonbracken
+simpson_bxp <- ggboxplot(d, x = "Site", y = "simpson", color = "Vegetation", ylab = "Simpson Diversity", palette = c("limegreen", "#AA4499"), lwd = 0.75) + theme(
+  #remove x axis label
+  axis.title.x=element_blank(),
+  # Remove panel border
+  panel.border = element_blank(),  
+  # Remove panel grid lines
+  panel.grid.major = element_blank(),
+  panel.grid.minor = element_blank(),
+  # Remove panel background
+  panel.background = element_blank(),
+  # Add axis line
+  axis.line = element_line(colour = "black", linewidth = 0.5),
+  #change colour and thickness of axis ticks
+  axis.ticks = element_line(colour = "black", linewidth = 0.5),
+  #change axis labels colour
+  axis.title.y = element_text(colour = "black"),
+  #change tick labels colour
+  axis.text.y = element_text(colour = "black"),
+) 
+#boxplot of grassland vs heathland, species richness
+evenness_bxp <- ggboxplot(d, x = "Site", y = "evenness", color = "Vegetation", ylab = "Pielou's Evenness", palette = c("limegreen", "#AA4499"), lwd = 0.75) + theme(
+  #remove x axis label
+  axis.title.x=element_blank(),
+  axis.text.x=element_blank(),
+  axis.ticks.x=element_blank(),
+  # Remove panel border
+  panel.border = element_blank(),  
+  # Remove panel grid lines
+  panel.grid.major = element_blank(),
+  panel.grid.minor = element_blank(),
+  # Remove panel background
+  panel.background = element_blank(),
+  # Add axis line
+  axis.line = element_line(colour = "black", linewidth = 0.5),
+  #change colour and thickness of axis ticks
+  axis.ticks = element_line(colour = "black", linewidth = 0.5),
+  #change axis labels colour
+  axis.title.y = element_text(colour = "black"),
+  #change tick labels colour
+  axis.text.y = element_text(colour = "black"),
+) 
+
+#three sites have only 1 species, meaning the eveness is NaN.  Do we make this 0, or omit as the code is currently doing?
+all_bxp <- ggarrange(richness_bxp, evenness_bxp, shannon_bxp, simpson_bxp, 
+                     labels = c("A", "B", "C", "D"),
+                     ncol = 2, nrow = 2,
+                     common.legend = TRUE)
+show(all_bxp)
+
+
 
 #### Beta diversity analysis of vegetation survey data ----
 #### Load vegetation abundance data
