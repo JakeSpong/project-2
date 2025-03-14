@@ -729,7 +729,7 @@ d <- readr::read_csv(
   here::here("data", "8) drift corrected-C-N.csv")
 ) 
 #trim off empty rows
-d <- d[1:120,1:16]
+d <- d[1:120,1:17]
 
 #order the sites as they should appear on the graph from west to east
 d$Site <- factor(d$Site, levels = c("Whiteside", "Haweswater", "Widdybanks", "Brimham Moor", "Scarth Wood Moor", "Bridestones"))
@@ -788,21 +788,83 @@ shapiro.test(x = aov_residuals)
 
 
 #### Total N ----
+
+d <- readr::read_csv(
+  here::here("data", "8) drift corrected-C-N.csv")
+) 
+#trim off empty rows
+d <- d[1:120,1:17]
+
+#order the sites as they should appear on the graph from west to east
+d$Site <- factor(d$Site, levels = c("Whiteside", "Haweswater", "Widdybanks", "Brimham Moor", "Scarth Wood Moor", "Bridestones"))
+
+#boxplot the data. Use aes() with backticks (``) so avoid an error with our column name
+n_bxp <- ggboxplot(d, x = "Site", aes(y = `Drift Corr N (g per kg)`), color = "Vegetation", palette = c("limegreen", "#AA4499"), lwd = 0.75)  +
+  labs(x = "Site",
+       y = expression("Total Soil Carbon (g kg"^-1*")")) + theme(
+         # Remove panel border
+         panel.border = element_blank(),  
+         # Remove panel grid lines
+         panel.grid.major = element_blank(),
+         panel.grid.minor = element_blank(),
+         # Remove panel background
+         panel.background = element_blank(),
+         # Add axis line
+         axis.line = element_line(colour = "black", linewidth = 0.5),
+         #change colour and thickness of axis ticks
+         axis.ticks = element_line(colour = "black", linewidth = 0.5),
+         #change axis labels colour
+         axis.title.x = element_text(colour = "black"),
+         axis.title.y = element_text(colour = "black"),
+         #change tick labels colour
+         axis.text.x = element_text(colour = "black"),
+         axis.text.y = element_text(colour = "black"),
+       ) 
+
+show(c_bxp)  
+#save our plot
+ggsave(path = "figures", paste0(Sys.Date(), "_total-N.svg"), width = 10, height= 5, n_bxp)
+
+
+#nested anova
+anova <- aov(d$`Drift Corr N (g per kg)` ~ d$Site / factor(d$Vegetation))
+summary(anova)
+#tukey's test to identify significant interactions
+tukey <- TukeyHSD(anova)
+print(tukey)
+#compact letter display
+cld <- multcompLetters4(anova, tukey)
+#compact letter display
+print(cld)
+
+
+#check homogeneity of variance
+plot(anova, 1)
+#levene test.  if p value < 0.05, there is evidence to suggest that the variance across groups is statistically significantly different.
+leveneTest(d$`Drift Corr N (g per kg)` ~ d$Vegetation*d$Site)
+#check normality.  
+plot(anova, 2)
+#conduct shapiro-wilk test on ANOVA residuals to test for normality
+#extract the residuals
+aov_residuals <- residuals(object = anova)
+#run shapiro-wilk test.  if p > 0.05 the data is normal
+shapiro.test(x = aov_residuals)
+
+
 #### C:N ratio ----
 
 d <- readr::read_csv(
   here::here("data", "8) drift corrected-C-N.csv")
 ) 
 #trim off empty rows
-d <- d[1:120,1:16]
+d <- d[1:120,1:17]
 
 #order the sites as they should appear on the graph from west to east
 d$Site <- factor(d$Site, levels = c("Whiteside", "Haweswater", "Widdybanks", "Brimham Moor", "Scarth Wood Moor", "Bridestones"))
 
-d$`C:N ratio` <- d$`N (%)`/d$`C (%)`
 
 #boxplot the data. Use aes() with backticks (``) so avoid an error with our column name
-cn_bxp <- ggboxplot(d, x = "Site", aes(y = `C:N ratio`), color = "Vegetation", palette = c("limegreen", "#AA4499"), lwd = 0.75)  +
+cn_bxp <- ggboxplot(d, x = "Site", aes(y = `CN ratio`), color = "Vegetation", palette = c("limegreen", "#AA4499"), lwd = 0.75)  +
   labs(x = "Site",
        y = expression("C:N Ratio")) + theme(
          # Remove panel border
@@ -830,7 +892,7 @@ ggsave(path = "figures", paste0(Sys.Date(), "_CN_ratio.svg"), width = 10, height
 
 
 #nested anova
-anova <- aov(d$`C:N ratio` ~ d$Site / factor(d$Vegetation))
+anova <- aov(d$`CN ratio` ~ d$Site / factor(d$Vegetation))
 summary(anova)
 #tukey's test to identify significant interactions
 tukey <- TukeyHSD(anova)
