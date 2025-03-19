@@ -1,4 +1,4 @@
-﻿Sample,Site,Vegetation,Datafile,Date,Time,Type,Weight (mg),N (%),C (%),Drift Corr N (%),Drift Corr C (%),Drift Corr N (mg),Drift Corr C (mg),Drift Corr N (g per kg),Drift Corr C (g per kg),CN ratio
+﻿Sample ID,Site,Vegetation,Datafile,Date,Time,Type,Weight (mg),N (%),C (%),Drift Corr N (%),Drift Corr C (%),Drift Corr N (mg),Drift Corr C (mg),Drift Corr N (g per kg),Drift Corr C (g per kg),CN ratio
 BRI-B-1,Bridestones,Bracken,mp20250311_09,11/03/2025,11:26,UNK,5.68,1.216864347,39.1371994,1.308471587,42.02242821,0.074321186,2.386873922,13.08471587,420.2242821,32.1156597
 BRI-B-2,Bridestones,Bracken,mp20250311_10,11/03/2025,11:31,UNK,11.527,0.401852757,10.95605659,0.430422227,11.73510537,0.04961477,1.352705596,4.304222275,117.3510537,27.26417137
 BRI-B-3,Bridestones,Bracken,mp20250311_11,11/03/2025,11:36,UNK,5.689,0.468316376,12.89499664,0.499665371,13.77837031,0.028425963,0.783851487,4.996653715,137.7837031,27.57519551

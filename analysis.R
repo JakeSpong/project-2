@@ -13,6 +13,7 @@ library(dataspice) #for creating metadata files
 library(multcompView) #for significant difference letters
 library(gitcreds)
 library(broom)
+library('FactoMineR') #for PCA visualisation
 
 #### Plot a map of our sample locations ----
 
@@ -591,6 +592,32 @@ for (wavelength in wavelength_of_interest){
   DOMboxplotter(d, wavelength)
 }
 
+#### Save SUVA data ----
+#read in the processed absorbance data
+d <- readr::read_csv(
+  here::here("data", "4) Processed Undiluted DOM Spectra.csv")
+) 
+
+#read in data containing DOM concentration
+d_conc <- readr::read_csv(
+  here::here("data", "7) Formatted-Averaged-TOC-Data.csv"))
+#add the DOM concentration column to our absorbance dataframe
+d <- merge(d, d_conc[, c("Sample ID", "NPOC (mg/l)")], by = "Sample ID", all.x = TRUE)
+#divide absorbance by concentration to standardize the measurements
+d$`SUVA (L mg-1 cm-1)` <- d$Absorbance/d$`NPOC (mg/l)`
+# repeat at wavelengths of 250 (aromaticity, apparent molecular weight), 254 (aromaticity), 260 (hydrophobic C content), 265 (relative abundance of functional groups), 272 (aromaticity), 280 (hydrophobic C content, humification index, apparent molecular size), 285 (humification index), 300 (characterization of humic substances), 340 (colour), 350 (apparent molecular size), 365 (aromaticity, apparent molecular weight), 400 (humic substances characterization), 436 (quality indicator), 465 (relative abundance of functional groups)
+
+#list of wavelengths of interest
+wavelength_of_interest <- list(254)
+
+abs <- d %>%
+  filter(`Wavelength (nm)` == wavelength_of_interest) %>% #filter for specific wavelength
+  select(`Sample ID`, `SUVA (L mg-1 cm-1)`) #select the relevant columns
+
+abs <- as.data.frame(abs)
+
+write.csv(abs, "data/SUVA data.csv")
+
 #### DOM Quantity Data Formatting ----
 #read in the raw data
 d <- readr::read_csv(
@@ -914,3 +941,128 @@ plot(anova, 2)
 aov_residuals <- residuals(object = anova)
 #run shapiro-wilk test.  if p > 0.05 the data is normal
 shapiro.test(x = aov_residuals)
+
+#### generate PCA data file containing all data we need ----
+d <- readr::read_csv(
+  here::here("data", "2025-03-19_PCA-data.csv"), show_col_types = FALSE
+) 
+#add in site names
+d$Site <- c(rep("Bridestones",20), rep("Scarth Wood Moor",20), rep("Brimham Moor",20), rep("Haweswater",20), rep("Whiteside", 20), rep("Widdybanks",20))
+#rename "Land" column to "Vegetation"
+names(d)[4] <- "Vegetation"
+#order samples by bracken or heather
+d <- arrange(d, d["Vegetation"])
+#ensure d is a dataframe
+d <- as.data.frame(d)
+#replace veg data null (empty excell cell) with "0"
+d[is.na(d)] <- 0
+#create a subset containing only species abundance values
+#just the species counts
+spe <- d[,-(1:5)]
+spe <- spe[,-(16:18)]
+#species richness
+d$`Veg. richness` <- apply(spe[,]>0,1,sum)
+#calculate diversity
+d$`Veg. shannon` <- diversity(spe[,], "shannon")
+d$`Veg. simpson` <- diversity(spe[,], "simpson")
+d$`Veg. evenness` <- d$`Veg. shannon` / log(d$`Veg. richness`)
+
+#import moisture data
+d_moisture <- readr::read_csv(
+  here::here("data-raw", "project-2-data-master", "individual", "1) Soil Moisture Content.csv")
+)
+#append the data
+d <- merge(d, d_moisture[, c("Sample ID", "Soil Moisture (% fresh soil mass)")], by = "Sample ID", all.x = TRUE)
+
+#pH data
+d_pH <- readr::read_csv(
+  here::here("data-raw", "project-2-data-master", "individual", "2) Soil pH.csv")
+)
+d <- merge(d, d_pH[, c("Sample ID", "pH")], by = "Sample ID", all.x = TRUE)
+
+#WEOC/TNB data
+d_toc <- readr::read_csv(
+  here::here("data", "7) Formatted-Averaged-TOC-Data.csv"))
+#Convert mg per L to mg C per g dry soil
+#add dry soil mass and water added columns from d_pH to d
+d_toc <- merge(d_toc, d_pH[, c("Sample ID", "Soil Mass (g)", "Water added (ml)")], by = "Sample ID", all.x = TRUE)
+#standardise NPOC and TNb by multiplying by volume of extract (in liters), and dividing by grams of dry soil added
+d_toc$`NPOC (mg C g-1)` <- (d_toc$`NPOC (mg/l)`*(d_toc$`Water added (ml)`/1000))/d_toc$`Soil Mass (g)`
+d_toc$`TNb (mg N g-1)` <- (d_toc$`TNb (mg/l)`*(d_toc$`Water added (ml)`/1000))/d_toc$`Soil Mass (g)`
+#merge the data
+d <- merge(d, d_toc[, c("Sample ID", "NPOC (mg C g-1)")], by = "Sample ID", all.x = TRUE)
+d <- merge(d, d_toc[, c("Sample ID", "TNb (mg N g-1)")], by = "Sample ID", all.x = TRUE)
+
+#total carbon, N, C:N
+d_totc <- readr::read_csv(
+  here::here("data", "8) drift corrected-C-N.csv")) 
+#trim off empty rows
+d_totc <- d_totc[1:120,1:17]
+d <- merge(d, d_totc[, c("Sample ID", "Drift Corr C (g per kg)")], by = "Sample ID", all.x = TRUE)
+d <- merge(d, d_totc[, c("Sample ID", "Drift Corr N (g per kg)")], by = "Sample ID", all.x = TRUE)
+d <- merge(d, d_totc[, c("Sample ID", "CN ratio")], by = "Sample ID", all.x = TRUE)
+
+#WEOC quality alpha parameter
+table <- readr::read_csv(
+  here::here("data", "5) alpha paramater of DOM curve fitting.csv")) 
+d <- merge(d, table[, c("Sample ID", "alpha")], by = "Sample ID", all.x = TRUE)
+
+#SUVA
+suva <- readr::read_csv(
+  here::here("data", "SUVA data.csv")) 
+d <- merge(d, suva[, c("Sample ID", "SUVA (L mg-1 cm-1)")], by = "Sample ID", all.x = TRUE)
+
+#save our master datafile
+write.csv(d, "data/2025-03-19_PCA-data.csv")
+
+#### PCA analysis ----
+d <- readr::read_csv(
+  here::here("data", "2025-03-19_PCA-data.csv"), show_col_types = FALSE
+) 
+numerical_d <- d[,-c(1:5)]
+numerical_d <- d_numerical[, -19]
+numerical_d <- na.omit(numerical_d)
+# Remove columns that are entirely zeros
+numerical_d <- numerical_d[, colSums(numerical_d != 0) > 0]
+
+
+#normalize the data
+data_normalized <- scale(numerical_d)
+#compute the PCA
+pca_result <- prcomp(data_normalized)
+# View the results
+summary(pca_result)  # Summary of the PCA (explained variance, etc.)
+
+# Principal components
+pca_result$x  # The scores (the projections of the original data onto the PCs)
+
+# The loadings (eigenvectors).
+pca_result$rotation  # The loadings (coefficients of the principal components)
+
+# Variance explained by each principal component
+pca_result$sdev^2 / sum(pca_result$sdev^2)  # Proportion of variance explained
+
+
+#needed for fviz_eig() function
+library(factoextra)
+#generate scree plot using fviz_eig() function.  This shows the eigenvalues from highest to lowest, i.e. from the components which explain the most variance to the components which explain the least
+fviz_eig(pca_result, addlabels = TRUE)
+
+
+# Plotting the PCA results (optional)
+# First PC vs. Second PC
+plot(pca_result$x[, 1], pca_result$x[,2], 
+     xlab = "PC1", ylab = "PC2", 
+     main = "PCA - PC1 vs PC2")
+
+
+# Biplot to visualize the PCA results.  We are vizualising the similarities and differences between samples, and shows the impact of each attribute on each of the principal components.  Variables that are grouped together are positively correlated with one another.  The further the distance between the variable and the origin, the better represented the variaible is.  Variables that are negatively correlated are displayed to the opposite side of the biplot's origin.
+biplot(pca_result)
+
+#now determine the variable's contribution to principal components.  This representation is called the Cos2, and corresponds to the square cosine.  A low value means the variable is not perfectly represented by that component, whilst a high value means a good representation of the variable on that component.
+fviz_cos2(pca_result, choice = "var", axes = 1:2)
+
+#combine biplot and attribute importance.  Attributes with similar cos2 scores will have similar colours.
+fviz_pca_var(pca_result, col.var = "cos2", 
+             gradient.cols = c("black", "orange", "green"),
+             repel = TRUE)
