@@ -1,0 +1,121 @@
+Sample ID,Site,Vegetation,SUVA (L mg-1 cm-1)
+BHM-B-1,Brimham Rocks,Bracken,0.031583472
+BHM-B-10,Brimham Rocks,Bracken,0.010237498
+BHM-B-2,Brimham Rocks,Bracken,0.004253034
+BHM-B-3,Brimham Rocks,Bracken,0.022669361
+BHM-B-4,Brimham Rocks,Bracken,0.006818612
+BHM-B-5,Brimham Rocks,Bracken,0.003247365
+BHM-B-6,Brimham Rocks,Bracken,0.010546814
+BHM-B-7,Brimham Rocks,Bracken,0.009878376
+BHM-B-8,Brimham Rocks,Bracken,0.010385276
+BHM-B-9,Brimham Rocks,Bracken,0.011926006
+BHM-H-1,Brimham Rocks,Heath,0.016741934
+BHM-H-10,Brimham Rocks,Heath,0.016683492
+BHM-H-2,Brimham Rocks,Heath,0.00430455
+BHM-H-3,Brimham Rocks,Heath,0.010196517
+BHM-H-4,Brimham Rocks,Heath,0.005438665
+BHM-H-5,Brimham Rocks,Heath,0.006916184
+BHM-H-6,Brimham Rocks,Heath,0.013785159
+BHM-H-7,Brimham Rocks,Heath,0.005866738
+BHM-H-8,Brimham Rocks,Heath,0.002831207
+BHM-H-9,Brimham Rocks,Heath,0.009779858
+BRI-B-1,Bridestones,Bracken,0.003549769
+BRI-B-10,Bridestones,Bracken,0.002766864
+BRI-B-2,Bridestones,Bracken,0.022043149
+BRI-B-3,Bridestones,Bracken,0.006349625
+BRI-B-4,Bridestones,Bracken,0.004529386
+BRI-B-5,Bridestones,Bracken,0.005349172
+BRI-B-6,Bridestones,Bracken,0.006310196
+BRI-B-7,Bridestones,Bracken,0.003326793
+BRI-B-8,Bridestones,Bracken,0.010511389
+BRI-B-9,Bridestones,Bracken,0.004990782
+BRI-H-1,Bridestones,Heath,0.009781839
+BRI-H-10,Bridestones,Heath,0.007394008
+BRI-H-2,Bridestones,Heath,0.006077091
+BRI-H-3,Bridestones,Heath,0.005980434
+BRI-H-4,Bridestones,Heath,0.006419486
+BRI-H-5,Bridestones,Heath,0.013875905
+BRI-H-6,Bridestones,Heath,0.028015183
+BRI-H-7,Bridestones,Heath,0.007090355
+BRI-H-8,Bridestones,Heath,0.003460216
+BRI-H-9,Bridestones,Heath,0.002997221
+HAW-B-1,Haweswater,Bracken,0.003555332
+HAW-B-10,Haweswater,Bracken,0.004305291
+HAW-B-2,Haweswater,Bracken,0.005636914
+HAW-B-3,Haweswater,Bracken,0.003452311
+HAW-B-4,Haweswater,Bracken,0.002528849
+HAW-B-5,Haweswater,Bracken,0.001602259
+HAW-B-6,Haweswater,Bracken,0.004079725
+HAW-B-7,Haweswater,Bracken,0.003980122
+HAW-B-8,Haweswater,Bracken,0.003591396
+HAW-B-9,Haweswater,Bracken,0.003549802
+HAW-H-1,Haweswater,Heath,0.004191519
+HAW-H-10,Haweswater,Heath,0.002454258
+HAW-H-2,Haweswater,Heath,0.006202839
+HAW-H-3,Haweswater,Heath,0.002630807
+HAW-H-4,Haweswater,Heath,0.002048024
+HAW-H-5,Haweswater,Heath,0.003670245
+HAW-H-6,Haweswater,Heath,0.004659059
+HAW-H-7,Haweswater,Heath,0.003397267
+HAW-H-8,Haweswater,Heath,0.001180984
+HAW-H-9,Haweswater,Heath,0.001730329
+SWM-B-1,Scarth Wood Moor,Bracken,0.006567307
+SWM-B-10,Scarth Wood Moor,Bracken,0.010194981
+SWM-B-2,Scarth Wood Moor,Bracken,0.005706894
+SWM-B-3,Scarth Wood Moor,Bracken,0.0093479
+SWM-B-4,Scarth Wood Moor,Bracken,0.005812541
+SWM-B-5,Scarth Wood Moor,Bracken,0.014803505
+SWM-B-6,Scarth Wood Moor,Bracken,0.013372296
+SWM-B-7,Scarth Wood Moor,Bracken,0.007212426
+SWM-B-8,Scarth Wood Moor,Bracken,0.010715309
+SWM-B-9,Scarth Wood Moor,Bracken,0.013318162
+SWM-H-1,Scarth Wood Moor,Heath,0.005558523
+SWM-H-10,Scarth Wood Moor,Heath,0.019120441
+SWM-H-2,Scarth Wood Moor,Heath,0.013409339
+SWM-H-3,Scarth Wood Moor,Heath,0.011035806
+SWM-H-4,Scarth Wood Moor,Heath,0.013392879
+SWM-H-5,Scarth Wood Moor,Heath,0.010590914
+SWM-H-6,Scarth Wood Moor,Heath,0.005861071
+SWM-H-7,Scarth Wood Moor,Heath,0.008364346
+SWM-H-8,Scarth Wood Moor,Heath,0.009942812
+SWM-H-9,Scarth Wood Moor,Heath,0.010435771
+WDY-B-1,Widdybanks,Bracken,0.006377866
+WDY-B-10,Widdybanks,Bracken,0.006297354
+WDY-B-2,Widdybanks,Bracken,0.013647207
+WDY-B-3,Widdybanks,Bracken,0.005705726
+WDY-B-4,Widdybanks,Bracken,0.003051848
+WDY-B-5,Widdybanks,Bracken,0.005825752
+WDY-B-6,Widdybanks,Bracken,0.005380483
+WDY-B-7,Widdybanks,Bracken,0.003072627
+WDY-B-8,Widdybanks,Bracken,0.00506639
+WDY-B-9,Widdybanks,Bracken,0.009113248
+WDY-H-1,Widdybanks,Heath,0.006026718
+WDY-H-10,Widdybanks,Heath,0.006531277
+WDY-H-2,Widdybanks,Heath,0.017529524
+WDY-H-3,Widdybanks,Heath,0.001746588
+WDY-H-4,Widdybanks,Heath,0.004572192
+WDY-H-5,Widdybanks,Heath,0.005355869
+WDY-H-6,Widdybanks,Heath,0.007903267
+WDY-H-7,Widdybanks,Heath,0.001185016
+WDY-H-8,Widdybanks,Heath,0.006298796
+WDY-H-9,Widdybanks,Heath,0.012185142
+WHI-B-1,Whiteside,Bracken,0.003373948
+WHI-B-10,Whiteside,Bracken,0.002886386
+WHI-B-2,Whiteside,Bracken,0.002027285
+WHI-B-3,Whiteside,Bracken,0.002215309
+WHI-B-4,Whiteside,Bracken,0.003273326
+WHI-B-5,Whiteside,Bracken,0.003498331
+WHI-B-6,Whiteside,Bracken,0.005493164
+WHI-B-7,Whiteside,Bracken,0.002240851
+WHI-B-8,Whiteside,Bracken,0.003555259
+WHI-B-9,Whiteside,Bracken,0.00334072
+WHI-H-1,Whiteside,Heath,0.003552855
+WHI-H-10,Whiteside,Heath,0.002011956
+WHI-H-2,Whiteside,Heath,0.002651469
+WHI-H-3,Whiteside,Heath,0.002807099
+WHI-H-4,Whiteside,Heath,0.003479679
+WHI-H-5,Whiteside,Heath,0.002723012
+WHI-H-6,Whiteside,Heath,0.00351205
+WHI-H-7,Whiteside,Heath,0.002791981
+WHI-H-8,Whiteside,Heath,0.003421154
+WHI-H-9,Whiteside,Heath,0.003063794
