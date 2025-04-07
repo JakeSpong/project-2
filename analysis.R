@@ -248,13 +248,13 @@ maps_figure <- ggarrange(bridestones_map, scarthwood_map, brimham_map,          
                          labels = c("A", "B", "C", "D", "E", "F"),
                          ncol = 2, nrow = 3,
                          #the width of each panel of the multifigure plot
-                         widths = c(5,5),
+                         widths = c(7,7),
                          common.legend = TRUE
 )
 #show the plot in the Plots window
 show(maps_figure)
 #save the figure
-ggsave("figures/Maps_panel_figure.svg", plot = last_plot(), width = 7.5, height = 6, dpi = 300)
+#ggsave("figures/Maps_panel_figure.svg", plot = last_plot(), width = 7.5, height = 6, dpi = 300)
 
 
 
