@@ -15,6 +15,108 @@ library(gitcreds)
 library(broom)
 library('FactoMineR') #for PCA visualisation
 
+#### NEw Mapping of Sample Locations ----
+library(ggplot2)
+library(rnaturalearth)
+library(rnaturalearthdata)
+library(sf)
+library(ggmap)
+
+#load the field data
+all_data <- readr::read_csv(
+  here::here("data", "all-sites_field-data.csv"), show_col_types = FALSE
+) 
+
+# Register your Google API key
+register_google(key = "AIzaSyA42ZmX_RGv9dTA7PFy4UR0YIjxW3x0rUE")
+
+# Load the UK map from the rnaturalearth package
+uk_map <- ne_countries(scale = "medium", returnclass = "sf") %>%
+  filter(name == "United Kingdom")
+
+#extract the sample coordinates from the dataframe
+sample_coordinates <- data.frame(
+  Site = all_data$Site,
+  Vegetation = all_data$Vegetation,
+  Longitude = all_data$LongitudeE,
+  Latitude = all_data$LatitudeN
+)
+#the sample coordinates belonging to each site
+bridestones <- sample_coordinates[1:20, ]
+scarthwood <- sample_coordinates[21:40, ]
+brimham <- sample_coordinates[41:60, ]
+haweswater <- sample_coordinates[61:80,]
+whiteside <- sample_coordinates[81:100, ]
+widdybanks <- sample_coordinates[101:120,]
+
+
+
+# Calculate the bounding box surrounding the 30 sample coordinates
+bridestones_longitude_range_sample <- range(bridestones$Longitude)
+bridestones_latitude_range_sample <- range(bridestones$Latitude)
+# Calculate the bounding box surrounding the 30 sample coordinates
+scarthwood_longitude_range_sample <- range(scarthwood$Longitude)
+scarthwood_latitude_range_sample <- range(scarthwood$Latitude)
+# Calculate the bounding box surrounding the 30 sample coordinates
+brimham_longitude_range_sample <- range(brimham$Longitude)
+brimham_latitude_range_sample <- range(brimham$Latitude)
+# Calculate the bounding box surrounding the 30 sample coordinates
+haweswater_longitude_range_sample <- range(haweswater$Longitude)
+haweswater_latitude_range_sample <- range(haweswater$Latitude)
+# Calculate the bounding box surrounding the 30 sample coordinates
+whiteside_longitude_range_sample <- range(whiteside$Longitude)
+whiteside_latitude_range_sample <- range(whiteside$Latitude)
+# Calculate the bounding box surrounding the 30 sample coordinates
+widdybanks_longitude_range_sample <- range(widdybanks$Longitude)
+widdybanks_latitude_range_sample <- range(widdybanks$Latitude)
+
+
+# Plot the UK map with only the bounding box
+UK_Hawes <- ggplot(data = uk_map) +
+  geom_sf(fill = "lightblue") +  # UK map with light blue fill
+  geom_rect(
+    aes(xmin = longitude_range_sample[1], xmax = longitude_range_sample[2], ymin = latitude_range_sample[1], ymax = latitude_range_sample[2]), 
+    color = "red", fill = NA, size = 2) +  # Add bounding box around the points
+  theme_minimal()
+#show the map
+#show(UK_Hawes)
+#save the UK map with Haweswater highlighted
+#ggsave("Figures/UK_Haweswater_boundingbox.svg", width = 8, height = 6)
+
+
+# Get the Google Satellite map for the zoomed-in area based on the 30 sample coordinates
+satellite_map <- get_map(location = c(lon = mean(brimham$Longitude), 
+                                      lat = mean(brimham$Latitude)),
+                         zoom = 15,  # Adjust zoom level for the desired zoom
+                         maptype = "satellite",  # Use the "satellite" map type
+                         source = "google")
+  #plot the map
+brimham_map <- ggmap(satellite_map) +
+  geom_point(data = brimham, aes(x = Longitude, y = Latitude, 
+                                            color = Vegetation, shape = Site), size = 2) +
+  scale_color_manual(values = c("Bracken" = "green", "Heath" = "purple")) +  # Color by habitat
+  scale_shape_manual(values = c("Brimham Moor" = 16)) +  # Shape by site
+  theme_minimal() + 
+  theme(legend.position = "right") 
+#show the map
+#show(sample_coords_map)
+# Save the final map to a file
+ggsave("figures/brimham_ample_locations.svg", plot = last_plot(), width = 7.5, height = 6, dpi = 300)
+
+
+#combine the two maps into a single figure
+maps_figure <- ggarrange(UK_Hawes, sample_coords_map, 
+                         labels = c("A", "B"),
+                         ncol = 2, nrow = 1,
+                         #the width of each panel of the multifigure plot
+                         widths = c(2,5))
+#show the plot in the Plots window
+#show(maps_figure)
+#save the figure
+#ggsave("Figures/Maps_panel_figure.svg", plot = last_plot(), width = 7.5, height = 6, dpi = 300)
+
+
+
 #### Plot a map of our sample locations ----
 
 library(leaflet)
