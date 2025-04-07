@@ -524,7 +524,7 @@ d$`Standardized Absorbance` <- d$Absorbance/d$`NPOC (mg/l)`
 # repeat at wavelengths of 250 (aromaticity, apparent molecular weight), 254 (aromaticity), 260 (hydrophobic C content), 265 (relative abundance of functional groups), 272 (aromaticity), 280 (hydrophobic C content, humification index, apparent molecular size), 285 (humification index), 300 (characterization of humic substances), 340 (colour), 350 (apparent molecular size), 365 (aromaticity, apparent molecular weight), 400 (humic substances characterization), 436 (quality indicator), 465 (relative abundance of functional groups)
 
 #list of wavelengths of interest
-wavelength_of_interest <- list(250, 254, 260, 265, 272, 280, 285, 300, 340, 350, 365, 400, 436, 465)
+wavelength_of_interest <- list(254)#list(250, 254, 260, 265, 272, 280, 285, 300, 340, 350, 365, 400, 436, 465)
 
 
 #function to plot data for DOM, requires dataframe d (with columns `Sample ID`, `Wavelength (nm)`, Absorbance, Standardized Absorbance) and wavelenth of interest
@@ -617,6 +617,37 @@ abs <- d %>%
 abs <- as.data.frame(abs)
 
 write.csv(abs, "data/SUVA data.csv")
+
+#### SUVA data analysis ----
+d <- readr::read_csv(
+  here::here("data", "SUVA data_all-factors.csv")
+) 
+#nested anova
+anova <- aov(d$`SUVA (L mg-1 cm-1)` ~ d$Site / factor(d$Vegetation))
+summary(anova)
+#tukey's test to identify significant interactions
+tukey <- TukeyHSD(anova)
+print(tukey)
+#compact letter display
+cld <- multcompLetters4(anova, tukey)
+#compact letter display
+print(cld)
+
+#### Alpha parameter analysis ----
+d <- readr::read_csv(
+  here::here("data", "5) alpha paramater of DOM curve fitting.csv")
+) 
+#nested anova
+anova <- aov(d$`alpha` ~ d$Site / factor(d$Vegetation))
+summary(anova)
+#tukey's test to identify significant interactions
+tukey <- TukeyHSD(anova)
+print(tukey)
+#compact letter display
+cld <- multcompLetters4(anova, tukey)
+#compact letter display
+print(cld)
+
 
 #### DOM Quantity Data Formatting ----
 #read in the raw data
@@ -828,7 +859,7 @@ d$Site <- factor(d$Site, levels = c("Whiteside", "Haweswater", "Widdybanks", "Br
 #boxplot the data. Use aes() with backticks (``) so avoid an error with our column name
 n_bxp <- ggboxplot(d, x = "Site", aes(y = `Drift Corr N (g per kg)`), color = "Vegetation", palette = c("limegreen", "#AA4499"), lwd = 0.75)  +
   labs(x = "Site",
-       y = expression("Total Soil Carbon (g kg"^-1*")")) + theme(
+       y = expression("Total Soil Nitrogen (g kg"^-1*")")) + theme(
          # Remove panel border
          panel.border = element_blank(),  
          # Remove panel grid lines
@@ -848,7 +879,7 @@ n_bxp <- ggboxplot(d, x = "Site", aes(y = `Drift Corr N (g per kg)`), color = "V
          axis.text.y = element_text(colour = "black"),
        ) 
 
-show(c_bxp)  
+show(n_bxp)  
 #save our plot
 ggsave(path = "figures", paste0(Sys.Date(), "_total-N.svg"), width = 10, height= 5, n_bxp)
 
