@@ -2568,6 +2568,179 @@ fviz_pca_var(pca_result, col.var = "cos2",
              repel = TRUE)
 
 
+#### Invertebrate catch percetnage breakdown  and standardozed abundances ----
+d <- readr::read_csv(
+  here::here("data", "Tullgren Extracts - Week 1 + 2 Extracts.csv")
+) 
+
+#order samples by ID alphabetically
+d <- arrange(d, d["Sample ID"])
+d <- as.data.frame(d)
+#replace null (empty excell cell) with "0"
+d[is.na(d)] <- 0
+#order the sites as they should appear on the graph from west to east
+d$Site <- factor(d$Site, levels = c("Whiteside", "Haweswater", "Widdybanks", "Brimham Rocks", "Scarth Wood Moor", "Bridestones"))
+#total mesofauna abundances
+d$`Total Mesofauna Catch`<- rowSums(d[,4:11])
+#total invertebrate abundances
+d$`Total Invertebrate Catch`<- rowSums(d[,4:23])
+
+
+print(sum(d$`Total Mesofauna Catch`))
+print(sum(d$`Total Invertebrate Catch`))
+
+#get percentages of mites/springtails of all morphospecies
+d$`Percentage Mites` = ((d$Mesostigmata + d$Oribatida + d$Astigmatina + d$Prostigmata)/(d$`Total Invertebrate Catch`))*100
+d$`Percentage Collembola` = ((d$Symphypleona + d$Neelidae + d$Entomobryomorpha + d$Poduromorpha)/d$`Total Invertebrate Catch`)*100
+
+#we are printing multiple lines so use cat()
+cat("Min mite percentage: ", min(d$`Percentage Mites`), "Max mite percentage: ", max(d$`Percentage Mites`),"Min collembola percentage: ", min(d$`Percentage Collembola`), "Max collembola percentage: ", max(d$`Percentage Collembola`))
+
+#standardize abundances to standard depth
+#extract the morphospecies count data
+#volume of the soil corer
+volume <- 0.1 * (pi*(0.025^2))
+d$CoreVolume <- volume
+#number of mesofauna per m3, to a depth of 10cm
+d$`1000s Individuals per m2 to 10 cm depth` <- ((d$`Total Mesofauna Catch`/d$CoreVolume)*0.1)/1000
+#plot abundances
+
+library(scales) # displays 100,000 as 100,000, not as 1e5
+
+figure <- ggboxplot(d, x = "Site", y = '1000s Individuals per m2 to 10 cm depth', color = "Vegetation", palette = c("limegreen", "#AA4499"), lwd = 0.75)  +
+  labs(y = expression("1000 individuals per m"^2*" soil (to 10 cm depth)")) + theme( #remove x axis label
+    axis.title.x=element_blank(),
+    # Remove panel border
+    panel.border = element_blank(),  
+    # Remove panel grid lines
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    # Remove panel background
+    panel.background = element_blank(),
+    # Add axis line
+    axis.line = element_line(colour = "black", linewidth = 0.5),
+    #change colour and thickness of axis ticks
+    axis.ticks = element_line(colour = "black", linewidth = 0.5),
+    #change axis labels colour
+    axis.title.y = element_text(colour = "black"),
+    #change tick labels colour
+    axis.text.y = element_text(colour = "black"),
+    legend.title = element_blank()
+  ) + scale_y_continuous(labels = label_comma())
+
+#display our plot
+figure
+
+
+ggsave(path = "figures", paste0(Sys.Date(), "_mesofauna_abundance_per_m2_to_10cm_depth.svg"), width = 10, height= 5, figure)
+
+
+
+#Type 1 two-way anova using data from all sites
+anova <- aov(d$`1000s Individuals per m2 to 10 cm depth` ~ d$Vegetation*d$Site)
+summary(anova)
+#tukey's test to identify significant interactions
+tukey <- TukeyHSD(anova)
+print(tukey)
+#compact letter display
+cld <- multcompLetters4(anova, tukey)
+print(cld)
+
+#check homogeneity of variance
+plot(anova, 1)
+#levene test.  if p value < 0.05, there is evidence to suggest that the variance across groups is statistically significantly different.
+leveneTest(d$`1000s Individuals per m2 to 10 cm depth` ~ d$Vegetation*d$Site)
+#check normality.  
+plot(anova, 2)
+#conduct shapiro-wilk test on ANOVA residuals to test for normality
+#extract the residuals
+aov_residuals <- residuals(object = anova)
+#run shapiro-wilk test.  if p > 0.05 the data is normal
+shapiro.test(x = aov_residuals)
+
+#now analyse at each site
+
+#Bridestones
+bri <- d[(21:40),]
+#Type 1 two-way anova using data from all sites
+anova <- aov(bri$`SUVA (L mg-1 cm-1)` ~ bri$Vegetation)
+summary(anova)
+#tukey's test to identify significant interactions
+tukey <- TukeyHSD(anova)
+#print(tukey)
+#compact letter display
+cld <- multcompLetters4(anova, tukey)
+#compact letter display
+print(cld)
+#Scarth Wood Moor
+swm <- d[(61:80),]
+#Type 1 two-way anova using data from all sites
+anova <- aov(swm$`SUVA (L mg-1 cm-1)` ~ swm$Vegetation)
+summary(anova)
+#tukey's test to identify significant interactions
+tukey <- TukeyHSD(anova)
+#print(tukey)
+#compact letter display
+cld <- multcompLetters4(anova, tukey)
+#compact letter display
+print(cld)
+#Brimham
+bhm <- d[(1:20),]
+#Type 1 two-way anova using data from all sites
+anova <- aov(bhm$`SUVA (L mg-1 cm-1)` ~ bhm$Vegetation)
+summary(anova)
+#tukey's test to identify significant interactions
+tukey <- TukeyHSD(anova)
+#print(tukey)
+#compact letter display
+cld <- multcompLetters4(anova, tukey)
+#compact letter display
+print(cld)
+#Widdybanks
+wdy <- d[(81:100),]
+#Type 1 two-way anova using data from all sites
+anova <- aov(wdy$`SUVA (L mg-1 cm-1)`~ wdy$Vegetation)
+summary(anova)
+#tukey's test to identify significant interactions
+tukey <- TukeyHSD(anova)
+#print(tukey)
+#compact letter display
+cld <- multcompLetters4(anova, tukey)
+#compact letter display
+print(cld)
+#Haweswater
+haw <- d[(41:60),]
+#Type 1 two-way anova using data from all sites
+anova <- aov(haw$`SUVA (L mg-1 cm-1)` ~ haw$Vegetation)
+summary(anova)
+#tukey's test to identify significant interactions
+tukey <- TukeyHSD(anova)
+#print(tukey)
+#compact letter display
+cld <- multcompLetters4(anova, tukey)
+#compact letter display
+print(cld)
+#Whiteside
+whi <- d[(101:120),]
+#Type 1 two-way anova using data from all sites
+anova <- aov(whi$`SUVA (L mg-1 cm-1)` ~ whi$Vegetation)
+summary(anova)
+#tukey's test to identify significant interactions
+tukey <- TukeyHSD(anova)
+#print(tukey)
+#compact letter display
+cld <- multcompLetters4(anova, tukey)
+#compact letter display
+print(cld)
+
+
+#also standardize per dry mass soil
+d_moisture <- readr::read_csv(
+  here::here("data-raw", "project-2-data-master", "individual", "1) Soil Moisture Content.csv")
+) 
+#read in data for wet mass of tullgren soil - or did we note down dry?
+
+
 #### Week 1 + 2 alpha diversity metrics ----
 d <- readr::read_csv(
   here::here("data", "Tullgren Extracts - Week 1 + 2 Extracts.csv")
@@ -2585,6 +2758,7 @@ d$`Total Invertebrate Catch`<- rowSums(d[,4:23])
 d$`Mesofauna Shannon` <- diversity(d[,4:11], "shannon")
 #simpson diversity of the 8 mesofauna groups
 d$`Mesofauna Simpson` <- diversity(d[,4:11], "simpson")
+
 
 
 #anova to see if key metrics differ between site/vegetation
