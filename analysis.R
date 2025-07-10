@@ -1323,27 +1323,48 @@ dom_bxp <- ggboxplot(d, x = "Site", aes(y = `NPOC (mg C g-1)`), color = "Vegetat
          axis.text.y = element_text(colour = "black"),
        ) 
 
+
+#boxplot the data. Use aes() with backticks (``) so avoid an error with our column name
+dom_bxp <- ggboxplot(d, x = "Site", aes(y = `NPOC (mg C g-1)`), color = "Vegetation", palette = c("limegreen", "#AA4499"), lwd = 0.75)  + 
+  labs(x = "Site",
+       y = expression("NPOC (mg C g"^-1*")")) + theme(
+         # Remove panel border
+         panel.border = element_blank(),  
+         # Remove panel grid lines
+         panel.grid.major = element_blank(),
+         panel.grid.minor = element_blank(),
+         # Remove panel background
+         panel.background = element_blank(),
+         # Add axis line
+         axis.line = element_line(colour = "black", linewidth = 0.5),
+         #change colour and thickness of axis ticks
+         axis.ticks = element_line(colour = "black", linewidth = 0.5),
+         #change axis labels colour
+         axis.title.x = element_text(colour = "black"),
+         axis.title.y = element_text(colour = "black"),
+         #change tick labels colour
+         axis.text.x = element_text(colour = "black"),
+         axis.text.y = element_text(colour = "black"),
+       ) 
 show(dom_bxp)  
 #save our plot
 ggsave(path = "figures", paste0(Sys.Date(), "_DOM.svg"), width = 10, height= 5, dom_bxp)
 
 
-#nested anova
-anova <- aov(d$`NPOC (mg C g-1)` ~ d$Vegetation * d$Site)
+#Type 1 two-way anova using data from all sites
+anova <- aov(d$`NPOC (mg C g-1)` ~ d$Vegetation*d$Site)
 summary(anova)
 #tukey's test to identify significant interactions
 tukey <- TukeyHSD(anova)
 print(tukey)
 #compact letter display
 cld <- multcompLetters4(anova, tukey)
-#compact letter display
 print(cld)
-
 
 #check homogeneity of variance
 plot(anova, 1)
 #levene test.  if p value < 0.05, there is evidence to suggest that the variance across groups is statistically significantly different.
-leveneTest(d$`NPOC (mg/l)` ~ d$Vegetation*d$Site)
+leveneTest(d$`NPOC (mg C g-1)` ~ d$Vegetation*d$Site)
 #check normality.  
 plot(anova, 2)
 #conduct shapiro-wilk test on ANOVA residuals to test for normality
@@ -1351,6 +1372,84 @@ plot(anova, 2)
 aov_residuals <- residuals(object = anova)
 #run shapiro-wilk test.  if p > 0.05 the data is normal
 shapiro.test(x = aov_residuals)
+
+#now analyse at each site
+
+#Bridestones
+bri <- d[(21:40),]
+#Type 1 two-way anova using data from all sites
+anova <- aov(bri$`NPOC (mg C g-1)` ~ bri$Vegetation)
+summary(anova)
+#tukey's test to identify significant interactions
+tukey <- TukeyHSD(anova)
+#print(tukey)
+#compact letter display
+cld <- multcompLetters4(anova, tukey)
+#compact letter display
+print(cld)
+#Scarth Wood Moor
+swm <- d[(61:80),]
+#Type 1 two-way anova using data from all sites
+anova <- aov(swm$`NPOC (mg C g-1)` ~ swm$Vegetation)
+summary(anova)
+#tukey's test to identify significant interactions
+tukey <- TukeyHSD(anova)
+#print(tukey)
+#compact letter display
+cld <- multcompLetters4(anova, tukey)
+#compact letter display
+print(cld)
+#Brimham
+bhm <- d[(1:20),]
+#Type 1 two-way anova using data from all sites
+anova <- aov(bhm$`NPOC (mg C g-1)` ~ bhm$Vegetation)
+summary(anova)
+#tukey's test to identify significant interactions
+tukey <- TukeyHSD(anova)
+#print(tukey)
+#compact letter display
+cld <- multcompLetters4(anova, tukey)
+#compact letter display
+print(cld)
+#Widdybanks
+wdy <- d[(81:100),]
+#Type 1 two-way anova using data from all sites
+anova <- aov(wdy$`NPOC (mg C g-1)` ~ wdy$Vegetation)
+summary(anova)
+#tukey's test to identify significant interactions
+tukey <- TukeyHSD(anova)
+#print(tukey)
+#compact letter display
+cld <- multcompLetters4(anova, tukey)
+#compact letter display
+print(cld)
+#Haweswater
+haw <- d[(41:60),]
+#Type 1 two-way anova using data from all sites
+anova <- aov(haw$`NPOC (mg C g-1)` ~ haw$Vegetation)
+summary(anova)
+#tukey's test to identify significant interactions
+tukey <- TukeyHSD(anova)
+#print(tukey)
+#compact letter display
+cld <- multcompLetters4(anova, tukey)
+#compact letter display
+print(cld)
+#Whiteside
+whi <- d[(101:120),]
+#Type 1 two-way anova using data from all sites
+anova <- aov(whi$`NPOC (mg C g-1)` ~ whi$Vegetation)
+summary(anova)
+#tukey's test to identify significant interactions
+tukey <- TukeyHSD(anova)
+#print(tukey)
+#compact letter display
+cld <- multcompLetters4(anova, tukey)
+#compact letter display
+print(cld)
+
+
+
 
 #boxplot the data. Use aes() with backticks (``) so avoid an error with our column name
 tnb_bxp <- ggboxplot(d, x = "Site", aes(y = `TNb (mg N g-1)`), color = "Vegetation", palette = c("limegreen", "#AA4499"), lwd = 0.75)  + 
@@ -1375,25 +1474,48 @@ tnb_bxp <- ggboxplot(d, x = "Site", aes(y = `TNb (mg N g-1)`), color = "Vegetati
          axis.text.y = element_text(colour = "black"),
        ) 
 
+tnb_bxp <- ggboxplot(d, x = "Vegetation", aes(y = `TNb (mg N g-1)`), color = "Site", lwd = 0.75)  + 
+  labs(x = "Vegetation",
+       y = expression("TNb (mg N g"^-1*")")) + theme(
+         # Remove panel border
+         panel.border = element_blank(),  
+         # Remove panel grid lines
+         panel.grid.major = element_blank(),
+         panel.grid.minor = element_blank(),
+         # Remove panel background
+         panel.background = element_blank(),
+         # Add axis line
+         axis.line = element_line(colour = "black", linewidth = 0.5),
+         #change colour and thickness of axis ticks
+         axis.ticks = element_line(colour = "black", linewidth = 0.5),
+         #change axis labels colour
+         axis.title.x = element_text(colour = "black"),
+         axis.title.y = element_text(colour = "black"),
+         #change tick labels colour
+         axis.text.x = element_text(colour = "black"),
+         axis.text.y = element_text(colour = "black"),
+       ) 
+
+
 show(tnb_bxp)  
 #save our plot
 ggsave(path = "figures", paste0(Sys.Date(), "_TNb.svg"), width = 10, height= 5, tnb_bxp)
 
 
-#nested anova
-anova <- aov(d$`TNb (mg N g-1)` ~ d$Vegetation * d$Site)
+#Type 1 two-way anova using data from all sites
+anova <- aov(d$`TNb (mg N g-1)` ~ d$Vegetation*d$Site)
 summary(anova)
 #tukey's test to identify significant interactions
 tukey <- TukeyHSD(anova)
 print(tukey)
 #compact letter display
+cld <- multcompLetters4(anova, tukey)
 print(cld)
-
 
 #check homogeneity of variance
 plot(anova, 1)
 #levene test.  if p value < 0.05, there is evidence to suggest that the variance across groups is statistically significantly different.
-leveneTest(d$`TNb (mg N g-1)` ~ d$Site / d$Vegetation)
+leveneTest(d$`NPOC (mg C g-1)` ~ d$Vegetation*d$Site)
 #check normality.  
 plot(anova, 2)
 #conduct shapiro-wilk test on ANOVA residuals to test for normality
@@ -1402,8 +1524,358 @@ aov_residuals <- residuals(object = anova)
 #run shapiro-wilk test.  if p > 0.05 the data is normal
 shapiro.test(x = aov_residuals)
 
+#now analyse at each site
+
+#Bridestones
+bri <- d[(21:40),]
+#Type 1 two-way anova using data from all sites
+anova <- aov(bri$`TNb (mg N g-1)` ~ bri$Vegetation)
+summary(anova)
+#tukey's test to identify significant interactions
+tukey <- TukeyHSD(anova)
+#print(tukey)
+#compact letter display
+cld <- multcompLetters4(anova, tukey)
+#compact letter display
+print(cld)
+#Scarth Wood Moor
+swm <- d[(61:80),]
+#Type 1 two-way anova using data from all sites
+anova <- aov(swm$`TNb (mg N g-1)` ~ swm$Vegetation)
+summary(anova)
+#tukey's test to identify significant interactions
+tukey <- TukeyHSD(anova)
+#print(tukey)
+#compact letter display
+cld <- multcompLetters4(anova, tukey)
+#compact letter display
+print(cld)
+#Brimham
+bhm <- d[(1:20),]
+#Type 1 two-way anova using data from all sites
+anova <- aov(bhm$`TNb (mg N g-1)` ~ bhm$Vegetation)
+summary(anova)
+#tukey's test to identify significant interactions
+tukey <- TukeyHSD(anova)
+#print(tukey)
+#compact letter display
+cld <- multcompLetters4(anova, tukey)
+#compact letter display
+print(cld)
+#Widdybanks
+wdy <- d[(81:100),]
+#Type 1 two-way anova using data from all sites
+anova <- aov(wdy$`TNb (mg N g-1)` ~ wdy$Vegetation)
+summary(anova)
+#tukey's test to identify significant interactions
+tukey <- TukeyHSD(anova)
+#print(tukey)
+#compact letter display
+cld <- multcompLetters4(anova, tukey)
+#compact letter display
+print(cld)
+#Haweswater
+haw <- d[(41:60),]
+#Type 1 two-way anova using data from all sites
+anova <- aov(haw$`TNb (mg N g-1)` ~ haw$Vegetation)
+summary(anova)
+#tukey's test to identify significant interactions
+tukey <- TukeyHSD(anova)
+#print(tukey)
+#compact letter display
+cld <- multcompLetters4(anova, tukey)
+#compact letter display
+print(cld)
+#Whiteside
+whi <- d[(101:120),]
+#Type 1 two-way anova using data from all sites
+anova <- aov(whi$`TNb (mg N g-1)` ~ whi$Vegetation)
+summary(anova)
+#tukey's test to identify significant interactions
+tukey <- TukeyHSD(anova)
+#print(tukey)
+#compact letter display
+cld <- multcompLetters4(anova, tukey)
+#compact letter display
+print(cld)
 
 
+
+
+
+
+#### Total N ----
+
+d <- readr::read_csv(
+  here::here("data", "8) drift corrected-C-N.csv")) 
+#order the sites as they should appear on the graph from west to east
+d$Site <- factor(d$Site, levels = c("Whiteside", "Haweswater", "Widdybanks", "Brimham Moor", "Scarth Wood Moor", "Bridestones"))
+
+#boxplot the data. Use aes() with backticks (``) so avoid an error with our column name
+n_bxp <- ggboxplot(d, x = "Site", aes(y = `Drift Corr N (g per kg)`), color = "Vegetation", palette = c("limegreen", "#AA4499"), lwd = 0.75)  +
+  labs(x = "Site",
+       y = expression("Total Soil Nitrogen (g kg"^-1*")")) + theme(
+         # Remove panel border
+         panel.border = element_blank(),  
+         # Remove panel grid lines
+         panel.grid.major = element_blank(),
+         panel.grid.minor = element_blank(),
+         # Remove panel background
+         panel.background = element_blank(),
+         # Add axis line
+         axis.line = element_line(colour = "black", linewidth = 0.5),
+         #change colour and thickness of axis ticks
+         axis.ticks = element_line(colour = "black", linewidth = 0.5),
+         #change axis labels colour
+         axis.title.x = element_text(colour = "black"),
+         axis.title.y = element_text(colour = "black"),
+         #change tick labels colour
+         axis.text.x = element_text(colour = "black"),
+         axis.text.y = element_text(colour = "black"),
+       ) 
+
+show(n_bxp)  
+#save our plot
+ggsave(path = "figures", paste0(Sys.Date(), "_total-N.svg"), width = 10, height= 5, n_bxp)
+
+#Type 1 two-way anova using data from all sites
+anova <- aov(d$`Drift Corr N (g per kg)` ~ d$Vegetation*d$Site)
+summary(anova)
+#tukey's test to identify significant interactions
+tukey <- TukeyHSD(anova)
+#print(tukey)
+#compact letter display
+cld <- multcompLetters4(anova, tukey)
+print(cld)
+
+#check homogeneity of variance
+plot(anova, 1)
+#levene test.  if p value < 0.05, there is evidence to suggest that the variance across groups is statistically significantly different.
+leveneTest(d$`Drift Corr N (g per kg)` ~ d$Vegetation*d$Site)
+#check normality.  
+plot(anova, 2)
+#conduct shapiro-wilk test on ANOVA residuals to test for normality
+#extract the residuals
+aov_residuals <- residuals(object = anova)
+#run shapiro-wilk test.  if p > 0.05 the data is normal
+shapiro.test(x = aov_residuals)
+
+#now analyse at each site
+
+
+#Bridestones
+bri <- d[(1:20),]
+#Type 1 two-way anova using data from all sites
+anova <- aov(bri$`Drift Corr N (g per kg)` ~ bri$Vegetation)
+summary(anova)
+#tukey's test to identify significant interactions
+tukey <- TukeyHSD(anova)
+#print(tukey)
+#compact letter display
+cld <- multcompLetters4(anova, tukey)
+#compact letter display
+print(cld)
+#Scarth Wood Moor
+swm <- d[(21:40),]
+#Type 1 two-way anova using data from all sites
+anova <- aov(swm$`Drift Corr N (g per kg)` ~ swm$Vegetation)
+summary(anova)
+#tukey's test to identify significant interactions
+tukey <- TukeyHSD(anova)
+#print(tukey)
+#compact letter display
+cld <- multcompLetters4(anova, tukey)
+#compact letter display
+print(cld)
+#Brimham
+bhm <- d[(41:60),]
+#Type 1 two-way anova using data from all sites
+anova <- aov(bhm$`Drift Corr N (g per kg)` ~ bhm$Vegetation)
+summary(anova)
+#tukey's test to identify significant interactions
+tukey <- TukeyHSD(anova)
+#print(tukey)
+#compact letter display
+cld <- multcompLetters4(anova, tukey)
+#compact letter display
+print(cld)
+#Widdybanks
+wdy <- d[(61:80),]
+#Type 1 two-way anova using data from all sites
+anova <- aov(wdy$`Drift Corr N (g per kg)` ~ wdy$Vegetation)
+summary(anova)
+#tukey's test to identify significant interactions
+tukey <- TukeyHSD(anova)
+#print(tukey)
+#compact letter display
+cld <- multcompLetters4(anova, tukey)
+#compact letter display
+print(cld)
+#Haweswater
+haw <- d[(81:100),]
+#Type 1 two-way anova using data from all sites
+anova <- aov(haw$`Drift Corr N (g per kg)` ~ haw$Vegetation)
+summary(anova)
+#tukey's test to identify significant interactions
+tukey <- TukeyHSD(anova)
+#print(tukey)
+#compact letter display
+cld <- multcompLetters4(anova, tukey)
+#compact letter display
+print(cld)
+#Whiteside
+whi <- d[(101:120),]
+#Type 1 two-way anova using data from all sites
+anova <- aov(whi$`Drift Corr N (g per kg)` ~ whi$Vegetation)
+summary(anova)
+#tukey's test to identify significant interactions
+tukey <- TukeyHSD(anova)
+#print(tukey)
+#compact letter display
+cld <- multcompLetters4(anova, tukey)
+#compact letter display
+print(cld)
+
+
+
+
+#### C:N ratio ----
+
+d <- readr::read_csv(
+  here::here("data", "8) drift corrected-C-N.csv")
+) 
+#trim off empty rows
+d <- d[1:120,1:17]
+
+#order the sites as they should appear on the graph from west to east
+d$Site <- factor(d$Site, levels = c("Whiteside", "Haweswater", "Widdybanks", "Brimham Moor", "Scarth Wood Moor", "Bridestones"))
+
+
+#boxplot the data. Use aes() with backticks (``) so avoid an error with our column name
+cn_bxp <- ggboxplot(d, x = "Site", aes(y = `CN ratio`), color = "Vegetation", palette = c("limegreen", "#AA4499"), lwd = 0.75)  +
+  labs(x = "Site",
+       y = expression("C:N Ratio")) + theme(
+         # Remove panel border
+         panel.border = element_blank(),  
+         # Remove panel grid lines
+         panel.grid.major = element_blank(),
+         panel.grid.minor = element_blank(),
+         # Remove panel background
+         panel.background = element_blank(),
+         # Add axis line
+         axis.line = element_line(colour = "black", linewidth = 0.5),
+         #change colour and thickness of axis ticks
+         axis.ticks = element_line(colour = "black", linewidth = 0.5),
+         #change axis labels colour
+         axis.title.x = element_text(colour = "black"),
+         axis.title.y = element_text(colour = "black"),
+         #change tick labels colour
+         axis.text.x = element_text(colour = "black"),
+         axis.text.y = element_text(colour = "black"),
+       ) 
+
+show(cn_bxp)  
+#save our plot
+ggsave(path = "figures", paste0(Sys.Date(), "_CN_ratio.svg"), width = 10, height= 5, cn_bxp)
+
+
+#Type 1 two-way anova using data from all sites
+anova <- aov(d$`CN ratio` ~ d$Vegetation*d$Site)
+summary(anova)
+#tukey's test to identify significant interactions
+tukey <- TukeyHSD(anova)
+print(tukey)
+#compact letter display
+cld <- multcompLetters4(anova, tukey)
+print(cld)
+
+#check homogeneity of variance
+plot(anova, 1)
+#levene test.  if p value < 0.05, there is evidence to suggest that the variance across groups is statistically significantly different.
+leveneTest(d$`Drift Corr N (g per kg)` ~ d$Vegetation*d$Site)
+#check normality.  
+plot(anova, 2)
+#conduct shapiro-wilk test on ANOVA residuals to test for normality
+#extract the residuals
+aov_residuals <- residuals(object = anova)
+#run shapiro-wilk test.  if p > 0.05 the data is normal
+shapiro.test(x = aov_residuals)
+
+#now analyse at each site
+
+
+#Bridestones
+bri <- d[(1:20),]
+#Type 1 two-way anova using data from all sites
+anova <- aov(bri$`CN ratio` ~ bri$Vegetation)
+summary(anova)
+#tukey's test to identify significant interactions
+tukey <- TukeyHSD(anova)
+#print(tukey)
+#compact letter display
+cld <- multcompLetters4(anova, tukey)
+#compact letter display
+print(cld)
+#Scarth Wood Moor
+swm <- d[(21:40),]
+#Type 1 two-way anova using data from all sites
+anova <- aov(swm$`CN ratio` ~ swm$Vegetation)
+summary(anova)
+#tukey's test to identify significant interactions
+tukey <- TukeyHSD(anova)
+#print(tukey)
+#compact letter display
+cld <- multcompLetters4(anova, tukey)
+#compact letter display
+print(cld)
+#Brimham
+bhm <- d[(41:60),]
+#Type 1 two-way anova using data from all sites
+anova <- aov(bhm$`CN ratio` ~ bhm$Vegetation)
+summary(anova)
+#tukey's test to identify significant interactions
+tukey <- TukeyHSD(anova)
+#print(tukey)
+#compact letter display
+cld <- multcompLetters4(anova, tukey)
+#compact letter display
+print(cld)
+#Widdybanks
+wdy <- d[(61:80),]
+#Type 1 two-way anova using data from all sites
+anova <- aov(wdy$`CN ratio` ~ wdy$Vegetation)
+summary(anova)
+#tukey's test to identify significant interactions
+tukey <- TukeyHSD(anova)
+#print(tukey)
+#compact letter display
+cld <- multcompLetters4(anova, tukey)
+#compact letter display
+print(cld)
+#Haweswater
+haw <- d[(81:100),]
+#Type 1 two-way anova using data from all sites
+anova <- aov(haw$`CN ratio` ~ haw$Vegetation)
+summary(anova)
+#tukey's test to identify significant interactions
+tukey <- TukeyHSD(anova)
+#print(tukey)
+#compact letter display
+cld <- multcompLetters4(anova, tukey)
+#compact letter display
+print(cld)
+#Whiteside
+whi <- d[(101:120),]
+#Type 1 two-way anova using data from all sites
+anova <- aov(whi$`CN ratio` ~ whi$Vegetation)
+summary(anova)
+#tukey's test to identify significant interactions
+tukey <- TukeyHSD(anova)
+#print(tukey)
+#compact letter display
+cld <- multcompLetters4(anova, tukey)
+#compact letter display
+print(cld)
 
 
 
@@ -1441,7 +1913,7 @@ d_long[,2] <- sapply(d_long[,2],as.numeric)
 #save our processed data file
 write.csv(d_long, "4) Processed Undiluted DOM Spectra.csv", row.names =FALSE)
 
-#### Soil DOM Quality Data Analysis ----
+#### Soil DOM Quality Data Analysis - alpha parameter generation ----
 
 #read in the processed absorbance data
 d <- readr::read_csv(
@@ -1519,15 +1991,7 @@ show(alpha_bxp)
 
 #save our plot
 ggsave(path = "C:/Users/jakef/Documents/York/Project 2 Analysis/project-2/figures", paste0(Sys.Date(), "_DOM-curve-alpha-parameter_green-purple.svg"), width = 10, height= 5, alpha_bxp)
-
-#nested anova
-anova <- aov(table$alpha ~ table$Vegetation*table$Site)
-
-summary(anova)
-#tukey's test to identify significant interactions
-tukey <- TukeyHSD(anova)
-print(tukey)
-
+- alp
 #now plot the DOM fitted curve alpha parameter against longitude
 
 individual <- readr::read_csv(
@@ -1561,6 +2025,115 @@ r_squared <- summary_model$r.squared
 # Print the R-squared value
 print(r_squared)
 
+#### Alpha parameter analysis ----
+d <- readr::read_csv(
+  here::here("data", "5) alpha paramater of DOM curve fitting.csv")
+) 
+
+
+#Type 1 two-way anova using data from all sites
+anova <- aov(d$alpha ~ d$Vegetation*d$Site)
+summary(anova)
+#tukey's test to identify significant interactions
+tukey <- TukeyHSD(anova)
+print(tukey)
+#compact letter display
+cld <- multcompLetters4(anova, tukey)
+print(cld)
+
+#check homogeneity of variance
+plot(anova, 1)
+#levene test.  if p value < 0.05, there is evidence to suggest that the variance across groups is statistically significantly different.
+leveneTest(d$alpha ~ d$Vegetation*d$Site)
+#check normality.  
+plot(anova, 2)
+#conduct shapiro-wilk test on ANOVA residuals to test for normality
+#extract the residuals
+aov_residuals <- residuals(object = anova)
+#run shapiro-wilk test.  if p > 0.05 the data is normal
+shapiro.test(x = aov_residuals)
+
+#now analyse at each site
+
+#Bridestones
+bri <- d[(21:40),]
+#Type 1 two-way anova using data from all sites
+anova <- aov(bri$`alpha` ~ bri$Vegetation)
+summary(anova)
+#tukey's test to identify significant interactions
+tukey <- TukeyHSD(anova)
+#print(tukey)
+#compact letter display
+cld <- multcompLetters4(anova, tukey)
+#compact letter display
+print(cld)
+#Scarth Wood Moor
+swm <- d[(61:80),]
+#Type 1 two-way anova using data from all sites
+anova <- aov(swm$alpha ~ swm$Vegetation)
+summary(anova)
+#tukey's test to identify significant interactions
+tukey <- TukeyHSD(anova)
+#print(tukey)
+#compact letter display
+cld <- multcompLetters4(anova, tukey)
+#compact letter display
+print(cld)
+#Brimham
+bhm <- d[(1:20),]
+#Type 1 two-way anova using data from all sites
+anova <- aov(bhm$alpha ~ bhm$Vegetation)
+summary(anova)
+#tukey's test to identify significant interactions
+tukey <- TukeyHSD(anova)
+#print(tukey)
+#compact letter display
+cld <- multcompLetters4(anova, tukey)
+#compact letter display
+print(cld)
+#Widdybanks
+wdy <- d[(81:100),]
+#Type 1 two-way anova using data from all sites
+anova <- aov(wdy$alpha ~ wdy$Vegetation)
+summary(anova)
+#tukey's test to identify significant interactions
+tukey <- TukeyHSD(anova)
+#print(tukey)
+#compact letter display
+cld <- multcompLetters4(anova, tukey)
+#compact letter display
+print(cld)
+#Haweswater
+haw <- d[(41:60),]
+#Type 1 two-way anova using data from all sites
+anova <- aov(haw$alpha ~ haw$Vegetation)
+summary(anova)
+#tukey's test to identify significant interactions
+tukey <- TukeyHSD(anova)
+#print(tukey)
+#compact letter display
+cld <- multcompLetters4(anova, tukey)
+#compact letter display
+print(cld)
+#Whiteside
+whi <- d[(101:120),]
+#Type 1 two-way anova using data from all sites
+anova <- aov(whi$alpha ~ whi$Vegetation)
+summary(anova)
+#tukey's test to identify significant interactions
+tukey <- TukeyHSD(anova)
+#print(tukey)
+#compact letter display
+cld <- multcompLetters4(anova, tukey)
+#compact letter display
+print(cld)
+
+
+
+
+
+
+
 #### DOM Specific Wavelength of Interest boxplots ----
 
 #read in the processed absorbance data
@@ -1576,9 +2149,6 @@ d <- merge(d, d_conc[, c("Sample ID", "NPOC (mg/l)")], by = "Sample ID", all.x =
 #divide absorbance by concentration to standardize the measurements
 d$`Standardized Absorbance` <- d$Absorbance/d$`NPOC (mg/l)`
 # repeat at wavelengths of 250 (aromaticity, apparent molecular weight), 254 (aromaticity), 260 (hydrophobic C content), 265 (relative abundance of functional groups), 272 (aromaticity), 280 (hydrophobic C content, humification index, apparent molecular size), 285 (humification index), 300 (characterization of humic substances), 340 (colour), 350 (apparent molecular size), 365 (aromaticity, apparent molecular weight), 400 (humic substances characterization), 436 (quality indicator), 465 (relative abundance of functional groups)
-
-#list of wavelengths of interest
-wavelength_of_interest <- list(254)#list(250, 254, 260, 265, 272, 280, 285, 300, 340, 350, 365, 400, 436, 465)
 
 
 #function to plot data for DOM, requires dataframe d (with columns `Sample ID`, `Wavelength (nm)`, Absorbance, Standardized Absorbance) and wavelenth of interest
@@ -1596,7 +2166,7 @@ DOMboxplotter <- function(d, wavelength){
   abs$Vegetation <- c(rep("Bracken",10), rep("Heathland", 10),rep("Bracken",10), rep("Heathland", 10),rep("Bracken",10), rep("Heathland", 10),rep("Bracken",10), rep("Heathland", 10),rep("Bracken",10), rep("Heathland", 10),rep("Bracken",10), rep("Heathland", 10))
   
   abs <- as.data.frame(abs)
-
+  
   #create string for y axis label
   yaxis_label <- paste("Absorbance at ", wavelength_of_interest, "nm")
   #reorder the sites so they show up on the plot from west (LHS) to east (RHS)
@@ -1632,15 +2202,109 @@ DOMboxplotter <- function(d, wavelength){
   ggsave(path = "C:/Users/jakef/Documents/York/Project 2 Analysis/project-2/figures", filename , width = 10, height= 5, abs_bxp)
   
   #statistical analysis
-  #nested anova
-  anova <- aov(abs$`Standardized Absorbance` ~ abs$Site / factor(abs$Vegetation))
+  
+  #Type 1 two-way anova using data from all sites
   print(wavelength_of_interest)
-  summary(anova)
+  anova <- aov(abs$`Standardized Absorbance` ~ abs$Vegetation*abs$Site)
+  print(summary(anova))
   #tukey's test to identify significant interactions
   tukey <- TukeyHSD(anova)
   print(tukey)
+  #compact letter display
+  cld <- multcompLetters4(anova, tukey)
+  print(cld)
+  
+  #check homogeneity of variance
+  plot(anova, 1)
+  #levene test.  if p value < 0.05, there is evidence to suggest that the variance across groups is statistically significantly different.
+  print(leveneTest(abs$`Standardized Absorbance` ~ abs$Vegetation*abs$Site))
+  #check normality.  
+  plot(anova, 2)
+  #conduct shapiro-wilk test on ANOVA residuals to test for normality
+  #extract the residuals
+  aov_residuals <- residuals(object = anova)
+  #run shapiro-wilk test.  if p > 0.05 the data is normal
+  print(shapiro.test(x = aov_residuals))
+  
+  
+  #Bridestones
+  bri <- abs[(21:40),]
+  #Type 1 two-way anova using data from all sites
+  anova <- aov(bri$`Standardized Absorbance` ~ bri$Vegetation)
+  summary(anova)
+  #tukey's test to identify significant interactions
+  tukey <- TukeyHSD(anova)
+  #print(tukey)
+  #compact letter display
+  cld <- multcompLetters4(anova, tukey)
+  #compact letter display
+  print(cld)
+  #Scarth Wood Moor
+  swm <- abs[(61:80),]
+  #Type 1 two-way anova using data from all sites
+  anova <- aov(swm$`Standardized Absorbance` ~ swm$Vegetation)
+  summary(anova)
+  #tukey's test to identify significant interactions
+  tukey <- TukeyHSD(anova)
+  #print(tukey)
+  #compact letter display
+  cld <- multcompLetters4(anova, tukey)
+  #compact letter display
+  print(cld)
+  #Brimham
+  bhm <- abs[(1:20),]
+  #Type 1 two-way anova using data from all sites
+  anova <- aov(bhm$`Standardized Absorbance` ~ bhm$Vegetation)
+  summary(anova)
+  #tukey's test to identify significant interactions
+  tukey <- TukeyHSD(anova)
+  #print(tukey)
+  #compact letter display
+  cld <- multcompLetters4(anova, tukey)
+  #compact letter display
+  print(cld)
+  #Widdybanks
+  wdy <- abs[(81:100),]
+  #Type 1 two-way anova using data from all sites
+  anova <- aov(wdy$`Standardized Absorbance`~ wdy$Vegetation)
+  summary(anova)
+  #tukey's test to identify significant interactions
+  tukey <- TukeyHSD(anova)
+  #print(tukey)
+  #compact letter display
+  cld <- multcompLetters4(anova, tukey)
+  #compact letter display
+  print(cld)
+  #Haweswater
+  haw <- abs[(41:60),]
+  #Type 1 two-way anova using data from all sites
+  anova <- aov(haw$`Standardized Absorbance` ~ haw$Vegetation)
+  summary(anova)
+  #tukey's test to identify significant interactions
+  tukey <- TukeyHSD(anova)
+  #print(tukey)
+  #compact letter display
+  cld <- multcompLetters4(anova, tukey)
+  #compact letter display
+  print(cld)
+  #Whiteside
+  whi <- abs[(101:120),]
+  #Type 1 two-way anova using data from all sites
+  anova <- aov(whi$`Standardized Absorbance` ~ whi$Vegetation)
+  summary(anova)
+  #tukey's test to identify significant interactions
+  tukey <- TukeyHSD(anova)
+  #print(tukey)
+  #compact letter display
+  cld <- multcompLetters4(anova, tukey)
+  #compact letter display
+  print(cld)
+  
+  
   
 }
+#list of wavelengths of interest
+wavelength_of_interest <- list(280)#list(250, 254, 260, 265, 272, 280, 285, 300, 340, 350, 365, 400, 436, 465)
 #plot the absorbance boxplot at the following given wavelengths
 for (wavelength in wavelength_of_interest){
   DOMboxplotter(d, wavelength)
@@ -1676,7 +2340,9 @@ write.csv(abs, "data/SUVA data.csv")
 d <- readr::read_csv(
   here::here("data", "SUVA data_all-factors.csv")
 ) 
-#nested anova
+
+
+#Type 1 two-way anova using data from all sites
 anova <- aov(d$`SUVA (L mg-1 cm-1)` ~ d$Vegetation*d$Site)
 summary(anova)
 #tukey's test to identify significant interactions
@@ -1684,81 +2350,12 @@ tukey <- TukeyHSD(anova)
 print(tukey)
 #compact letter display
 cld <- multcompLetters4(anova, tukey)
-#compact letter display
 print(cld)
-
-#### Alpha parameter analysis ----
-d <- readr::read_csv(
-  here::here("data", "5) alpha paramater of DOM curve fitting.csv")
-) 
-#nested anova
-anova <- aov(d$`alpha` ~ d$Vegetation * d$Site)
-summary(anova)
-#tukey's test to identify significant interactions
-tukey <- TukeyHSD(anova)
-print(tukey)
-#compact letter display
-cld <- multcompLetters4(anova, tukey)
-#compact letter display
-print(cld)
-
-
-#### Total N ----
-
-d <- readr::read_csv(
-  here::here("data", "8) drift corrected-C-N.csv")
-) 
-#trim off empty rows
-d <- d[1:120,1:17]
-
-#order the sites as they should appear on the graph from west to east
-d$Site <- factor(d$Site, levels = c("Whiteside", "Haweswater", "Widdybanks", "Brimham Moor", "Scarth Wood Moor", "Bridestones"))
-
-#boxplot the data. Use aes() with backticks (``) so avoid an error with our column name
-n_bxp <- ggboxplot(d, x = "Site", aes(y = `Drift Corr N (g per kg)`), color = "Vegetation", palette = c("limegreen", "#AA4499"), lwd = 0.75)  +
-  labs(x = "Site",
-       y = expression("Total Soil Nitrogen (g kg"^-1*")")) + theme(
-         # Remove panel border
-         panel.border = element_blank(),  
-         # Remove panel grid lines
-         panel.grid.major = element_blank(),
-         panel.grid.minor = element_blank(),
-         # Remove panel background
-         panel.background = element_blank(),
-         # Add axis line
-         axis.line = element_line(colour = "black", linewidth = 0.5),
-         #change colour and thickness of axis ticks
-         axis.ticks = element_line(colour = "black", linewidth = 0.5),
-         #change axis labels colour
-         axis.title.x = element_text(colour = "black"),
-         axis.title.y = element_text(colour = "black"),
-         #change tick labels colour
-         axis.text.x = element_text(colour = "black"),
-         axis.text.y = element_text(colour = "black"),
-       ) 
-
-show(n_bxp)  
-#save our plot
-ggsave(path = "figures", paste0(Sys.Date(), "_total-N.svg"), width = 10, height= 5, n_bxp)
-
-
-#nested anova
-anova <- aov(d$`Drift Corr N (g per kg)` ~ d$Vegetation * d$Site)
-summary(anova)
-
-#tukey's test to identify significant interactions
-tukey <- TukeyHSD(anova)
-print(tukey)
-#compact letter display
-cld <- multcompLetters4(anova, tukey)
-#compact letter display
-print(cld)
-
 
 #check homogeneity of variance
 plot(anova, 1)
 #levene test.  if p value < 0.05, there is evidence to suggest that the variance across groups is statistically significantly different.
-leveneTest(d$`Drift Corr N (g per kg)` ~ d$Vegetation*d$Site)
+leveneTest(d$`SUVA (L mg-1 cm-1)` ~ d$Vegetation*d$Site)
 #check normality.  
 plot(anova, 2)
 #conduct shapiro-wilk test on ANOVA residuals to test for normality
@@ -1767,73 +2364,83 @@ aov_residuals <- residuals(object = anova)
 #run shapiro-wilk test.  if p > 0.05 the data is normal
 shapiro.test(x = aov_residuals)
 
+#now analyse at each site
 
-#### C:N ratio ----
-
-d <- readr::read_csv(
-  here::here("data", "8) drift corrected-C-N.csv")
-) 
-#trim off empty rows
-d <- d[1:120,1:17]
-
-#order the sites as they should appear on the graph from west to east
-d$Site <- factor(d$Site, levels = c("Whiteside", "Haweswater", "Widdybanks", "Brimham Moor", "Scarth Wood Moor", "Bridestones"))
-
-
-#boxplot the data. Use aes() with backticks (``) so avoid an error with our column name
-cn_bxp <- ggboxplot(d, x = "Site", aes(y = `CN ratio`), color = "Vegetation", palette = c("limegreen", "#AA4499"), lwd = 0.75)  +
-  labs(x = "Site",
-       y = expression("C:N Ratio")) + theme(
-         # Remove panel border
-         panel.border = element_blank(),  
-         # Remove panel grid lines
-         panel.grid.major = element_blank(),
-         panel.grid.minor = element_blank(),
-         # Remove panel background
-         panel.background = element_blank(),
-         # Add axis line
-         axis.line = element_line(colour = "black", linewidth = 0.5),
-         #change colour and thickness of axis ticks
-         axis.ticks = element_line(colour = "black", linewidth = 0.5),
-         #change axis labels colour
-         axis.title.x = element_text(colour = "black"),
-         axis.title.y = element_text(colour = "black"),
-         #change tick labels colour
-         axis.text.x = element_text(colour = "black"),
-         axis.text.y = element_text(colour = "black"),
-       ) 
-
-show(cn_bxp)  
-#save our plot
-ggsave(path = "figures", paste0(Sys.Date(), "_CN_ratio.svg"), width = 10, height= 5, cn_bxp)
-
-
-
-
-
-#anova
-anova <- aov(d$`CN ratio` ~ d$Vegetation * d$Site)
+#Bridestones
+bri <- d[(21:40),]
+#Type 1 two-way anova using data from all sites
+anova <- aov(bri$`SUVA (L mg-1 cm-1)` ~ bri$Vegetation)
 summary(anova)
 #tukey's test to identify significant interactions
 tukey <- TukeyHSD(anova)
-print(tukey)
+#print(tukey)
+#compact letter display
+cld <- multcompLetters4(anova, tukey)
+#compact letter display
+print(cld)
+#Scarth Wood Moor
+swm <- d[(61:80),]
+#Type 1 two-way anova using data from all sites
+anova <- aov(swm$`SUVA (L mg-1 cm-1)` ~ swm$Vegetation)
+summary(anova)
+#tukey's test to identify significant interactions
+tukey <- TukeyHSD(anova)
+#print(tukey)
+#compact letter display
+cld <- multcompLetters4(anova, tukey)
+#compact letter display
+print(cld)
+#Brimham
+bhm <- d[(1:20),]
+#Type 1 two-way anova using data from all sites
+anova <- aov(bhm$`SUVA (L mg-1 cm-1)` ~ bhm$Vegetation)
+summary(anova)
+#tukey's test to identify significant interactions
+tukey <- TukeyHSD(anova)
+#print(tukey)
+#compact letter display
+cld <- multcompLetters4(anova, tukey)
+#compact letter display
+print(cld)
+#Widdybanks
+wdy <- d[(81:100),]
+#Type 1 two-way anova using data from all sites
+anova <- aov(wdy$`SUVA (L mg-1 cm-1)`~ wdy$Vegetation)
+summary(anova)
+#tukey's test to identify significant interactions
+tukey <- TukeyHSD(anova)
+#print(tukey)
+#compact letter display
+cld <- multcompLetters4(anova, tukey)
+#compact letter display
+print(cld)
+#Haweswater
+haw <- d[(41:60),]
+#Type 1 two-way anova using data from all sites
+anova <- aov(haw$`SUVA (L mg-1 cm-1)` ~ haw$Vegetation)
+summary(anova)
+#tukey's test to identify significant interactions
+tukey <- TukeyHSD(anova)
+#print(tukey)
+#compact letter display
+cld <- multcompLetters4(anova, tukey)
+#compact letter display
+print(cld)
+#Whiteside
+whi <- d[(101:120),]
+#Type 1 two-way anova using data from all sites
+anova <- aov(whi$`SUVA (L mg-1 cm-1)` ~ whi$Vegetation)
+summary(anova)
+#tukey's test to identify significant interactions
+tukey <- TukeyHSD(anova)
+#print(tukey)
 #compact letter display
 cld <- multcompLetters4(anova, tukey)
 #compact letter display
 print(cld)
 
 
-#check homogeneity of variance
-plot(anova, 1)
-#levene test.  if p value < 0.05, there is evidence to suggest that the variance across groups is statistically significantly different.
-leveneTest(d$`CN ratio`~ d$Vegetation*d$Site)
-#check normality.  
-plot(anova, 2)
-#conduct shapiro-wilk test on ANOVA residuals to test for normality
-#extract the residuals
-aov_residuals <- residuals(object = anova)
-#run shapiro-wilk test.  if p > 0.05 the data is normal
-shapiro.test(x = aov_residuals)
+
 
 #### generate PCA data file containing all data we need ----
 d <- readr::read_csv(
@@ -1959,6 +2566,102 @@ fviz_cos2(pca_result, choice = "var", axes = 1:2)
 fviz_pca_var(pca_result, col.var = "cos2", 
              gradient.cols = c("black", "orange", "green"),
              repel = TRUE)
+
+
+#### Week 1 + 2 alpha diversity metrics ----
+d <- readr::read_csv(
+  here::here("data", "Tullgren Extracts - Week 1 + 2 Extracts.csv")
+) 
+#order samples by ID alphabetically
+d <- arrange(d, d["Sample ID"])
+d <- as.data.frame(d)
+#replace null (empty excell cell) with "0"
+d[is.na(d)] <- 0
+#total mesofauna abundances
+d$`Total Mesofauna Catch`<- rowSums(d[,4:11])
+#total invertebrate abundances
+d$`Total Invertebrate Catch`<- rowSums(d[,4:23])
+#shannon diversity of the 8 mesofauna groups
+d$`Mesofauna Shannon` <- diversity(d[,4:11], "shannon")
+#simpson diversity of the 8 mesofauna groups
+d$`Mesofauna Simpson` <- diversity(d[,4:11], "simpson")
+
+
+#anova to see if key metrics differ between site/vegetation
+#anova
+anova <- aov(d$`Total Mesofauna Catch` ~ d$Vegetation * d$Site)
+summary(anova)
+#tukey's test to identify significant interactions
+tukey <- TukeyHSD(anova)
+print(tukey)
+#compact letter display
+cld <- multcompLetters4(anova, tukey)
+#compact letter display
+print(cld)
+
+anova <- aov(d$`Total Invertebrate Catch` ~ d$Vegetation * d$Site)
+summary(anova)
+#tukey's test to identify significant interactions
+tukey <- TukeyHSD(anova)
+print(tukey)
+#compact letter display
+cld <- multcompLetters4(anova, tukey)
+#compact letter display
+print(cld)
+
+anova <- aov(d$`Mesofauna Shannon` ~ d$Vegetation * d$Site)
+summary(anova)
+#tukey's test to identify significant interactions
+tukey <- TukeyHSD(anova)
+print(tukey)
+#compact letter display
+cld <- multcompLetters4(anova, tukey)
+#compact letter display
+print(cld)
+
+anova <- aov(d$`Mesofauna Simpson` ~ d$Vegetation * d$Site)
+summary(anova)
+#tukey's test to identify significant interactions
+tukey <- TukeyHSD(anova)
+print(tukey)
+#compact letter display
+cld <- multcompLetters4(anova, tukey)
+#compact letter display
+print(cld)
+
+anova <- aov(d$`Neelidae` ~ d$Vegetation * d$Site)
+summary(anova)
+#tukey's test to identify significant interactions
+tukey <- TukeyHSD(anova)
+print(tukey)
+#compact letter display
+cld <- multcompLetters4(anova, tukey)
+#compact letter display
+print(cld)
+
+
+#graphing boxplots with bracken split from nonbracken
+shannon_bxp <-ggboxplot(d, x = "Site", y = "Mesofauna Shannon", color = "Vegetation", ylab = "Shannon Diversity", palette = c("limegreen", "purple"), lwd = 0.75) + theme(
+  #remove x axis label
+  axis.title.x=element_blank(),
+  # Remove panel border
+  panel.border = element_blank(),  
+  # Remove panel grid lines
+  panel.grid.major = element_blank(),
+  panel.grid.minor = element_blank(),
+  # Remove panel background
+  panel.background = element_blank(),
+  # Add axis line
+  axis.line = element_line(colour = "black", linewidth = 0.5),
+  #change colour and thickness of axis ticks
+  axis.ticks = element_line(colour = "black", linewidth = 0.5),
+  #change axis labels colour
+  axis.title.y = element_text(colour = "black"),
+  #change tick labels colour
+  axis.text.y = element_text(colour = "black"),
+  legend.title = element_blank()
+) 
+show(shannon_bxp)
 
 #### Week 1 extracts mesofauna NMDS ----
 d <- readr::read_csv(
@@ -2304,97 +3007,3 @@ ggsave(path = "figures", paste0(Sys.Date(), "_mean_species_composition_bracken.s
 anova <- aov(d$`Neelidae` ~ d$Vegetation * d$Site)
 summary(anova)
 
-#### Week 1 + 2 alpha diversity metrics ----
-d <- readr::read_csv(
-  here::here("data", "Tullgren Extracts - Week 1 + 2 Extracts.csv")
-) 
-#order samples by ID alphabetically
-d <- arrange(d, d["Sample ID"])
-d <- as.data.frame(d)
-#replace null (empty excell cell) with "0"
-d[is.na(d)] <- 0
-#total mesofauna abundances
-d$`Total Mesofauna Catch`<- rowSums(d[,4:11])
-#total invertebrate abundances
-d$`Total Invertebrate Catch`<- rowSums(d[,4:23])
-#shannon diversity of the 8 mesofauna groups
-d$`Mesofauna Shannon` <- diversity(d[,4:11], "shannon")
-#simpson diversity of the 8 mesofauna groups
-d$`Mesofauna Simpson` <- diversity(d[,4:11], "simpson")
-
-
-#anova to see if key metrics differ between site/vegetation
-#anova
-anova <- aov(d$`Total Mesofauna Catch` ~ d$Vegetation * d$Site)
-summary(anova)
-#tukey's test to identify significant interactions
-tukey <- TukeyHSD(anova)
-print(tukey)
-#compact letter display
-cld <- multcompLetters4(anova, tukey)
-#compact letter display
-print(cld)
-
-anova <- aov(d$`Total Invertebrate Catch` ~ d$Vegetation * d$Site)
-summary(anova)
-#tukey's test to identify significant interactions
-tukey <- TukeyHSD(anova)
-print(tukey)
-#compact letter display
-cld <- multcompLetters4(anova, tukey)
-#compact letter display
-print(cld)
-
-anova <- aov(d$`Mesofauna Shannon` ~ d$Vegetation * d$Site)
-summary(anova)
-#tukey's test to identify significant interactions
-tukey <- TukeyHSD(anova)
-print(tukey)
-#compact letter display
-cld <- multcompLetters4(anova, tukey)
-#compact letter display
-print(cld)
-
-anova <- aov(d$`Mesofauna Simpson` ~ d$Vegetation * d$Site)
-summary(anova)
-#tukey's test to identify significant interactions
-tukey <- TukeyHSD(anova)
-print(tukey)
-#compact letter display
-cld <- multcompLetters4(anova, tukey)
-#compact letter display
-print(cld)
-
-anova <- aov(d$`Neelidae` ~ d$Vegetation * d$Site)
-summary(anova)
-#tukey's test to identify significant interactions
-tukey <- TukeyHSD(anova)
-print(tukey)
-#compact letter display
-cld <- multcompLetters4(anova, tukey)
-#compact letter display
-print(cld)
-
-
-#graphing boxplots with bracken split from nonbracken
-shannon_bxp <-ggboxplot(d, x = "Site", y = "Mesofauna Shannon", color = "Vegetation", ylab = "Shannon Diversity", palette = c("limegreen", "purple"), lwd = 0.75) + theme(
-  #remove x axis label
-  axis.title.x=element_blank(),
-  # Remove panel border
-  panel.border = element_blank(),  
-  # Remove panel grid lines
-  panel.grid.major = element_blank(),
-  panel.grid.minor = element_blank(),
-  # Remove panel background
-  panel.background = element_blank(),
-  # Add axis line
-  axis.line = element_line(colour = "black", linewidth = 0.5),
-  #change colour and thickness of axis ticks
-  axis.ticks = element_line(colour = "black", linewidth = 0.5),
-  #change axis labels colour
-  axis.title.y = element_text(colour = "black"),
-  #change tick labels colour
-  axis.text.y = element_text(colour = "black"),
-  legend.title = element_blank()
-) 
-show(shannon_bxp)
