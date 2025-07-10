@@ -2739,6 +2739,7 @@ d_moisture <- readr::read_csv(
   here::here("data-raw", "project-2-data-master", "individual", "1) Soil Moisture Content.csv")
 ) 
 #read in data for wet mass of tullgren soil - or did we note down dry?
+#missing this data 
 
 
 #### Week 1 + 2 alpha diversity metrics ----
