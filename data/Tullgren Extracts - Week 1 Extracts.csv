@@ -1,0 +1,51 @@
+Sample ID,Site,Vegetation,Mesostigmata,Oribatida,Astigmatina,Prostigmata,Symphypleona,Entomobryomorpha,Poduromorpha,Neelidae,Araneae,Enchytraeidae,Thysanoptera,Diptera,Stigmus,Chilopoda,Diplopoda,Staphylinidae,Tingidae,Lasius flavus,Unknown
+HAW B 1,Haweswater,Bracken,22,139,12,18,2,4,6,8,2,1,1,,,,,,,,
+HAW B 6,Haweswater,Bracken,2,17,2,5,1,,7,0,,,,,,,,,,,
+HAW B 9,Haweswater,Bracken,14,25,15,14,0,4,4,1,,,,,,,,,,,
+HAW B 2,Haweswater,Bracken,24,255,31,27,2,46,56,5,1,4,,,1,,,,,1,
+HAW B 7,Haweswater,Bracken,23,154,34,8,6,14,31,2,,1,,,,,,,,,
+HAW H 1,Haweswater,Heath,,10,6,2,,5,1,,,1,,1,,,,,,,
+HAW H 2,Haweswater,Heath,,6,14,,,,6,,,,,1,,,,,,,
+HAW H 3,Haweswater,Heath,,10,14,16,1,1,77,,,,,,,,,,,,
+HAW H 4,Haweswater,Heath,,2,3,10,1,,46,,,4,,,,,,,,,
+HAW H 5,Haweswater,Heath,2,8,14,,2,1,4,,1,2,,1,,,,,,,
+WHI B 1,Whiteside,Bracken,,15,1,7,4,7,1,3,,,,,1,,,,,,
+WHI B 2,Whiteside,Bracken,2,14,34,10,,20,29,5,,5,,2,,2,,1,,,
+WHI B 3,Whiteside,Bracken,23,74,40,18,2,33,42,13,,10,,,,,,,,,
+WHI B 4,Whiteside,Bracken,,1,1,1,1,,,,,1,,1,,,,,,,
+WHI B 5,Whiteside,Bracken,9,43,6,5,1,10,2,,,3,,,,,,,,,1
+WHI H 1,Whiteside,Heath,12,41,13,5,1,141,23,2,,1,,2,,,,,,,
+WHI H 2,Whiteside,Heath,3,8,14,6,1,18,29,1,,,1,2,,,,,,,
+WHI H 3,Whiteside,Heath,,12,9,13,,6,30,,,2,,,,,,,,,
+WHI H 4,Whiteside,Heath,9,80,33,37,4,143,56,4,,2,,,,,,,,,
+WHI H 5,Whiteside,Heath,6,98,47,12,3,19,7,2,,1,,,,1,,,,,3
+BHM B 1,Brimham Rocks,Bracken,14,335,175,36,,4,3,,,3,,,,,,,,,
+WDY B 1,Widdybanks,Bracken,18,21,44,21,1,22,26,5,,5,,,,1,,1,,,1
+WDY B 2,Widdybanks,Bracken,9,136,56,15,,19,22,1,,1,,,,,,1,,,
+WDY B 3,Widdybanks,Bracken,18,67,32,22,,36,18,3,2,4,,,,10,,,,,
+WDY B 6,Widdybanks,Bracken,10,39,11,10,,29,7,,,,,,,,,,,,7
+WDY B 7,Widdybanks,Bracken,12,102,173,69,,30,2,2,,2,,,,,,,,,3
+WDY H 1 ,Widdybanks,Heath,28,338,53,153,2,7,6,,,2,,,,,,,,,
+WDY H 2,Widdybanks,Heath,17,170,22,77,1,87,12,1,,1,,,,1,,1,,1,
+WDY H 4,Widdybanks,Heath,12,27,14,32,1,10,12,5,,,,,,,,,,,1
+WDY H 5,Widdybanks,Heath,,8,7,9,,11,11,1,,10,,,,,,,,,
+WDY H 7,Widdybanks,Heath,9,172,60,67,,29,20,4,,,,,,,,,,,1
+BHM B 4,Brimham Rocks,Bracken,2,27,4,7,,,1,1,,,,,,,,,,,1
+BHM B 2,Brimham Rocks,Bracken,36,207,92,60,,21,9,2,,2,,,,,,,,,8
+BHM B 6,Brimham Rocks,Bracken,16,189,37,26,1,10,,,,1,,,,1,2,,1,,
+BHM B 10,Brimham Rocks,Bracken,24,127,141,40,,14,6,,,,,,,,1,1,,,
+BHM H 2,Brimham Rocks,Heath,5,114,33,29,,3,3,,,1,,,,,,1,1,,
+BHM H 6,Brimham Rocks,Heath,4,118,44,17,1,6,4,,,5,,,,,,,,,1
+BHM H 7,Brimham Rocks,Heath,3,88,35,37,,2,6,,1,,,,,,,,,,
+BHM H 8,Brimham Rocks,Heath,7,117,24,40,1,13,18,4,,,,,,,1,,,,3
+BHM H 10,Brimham Rocks,Heath,15,89,34,34,,14,15,2,,4,,,,1,,,,,1
+BRI B 1,Bridestones,Bracken,3,47,23,24,,5,1,,,,,,,,,,,,
+BRI B 2,Bridestones,Bracken,1,21,11,12,,2,9,,,,,,,,,4,,,2
+BRI B 3,Bridestones,Bracken,11,84,56,26,,,,,,1,,,,,,1,,,1
+BRI B 4,Bridestones,Bracken,,26,51,28,,8,4,,,3,,,,,,1,,,
+BRI B 5,Bridestones,Bracken,6,73,49,19,,38,3,,,1,,,,,,,,,
+BRI H 1,Bridestones,Heath,93,187,77,39,,,24,4,,9,,2,,,,,,,
+BRI H 2,Bridestones,Heath,1,56,14,8,1,2,11,,,10,,,,,1,1,,,3
+BRI H 3,Bridestones,Heath,2,89,35,8,,1,,1,,,,,,,,,,,7
+BRI H 4,Bridestones,Heath,7,34,27,16,,6,4,2,,6,,,,,,,,,
+BRI H 5,Bridestones,Heath,7,64,25,30,8,1,115,1,,2,,,,,,,,,
