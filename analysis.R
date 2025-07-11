@@ -3115,6 +3115,167 @@ aov_residuals <- residuals(object = anova)
 #run shapiro-wilk test.  if p > 0.05 the data is normal
 shapiro.test(x = aov_residuals)
 
+
+#now analyse at each site
+
+#Bridestones
+bri <- d[(11:20),]
+#Type 1 two-way anova using data from all sites
+anova <- aov(bri$`Oribatida` ~ bri$Vegetation)
+summary(anova)
+#tukey's test to identify significant interactions
+tukey <- TukeyHSD(anova)
+#print(tukey)
+#compact letter display
+cld <- multcompLetters4(anova, tukey)
+#compact letter display
+print(cld)
+
+#check homogeneity of variance
+plot(anova, 1)
+#levene test.  if p value < 0.05, there is evidence to suggest that the variance across groups is statistically significantly different.
+leveneTest(bri$Oribatida ~ bri$Vegetation*bri$Site)
+#check normality.  
+plot(anova, 2)
+#conduct shapiro-wilk test on ANOVA residuals to test for normality
+#extract the residuals
+aov_residuals <- residuals(object = anova)
+#run shapiro-wilk test.  if p > 0.05 the data is normal
+shapiro.test(x = aov_residuals)
+
+
+#Scarth Wood Moor
+swm <- d[(31:40),]
+#Type 1 two-way anova using data from all sites
+anova <- aov(swm$`Oribatida (log (x + 1) transformed)` ~ swm$Vegetation)
+summary(anova)
+#tukey's test to identify significant interactions
+tukey <- TukeyHSD(anova)
+#print(tukey)
+#compact letter display
+cld <- multcompLetters4(anova, tukey)
+#compact letter display
+print(cld)
+
+#check homogeneity of variance
+plot(anova, 1)
+#levene test.  if p value < 0.05, there is evidence to suggest that the variance across groups is statistically significantly different.
+leveneTest(swm$Oribatida ~ swm$Vegetation*swm$Site)
+#check normality.  
+plot(anova, 2)
+#conduct shapiro-wilk test on ANOVA residuals to test for normality
+#extract the residuals
+aov_residuals <- residuals(object = anova)
+#run shapiro-wilk test.  if p > 0.05 the data is normal
+shapiro.test(x = aov_residuals)
+
+
+#Brimham
+bhm <- d[(1:10),]
+#Type 1 two-way anova using data from all sites
+anova <- aov(bhm$Oribatida ~ bhm$Vegetation)
+summary(anova)
+#tukey's test to identify significant interactions
+tukey <- TukeyHSD(anova)
+#print(tukey)
+#compact letter display
+cld <- multcompLetters4(anova, tukey)
+#compact letter display
+print(cld)
+
+#check homogeneity of variance
+plot(anova, 1)
+#levene test.  if p value < 0.05, there is evidence to suggest that the variance across groups is statistically significantly different.
+leveneTest(bhm$Oribatida ~ bhm$Vegetation*bhm$Site)
+#check normality.  
+plot(anova, 2)
+#conduct shapiro-wilk test on ANOVA residuals to test for normality
+#extract the residuals
+aov_residuals <- residuals(object = anova)
+#run shapiro-wilk test.  if p > 0.05 the data is normal
+shapiro.test(x = aov_residuals)
+
+
+
+#Widdybanks
+wdy <- d[(41:50),]
+#Type 1 two-way anova using data from all sites
+anova <- aov(wdy$Oribatida ~ wdy$Vegetation)
+summary(anova)
+#tukey's test to identify significant interactions
+tukey <- TukeyHSD(anova)
+#print(tukey)
+#compact letter display
+cld <- multcompLetters4(anova, tukey)
+#compact letter display
+print(cld)
+
+
+#check homogeneity of variance
+plot(anova, 1)
+#levene test.  if p value < 0.05, there is evidence to suggest that the variance across groups is statistically significantly different.
+leveneTest(wdy$Oribatida ~ wdy$Vegetation*wdy$Site)
+#check normality.  
+plot(anova, 2)
+#conduct shapiro-wilk test on ANOVA residuals to test for normality
+#extract the residuals
+aov_residuals <- residuals(object = anova)
+#run shapiro-wilk test.  if p > 0.05 the data is normal
+shapiro.test(x = aov_residuals)
+
+#Haweswater
+haw <- d[(21:30),]
+#Type 1 two-way anova using data from all sites
+anova <- aov(haw$Oribatida ~ haw$Vegetation)
+summary(anova)
+#tukey's test to identify significant interactions
+tukey <- TukeyHSD(anova)
+#print(tukey)
+#compact letter display
+cld <- multcompLetters4(anova, tukey)
+#compact letter display
+print(cld)
+
+#check homogeneity of variance
+plot(anova, 1)
+#levene test.  if p value < 0.05, there is evidence to suggest that the variance across groups is statistically significantly different.
+leveneTest(haw$Oribatida ~ haw$Vegetation*haw$Site)
+#check normality.  
+plot(anova, 2)
+#conduct shapiro-wilk test on ANOVA residuals to test for normality
+#extract the residuals
+aov_residuals <- residuals(object = anova)
+#run shapiro-wilk test.  if p > 0.05 the data is normal
+shapiro.test(x = aov_residuals)
+
+
+#Whiteside
+whi <- d[(51:60),]
+#Type 1 two-way anova using data from all sites
+anova <- aov(whi$Oribatida ~ whi$Vegetation)
+summary(anova)
+#tukey's test to identify significant interactions
+tukey <- TukeyHSD(anova)
+#print(tukey)
+#compact letter display
+cld <- multcompLetters4(anova, tukey)
+#compact letter display
+print(cld)
+
+
+#check homogeneity of variance
+plot(anova, 1)
+#levene test.  if p value < 0.05, there is evidence to suggest that the variance across groups is statistically significantly different.
+leveneTest(whi$Oribatida ~ whi$Vegetation*whi$Site)
+#check normality.  
+plot(anova, 2)
+#conduct shapiro-wilk test on ANOVA residuals to test for normality
+#extract the residuals
+aov_residuals <- residuals(object = anova)
+#run shapiro-wilk test.  if p > 0.05 the data is normal
+shapiro.test(x = aov_residuals)
+
+
 #### Astigmatina abundance ANOVAs ----
 #transform mesostig abundance data as there are many 0s
 d$`Astigmatina (log (x + 10) transformed)` <- log(d$Astigmatina + 10)
@@ -3167,6 +3328,171 @@ astig_bxp <-ggboxplot(d, x = "Site", y = "`Astigmatina (log (x + 10) transformed
   legend.title = element_blank()
 ) 
 show(astig_bxp)
+
+#now analyse at each site
+
+#Bridestones
+bri <- d[(11:20),]
+#Type 1 two-way anova using data from all sites
+anova <- aov(bri$Astigmatina ~ bri$Vegetation)
+summary(anova)
+#tukey's test to identify significant interactions
+tukey <- TukeyHSD(anova)
+#print(tukey)
+#compact letter display
+cld <- multcompLetters4(anova, tukey)
+#compact letter display
+print(cld)
+
+#check homogeneity of variance
+plot(anova, 1)
+#levene test.  if p value < 0.05, there is evidence to suggest that the variance across groups is statistically significantly different.
+leveneTest(bri$Astigmatina ~ bri$Vegetation*bri$Site)
+#check normality.  
+plot(anova, 2)
+#conduct shapiro-wilk test on ANOVA residuals to test for normality
+#extract the residuals
+aov_residuals <- residuals(object = anova)
+#run shapiro-wilk test.  if p > 0.05 the data is normal
+shapiro.test(x = aov_residuals)
+
+
+#Scarth Wood Moor
+swm <- d[(31:40),]
+#Type 1 two-way anova using data from all sites
+anova <- aov(swm$`Astigmatina (log (x + 10) transformed)` ~ swm$Vegetation)
+summary(anova)
+#tukey's test to identify significant interactions
+tukey <- TukeyHSD(anova)
+#print(tukey)
+#compact letter display
+cld <- multcompLetters4(anova, tukey)
+#compact letter display
+print(cld)
+
+#check homogeneity of variance
+plot(anova, 1)
+colnames(swm)[30] <- "Astigmatina transformed"
+#levene test.  if p value < 0.05, there is evidence to suggest that the variance across groups is statistically significantly different.
+leveneTest(swm$`Astigmatina transformed` ~ swm$Vegetation*swm$Site)
+#check normality.  
+plot(anova, 2)
+#conduct shapiro-wilk test on ANOVA residuals to test for normality
+#extract the residuals
+aov_residuals <- residuals(object = anova)
+#run shapiro-wilk test.  if p > 0.05 the data is normal
+shapiro.test(x = aov_residuals)
+
+
+#Brimham
+bhm <- d[(1:10),]
+#Type 1 two-way anova using data from all sites
+anova <- aov(bhm$`Astigmatina (log (x + 10) transformed)` ~ bhm$Vegetation)
+summary(anova)
+#tukey's test to identify significant interactions
+tukey <- TukeyHSD(anova)
+#print(tukey)
+#compact letter display
+cld <- multcompLetters4(anova, tukey)
+#compact letter display
+print(cld)
+
+#check homogeneity of variance
+plot(anova, 1)
+#rename otherwise levene test won't work
+colnames(bhm)[30] <- "Astigmatina transformed"
+#levene test.  if p value < 0.05, there is evidence to suggest that the variance across groups is statistically significantly different.
+leveneTest(bhm$`Astigmatina transformed` ~ bhm$Vegetation*bhm$Site)
+#check normality.  
+plot(anova, 2)
+#conduct shapiro-wilk test on ANOVA residuals to test for normality
+#extract the residuals
+aov_residuals <- residuals(object = anova)
+#run shapiro-wilk test.  if p > 0.05 the data is normal
+shapiro.test(x = aov_residuals)
+
+
+
+#Widdybanks
+wdy <- d[(41:50),]
+#Type 1 two-way anova using data from all sites
+anova <- aov(wdy$`Astigmatina (log (x + 10) transformed)` ~ wdy$Vegetation)
+summary(anova)
+#tukey's test to identify significant interactions
+tukey <- TukeyHSD(anova)
+#print(tukey)
+#compact letter display
+cld <- multcompLetters4(anova, tukey)
+#compact letter display
+print(cld)
+
+
+#check homogeneity of variance
+plot(anova, 1)
+colnames(wdy)[30] <- "Astigmatina transformed"
+#levene test.  if p value < 0.05, there is evidence to suggest that the variance across groups is statistically significantly different.
+leveneTest(wdy$`Astigmatina transformed` ~ wdy$Vegetation*wdy$Site)
+#check normality.  
+plot(anova, 2)
+#conduct shapiro-wilk test on ANOVA residuals to test for normality
+#extract the residuals
+aov_residuals <- residuals(object = anova)
+#run shapiro-wilk test.  if p > 0.05 the data is normal
+shapiro.test(x = aov_residuals)
+
+#Haweswater
+haw <- d[(21:30),]
+#Type 1 two-way anova using data from all sites
+anova <- aov(haw$Astigmatina ~ haw$Vegetation)
+summary(anova)
+#tukey's test to identify significant interactions
+tukey <- TukeyHSD(anova)
+#print(tukey)
+#compact letter display
+cld <- multcompLetters4(anova, tukey)
+#compact letter display
+print(cld)
+
+#check homogeneity of variance
+plot(anova, 1)
+#levene test.  if p value < 0.05, there is evidence to suggest that the variance across groups is statistically significantly different.
+leveneTest(haw$Astigmatina ~ haw$Vegetation*haw$Site)
+#check normality.  
+plot(anova, 2)
+#conduct shapiro-wilk test on ANOVA residuals to test for normality
+#extract the residuals
+aov_residuals <- residuals(object = anova)
+#run shapiro-wilk test.  if p > 0.05 the data is normal
+shapiro.test(x = aov_residuals)
+
+
+#Whiteside
+whi <- d[(51:60),]
+#Type 1 two-way anova using data from all sites
+anova <- aov(whi$Astigmatina ~ whi$Vegetation)
+summary(anova)
+#tukey's test to identify significant interactions
+tukey <- TukeyHSD(anova)
+#print(tukey)
+#compact letter display
+cld <- multcompLetters4(anova, tukey)
+#compact letter display
+print(cld)
+
+
+#check homogeneity of variance
+plot(anova, 1)
+#levene test.  if p value < 0.05, there is evidence to suggest that the variance across groups is statistically significantly different.
+leveneTest(whi$Astigmatina ~ whi$Vegetation*whi$Site)
+#check normality.  
+plot(anova, 2)
+#conduct shapiro-wilk test on ANOVA residuals to test for normality
+#extract the residuals
+aov_residuals <- residuals(object = anova)
+#run shapiro-wilk test.  if p > 0.05 the data is normal
+shapiro.test(x = aov_residuals)
+
+
 #### Prostigmata abundance ANOVAs ----
 
 #transform the data to pass Shapiro
