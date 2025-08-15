@@ -2618,7 +2618,7 @@ fviz_pca_var(pca_result, col.var = "cos2",
 
 #### Invertebrate catch percetnage breakdown  and standardozed abundances ----
 d <- readr::read_csv(
-  here::here("data", "Tullgren Extracts - Week 1 + 2 Extracts.csv")
+  here::here("data", "n = 10 Tullgren Extracts - Week 1 + 2 Extracts.csv")
 ) 
 
 #order samples by ID alphabetically
