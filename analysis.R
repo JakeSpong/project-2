@@ -2627,11 +2627,11 @@ d <- as.data.frame(d)
 #replace null (empty excell cell) with "0"
 d[is.na(d)] <- 0
 #order the sites as they should appear on the graph from west to east
-d$Site <- factor(d$Site, levels = c("Whiteside", "Haweswater", "Widdybanks", "Brimham Rocks", "Scarth Wood Moor", "Bridestones"))
+d$Site <- factor(d$Site, levels = c("Whiteside", "Haweswater", "Widdybanks", "Brimham Moor", "Scarth Wood Moor", "Bridestones"))
 #total mesofauna abundances
 d$`Total Mesofauna Catch`<- rowSums(d[,4:11])
 #total invertebrate abundances
-d$`Total Invertebrate Catch`<- rowSums(d[,4:23])
+d$`Total Invertebrate Catch`<- rowSums(d[,4:27])
 
 
 print(sum(d$`Total Mesofauna Catch`))
@@ -2640,9 +2640,10 @@ print(sum(d$`Total Invertebrate Catch`))
 #get percentages of mites/springtails of all morphospecies
 d$`Percentage Mites` = ((d$Mesostigmata + d$Oribatida + d$Astigmatina + d$Prostigmata)/(d$`Total Invertebrate Catch`))*100
 d$`Percentage Collembola` = ((d$Symphypleona + d$Neelidae + d$Entomobryomorpha + d$Poduromorpha)/d$`Total Invertebrate Catch`)*100
+d$`Percentage Other` = (100-d$`Percentage Collembola` - d$`Percentage Mites`)
 
 #we are printing multiple lines so use cat()
-cat("Min mite percentage: ", min(d$`Percentage Mites`), "Max mite percentage: ", max(d$`Percentage Mites`),"Min collembola percentage: ", min(d$`Percentage Collembola`), "Max collembola percentage: ", max(d$`Percentage Collembola`))
+cat("Min mite percentage: ", min(d$`Percentage Mites`), "Max mite percentage: ", max(d$`Percentage Mites`),"Min collembola percentage: ", min(d$`Percentage Collembola`), "Max collembola percentage: ", max(d$`Percentage Collembola`), "Min other invert percentage: ", min(d$`Percentage Other`), "Max other invert percentage: ", max(d$`Percentage Other`))
 
 #standardize abundances to standard depth
 #extract the morphospecies count data
@@ -2678,7 +2679,6 @@ figure <- ggboxplot(d, x = "Site", y = '1000s Individuals per m2 to 10 cm depth'
 
 #display our plot
 figure
-
 
 ggsave(path = "figures", paste0(Sys.Date(), "_mesofauna_abundance_per_m2_to_10cm_depth.svg"), width = 10, height= 5, figure)
 
@@ -2792,7 +2792,7 @@ d_moisture <- readr::read_csv(
 
 #### Week 1 + 2 alpha diversity metrics ----
 d <- readr::read_csv(
-  here::here("data", "Tullgren Extracts - Week 1 + 2 Extracts.csv")
+  here::here("data", "n = 10 Tullgren Extracts - Week 1 + 2 Extracts.csv")
 ) 
 #order samples by ID alphabetically
 d <- arrange(d, d["Sample ID"])
@@ -2804,7 +2804,7 @@ d[is.na(d)] <- 0
 #total mesofauna abundances
 d$`Total Mesofauna Catch`<- rowSums(d[,4:11])
 #total invertebrate abundances
-d$`Total Invertebrate Catch`<- rowSums(d[,4:23])
+d$`Total Invertebrate Catch`<- rowSums(d[,4:27])
 #shannon diversity of the 8 mesofauna groups
 d$`Mesofauna Shannon` <- diversity(d[,4:11], "shannon")
 #simpson diversity of the 8 mesofauna groups
@@ -3605,11 +3605,9 @@ shapiro.test(x = aov_residuals)
 
 
 
-
-
 #### Week 1 extracts mesofauna NMDS ----
 d <- readr::read_csv(
-  here::here("data", "Tullgren Extracts - Week 1 Extracts.csv")
+  here::here("data", "n = 10 Tullgren Extracts - Week 1 Extracts.csv")
 ) 
 #order samples by ID alphabetically
 d <- arrange(d, d["Sample ID"])
@@ -3641,12 +3639,12 @@ plot(example_NMDS, col = "white")
 
 
 #assign the treatments to relevant rows of the dataframe
-treat=c(rep("Brimham Bracken",5),rep("Brimham Heath",5), rep("Bridestones Bracken",5),rep("Bridestones Heath",5), rep("Haweswater Bracken", 5), rep("Haweswater Heath", 5), rep("Widdybanks Bracken", 5), rep("Widdybanks Heath", 5), rep("Whiteside Bracken", 5), rep("Whiteside Heath", 5))
+treat=c(rep("Brimham Bracken",10),rep("Brimham Heath",10), rep("Bridestones Bracken",10),rep("Bridestones Heath",10), rep("Haweswater Bracken", 10), rep("Haweswater Heath", 10), rep("Widdybanks Bracken", 10), rep("Widdybanks Heath", 10), rep("Whiteside Bracken", 10), rep("Whiteside Heath", 10))
 #set the colour for each treatment
 #colors =c(rep("#44AA99",5),rep("#117733",5), rep("#88CCEE",5),rep("#332288",5), rep("#AA4499", 5), rep("#882255", 5)) 
-colors =c(rep("#999999",5),rep("#E69F00",5), rep("#56B4E9",5),rep("#009E73",5), rep("#CC79A7", 5), rep("#0072B2", 5), rep("black",5),rep("green",5), rep("purple", 5), rep("red", 5)) 
+colors =c(rep("#999999",10),rep("#E69F00",10), rep("#56B4E9",10),rep("#009E73",10), rep("#CC79A7", 10), rep("#0072B2", 10), rep("black",10),rep("green",10), rep("purple", 10), rep("red", 10)) 
 #shapes for point codes
-pchs<- c(rep(15, 5), rep(0, 5), rep(16, 5), rep(1, 5), rep(17, 5), rep(2, 5), rep(18, 5), rep(3, 5), rep(19, 5), rep(4, 5))
+pchs<- c(rep(15, 10), rep(0, 10), rep(16, 10), rep(1, 10), rep(17, 10), rep(2, 10), rep(18, 10), rep(3, 10), rep(19, 10), rep(4, 10))
 #display the stress for all morphotypes
 #text(-0.8,1.4, paste("Stress = ", round(example_NMDS$stress, 3)))
 #display the stress for only mites and springtails
@@ -3682,12 +3680,22 @@ for(i in unique(treat)) {
                 groups=treat[treat==i],col=colors[grep(i,treat)],label=F) } }
 
 plot(meso.intfit, col = "black", cex = 0.7)
-legend(0.7,2, legend=c("Brimham Bracken", "Brimham Heath", "Bridestones Bracken", "Bridestones Heath", "Haweswater Bracken", "Haweswater Heath", "Widdybanks Bracken", "Widdybanks Heath", "Whiteside Bracken", "Whiteside Heath"), col = c("#999999", "#E69F00", "#56B4E9", "#009E73", "#CC79A7", "#0072B2", "black", "green", "purple", "red"), pch = c(15, 0,16,1,17,2, 18, 3, 19, 4))
+legend(-1,0, legend=c("Brimham Bracken", "Brimham Heath", "Bridestones Bracken", "Bridestones Heath", "Haweswater Bracken", "Haweswater Heath", "Widdybanks Bracken", "Widdybanks Heath", "Whiteside Bracken", "Whiteside Heath"), col = c("#999999", "#E69F00", "#56B4E9", "#009E73", "#CC79A7", "#0072B2", "black", "green", "purple", "red"), pch = c(15, 0,16,1,17,2, 18, 3, 19, 4))
 
 
 
 #overlay environmental variables
-env <- all_data[, 12:20]
+#load the field data
+all_data <- readr::read_csv(
+  here::here("data", "all-sites_field-data.csv"), show_col_types = FALSE
+) 
+#order samples by ID alphabetically
+all_data <- arrange(all_data, all_data["SampleID"])
+all_data <- as.data.frame(all_data)
+#replace null (empty excell cell) with "0"
+all_data[is.na(all_data)] <- 0
+
+env <- all_data[, 6:21]
 rownames(env) <- all_data[, 1]
 meso.envfit <- envfit(example_NMDS, env, permutations = 999)
 
@@ -3711,15 +3719,15 @@ plot(meso.envfit, col = "black", cex = 0.7)
 
 # do PERMANOVA analysis
 #data frame containing the independent variables (Habitat, Vegetation) we shall be using in our PERMANOVA
-idvs <- all_data[,(3:4)]
+idvs <- d[,(2:3)]
 #run the permanova
-morph_permanova <- adonis2(spe ~ Habitat*Vegetation, idvs, permutations = 999, method = "bray", by = "terms")
+morph_permanova <- adonis2(spe ~ Site*Vegetation, idvs, permutations = 999, method = "bray", by = "terms")
 morph_permanova
 
 
 #run an ANOSIM. The ANOSIM test is similar to an ANOVA hypothesis test, but it uses a dissimilarity matrix as input instead of raw data. It is also non-parametric, meaning it doesn’t assume much about your data (like normal distribution etc), so it’s a good bet for often-skewed microbial abundance data. As a non-parametric test, ANOSIM uses ranked dissimilarities instead of actual distances, and in this way it’s a very nice complement to an NMDS plot. The main point of the ANOSIM test is to determine if the differences between two or more groups are significant.
 #run an anosim - when grouping by habitat
-ano = anosim(as.matrix(spe), grouping = all_data$Habitat, permutations = 9999, distance = "bray")
+ano = anosim(as.matrix(spe), grouping = all_data$Site, permutations = 9999, distance = "bray")
 #check output of anosim
 ano
 plot(ano)
@@ -3735,7 +3743,7 @@ plot(ano)
 
 #### Week 1 + 2 extracts mesofauna NMDS ----
 d <- readr::read_csv(
-  here::here("data", "Tullgren Extracts - Week 1 + 2 Extracts.csv")
+  here::here("data", "n = 10 Tullgren Extracts - Week 1 + 2 Extracts.csv")
 ) 
 #order samples by ID alphabetically
 d <- arrange(d, d["Sample ID"])
@@ -3776,18 +3784,21 @@ stressplot(example_NMDS)
 plot(example_NMDS, col = "white")
 
 
+
 #assign the treatments to relevant rows of the dataframe
-treat=c(rep("Brimham Bracken",5),rep("Brimham Heath",5), rep("Bridestones Bracken",5),rep("Bridestones Heath",5), rep("Haweswater Bracken", 5), rep("Haweswater Heath", 5), rep("Scarth Wood Bracken", 5), rep("Scarth Wood Heath", 5),rep("Widdybanks Bracken", 5), rep("Widdybanks Heath", 5), rep("Whiteside Bracken", 5), rep("Whiteside Heath", 5))
+treat=c(rep("Brimham Bracken",10),rep("Brimham Heath",10), rep("Bridestones Bracken",10),rep("Bridestones Heath",10), rep("Haweswater Bracken", 10), rep("Haweswater Heath", 10), rep("Widdybanks Bracken", 10), rep("Widdybanks Heath", 10), rep("Whiteside Bracken", 10), rep("Whiteside Heath", 10))
 #set the colour for each treatment
 #colors =c(rep("#44AA99",5),rep("#117733",5), rep("#88CCEE",5),rep("#332288",5), rep("#AA4499", 5), rep("#882255", 5)) 
-#colors =c(rep("#999999",5),rep("#E69F00",5), rep("#56B4E9",5),rep("#009E73",5), rep("#CC79A7", 5), rep("#0072B2", 5), rep("black",5),rep("green",5), rep("purple", 5), rep("red", 5), rep("cyan", 5), rep("navy", 5)) 
-colors =c(rep("green",5),rep("purple",5), rep("green",5),rep("purple",5),rep("green",5),rep("purple",5),rep("green",5),rep("purple",5),rep("green",5),rep("purple",5),rep("green",5),rep("purple",5)) 
+colors =c(rep("#999999",10),rep("#E69F00",10), rep("#56B4E9",10),rep("#009E73",10), rep("#CC79A7", 10), rep("#0072B2", 10), rep("black",10),rep("green",10), rep("purple", 10), rep("red", 10)) 
 #shapes for point codes
-pchs<- c(rep(15, 5), rep(0, 5), rep(16, 5), rep(1, 5), rep(17, 5), rep(2, 5), rep(18, 5), rep(3, 5), rep(19, 5), rep(4, 5), rep(20, 5), rep(5,5))
+pchs<- c(rep(15, 10), rep(0, 10), rep(16, 10), rep(1, 10), rep(17, 10), rep(2, 10), rep(18, 10), rep(3, 10), rep(19, 10), rep(4, 10))
+
+#colors =c(rep("green",10),rep("purple",10), rep("green",10),rep("purple",10),rep("green",10),rep("purple",10),rep("green",10),rep("purple",10),rep("green",10),rep("purple",10),rep("green",10),rep("purple",10)) 
+
 #display the stress for all morphotypes
 #text(-0.8,1.4, paste("Stress = ", round(example_NMDS$stress, 3)))
 #display the stress for only mites and springtails
-text(-1.5,0.4, paste("Stress = ", round(example_NMDS$stress, 3)))
+text(-1,0.5, paste("Stress = ", round(example_NMDS$stress, 3)))
 #visualise the points and ellipses
 for(i in unique(treat)) {
   #we have added an if statement so we can chose which points and ellipses to plot at a time e.g. i == "Grassland Bracken".  If we want to plot all ellipses simultaneously, set i == i
@@ -3800,9 +3811,64 @@ for(i in unique(treat)) {
     ordiellipse(example_NMDS$point[grep(i,treat),],kind = "se", conf = 0.95, draw="polygon",
                 groups=treat[treat==i],col=colors[grep(i,treat)],label=F) } }
 
+legend(-1.3,0.4, legend=c("Brimham Bracken", "Brimham Heath", "Bridestones Bracken", "Bridestones Heath", "Haweswater Bracken", "Haweswater Heath", "Widdybanks Bracken", "Widdybanks Heath", "Whiteside Bracken", "Whiteside Heath"), col = c("#999999", "#E69F00", "#56B4E9", "#009E73", "#CC79A7", "#0072B2", "black", "green", "purple", "red"), pch = c(15, 0,16,1,17,2, 18, 3, 19, 4))
+
+####now NMDS just with bracken vs non bracken, never mind the site----
+d <- readr::read_csv(
+  here::here("data", "n = 10 Tullgren Extracts - Week 1 + 2 Extracts.csv")
+) 
+#order samples by ID alphabetically
+d <- arrange(d, d["Vegetation"])
+d <- as.data.frame(d)
+#replace null (empty excell cell) with "0"
+d[is.na(d)] <- 0
+#replace row index with sample names
+rownames(d) <- d[,1]
+#just the morphospecies counts
+#spe <- d[,-(1:3)]
+#just the mite and springtail groups
+spe <- d[, (4:11)]
+spe <- as.matrix(spe)
+
+#all morphospecies
+#spe <- all_data[,51:436]
+#replace row index with sample names
+rownames(spe) <- d[,1]
+spe <- as.matrix(spe)
+
+#make sure our variables are coded as factors
+d$Vegetation <- factor(d$Vegetation, levels = c("Bracken", "Heather"), labels = c("Bracken", "Heather"))
+
+#k is the number of reduced dimensions
+#trymax sets the default number of iterations
+example_NMDS <- metaMDS(spe, distance = "bray", k = 2, maxit = 999, trymax = 500)
+#Shephard plot shows scatter around the regession between the interpoint distances in the final configuration (i.e. the distances between each pair of communities) against their original dissimilarities.  Large scatter around the line suggests the original dissimilarities are not well preserved in the reduced number of dimensions
+stressplot(example_NMDS)
+#set dimensions of new graphics window
+#dev.new(width = 719, height = 412, unit = "px")
+#plot the NMDS
+plot(example_NMDS, col = "white")
+#assign the treatments to relevant rows of the dataframe
+treat=c(rep("Bracken",60),rep("Heather",60))
+#set the colour for each treatment
+colors=c(rep("#117733",60), rep("#AA4499", 60))
+text(-1,2, paste("Stress = ", round(example_NMDS$stress, 3)))
+
+for(i in unique(treat)) {
+  #we have added an if statement so we can chose which points and ellipses to plot at a time e.g. i == "Grassland Bracken".  If we want to plot all ellipses simultaneously, set i == i
+  if(i == i){
+    #change the colour of each site name so samples from the same treatment have the same colour
+    orditorp(example_NMDS$point[grep(i,treat),],display="sites", col=colors[grep(i,treat)], cex=0.7,air=0.01)
+    #plots ellipse with ellipse centered on the centroid of the samples from the same treatment (and thus encapsulating 95% of the variance)
+    ordiellipse(example_NMDS$point[grep(i,treat),],draw="polygon",
+                groups=treat[treat==i],col=colors[grep(i,treat)],label=F) } }
+#specify legend manually
+legend(0.8,-0.4, legend = c("Bracken", "Heather"), fill = c("#117733",  "#AA4499"))
+
+#save the file using Export -> Save As Image -> 
 
 
-#overlay mesofauna morphotypes (instrinsic variables)
+####overlay mesofauna morphotypes (instrinsic variables)----
 meso.intfit <- envfit(example_NMDS, spe, permutations = 999)
 dev.new()
 ordiplot(example_NMDS, type = "n", main = "intrinsic variables")
@@ -3850,15 +3916,15 @@ plot(meso.envfit, col = "black", cex = 0.7)
 
 # do PERMANOVA analysis
 #data frame containing the independent variables (Habitat, Vegetation) we shall be using in our PERMANOVA
-idvs <- all_data[,(3:4)]
+idvs <- d[,(2:3)]
 #run the permanova
-morph_permanova <- adonis2(spe ~ Habitat*Vegetation, idvs, permutations = 999, method = "bray", by = "terms")
+morph_permanova <- adonis2(spe ~ Site*Vegetation, idvs, permutations = 999, method = "bray", by = "terms")
 morph_permanova
 
 
 #run an ANOSIM. The ANOSIM test is similar to an ANOVA hypothesis test, but it uses a dissimilarity matrix as input instead of raw data. It is also non-parametric, meaning it doesn’t assume much about your data (like normal distribution etc), so it’s a good bet for often-skewed microbial abundance data. As a non-parametric test, ANOSIM uses ranked dissimilarities instead of actual distances, and in this way it’s a very nice complement to an NMDS plot. The main point of the ANOSIM test is to determine if the differences between two or more groups are significant.
 #run an anosim - when grouping by habitat
-ano = anosim(as.matrix(spe), grouping = all_data$Habitat, permutations = 9999, distance = "bray")
+ano = anosim(as.matrix(spe), grouping = all_data$Site, permutations = 9999, distance = "bray")
 #check output of anosim
 ano
 plot(ano)
@@ -3878,7 +3944,7 @@ plot(ano)
 library(tidyverse)
 
 d <- readr::read_csv(
-  here::here("data", "Tullgren Extracts - Week 1 + 2 Extracts.csv")
+  here::here("data", "n = 10 Tullgren Extracts - Week 1 + 2 Extracts.csv")
 ) 
 #order samples by ID alphabetically
 d <- arrange(d, d["Sample ID"])
@@ -3913,7 +3979,7 @@ df_summary <- df_prop %>%
 #reorder the sites so they are plotted in the order we want
 df_summary$Site.x <- factor(df_summary$Site.x, levels = c(
   "Haweswater", "Whiteside", "Widdybanks", 
-  "Brimham Rocks", "Scarth Wood Moor", "Bridestones"
+  "Brimham Moor", "Scarth Wood Moor", "Bridestones"
 ))
 # Set custom species stacking order (bottom to top)
 df_summary$Species <- factor(df_summary$Species, levels = rev(c(
@@ -3921,7 +3987,7 @@ df_summary$Species <- factor(df_summary$Species, levels = rev(c(
 
 
 # Split into two datasets: Heath and Bracken
-df_heath <- df_summary %>% filter(Vegetation.x == "Heath")
+df_heath <- df_summary %>% filter(Vegetation.x == "Heather")
 df_bracken <- df_summary %>% filter(Vegetation.x == "Bracken")
 
 # Plot 1: Heath
