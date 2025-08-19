@@ -2616,6 +2616,8 @@ fviz_pca_var(pca_result, col.var = "cos2",
              repel = TRUE)
 
 
+
+
 #### Invertebrate catch percetnage breakdown  and standardozed abundances ----
 d <- readr::read_csv(
   here::here("data", "n = 10 Tullgren Extracts - Week 1 + 2 Extracts.csv")
@@ -2694,6 +2696,89 @@ figure
 
 ggsave(path = "figures", paste0(Sys.Date(), "_mesofauna_abundance_per_100_g_dry_soil.svg"), width = 10, height= 5, figure)
 
+
+#stacked barcharts showing how communities change across site, as % of total number of organisms.  Standardized by dry soil mass?
+
+d$`Mesostigmata per 100 g dry soil mass` <- (d$Mesostigmata/d$`Dry soil mass (g)`)*100
+d$`Oribatida per 100 g dry soil mass` <- (d$Oribatida/d$`Dry soil mass (g)`)*100
+d$`Astigmatina per 100 g dry soil mass` <- (d$Astigmatina/d$`Dry soil mass (g)`)*100
+d$`Prostigmata per 100 g dry soil mass` <- (d$Prostigmata/d$`Dry soil mass (g)`)*100
+d$`Entomobryomorpha per 100 g dry soil mass` <- (d$Entomobryomorpha/d$`Dry soil mass (g)`)*100
+d$`Poduromorpha per 100 g dry soil mass` <- (d$Poduromorpha/d$`Dry soil mass (g)`)*100
+d$`Symphypleona per 100 g dry soil mass` <- (d$Symphypleona/d$`Dry soil mass (g)`)*100
+d$`Neelidae per 100 g dry soil mass` <- (d$Neelidae/d$`Dry soil mass (g)`)*100
+
+
+# Load necessary libraries
+library(tidyverse)
+
+spe <- d[,c(1,2,3, 37, 38, 39, 40, 41, 42, 43, 44)]
+
+# Identify species columns (exclude metadata)
+species_cols <- setdiff(names(spe), c("Sample ID", "Site", "Vegetation"))
+
+# Step 1: Pivot to long format
+df_long <- spe %>%
+  pivot_longer(cols = all_of(species_cols),
+               names_to = "Species",
+               values_to = "Abundance")
+
+# Step 2: Calculate proportional abundance within each Sample
+df_prop <- df_long %>%
+  group_by(`Sample ID`) %>%
+  mutate(Proportion = Abundance / sum(Abundance)) %>%
+  ungroup()
+
+# Step 3: Merge in Site and Vegetation info
+df_meta <- spe %>% select(`Sample ID`, Site, Vegetation) %>% distinct()
+df_prop <- df_prop %>% left_join(df_meta, by = "Sample ID")
+
+# Step 4: Aggregate to Site × Vegetation: compute mean proportion per species
+df_summary <- df_prop %>%
+  group_by(Site.x, Vegetation.x, Species) %>%
+  summarise(Mean_Proportion = mean(Proportion, na.rm = TRUE), .groups = "drop")
+#reorder the sites so they are plotted in the order we want
+df_summary$Site.x <- factor(df_summary$Site.x, levels = c(
+  "Haweswater", "Whiteside", "Widdybanks", 
+  "Brimham Moor", "Scarth Wood Moor", "Bridestones"
+))
+# Set custom species stacking order (bottom to top)
+df_summary$Species <- factor(df_summary$Species, levels = rev(c(
+  "Mesostigmata per 100 g dry soil mass", "Oribatida per 100 g dry soil mass", "Astigmatina per 100 g dry soil mass", "Prostigmata per 100 g dry soil mass", "Entomobryomorpha per 100 g dry soil mass", "Poduromorpha per 100 g dry soil mass", "Symphypleona per 100 g dry soil mass",  "Neelidae per 100 g dry soil mass")))
+
+
+# Split into two datasets: Heath and Bracken
+df_heath <- df_summary %>% filter(Vegetation.x == "Heather")
+df_bracken <- df_summary %>% filter(Vegetation.x == "Bracken")
+
+# Plot 1: Heath
+plot_heath <- ggplot(df_heath, aes(x = Site.x, y = Mean_Proportion, fill = Species)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Mean Species Composition in Heath",
+       x = "Site", y = "Mean Proportional Abundance") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90))
+
+# Plot 2: Bracken
+plot_bracken <- ggplot(df_bracken, aes(x = Site.x, y = Mean_Proportion, fill = Species)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Mean Species Composition in Bracken",
+       x = "Site", y = "Mean Proportional Abundance") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90))
+
+show(plot_heath)
+show(plot_bracken)
+
+# Save plots
+ggsave(path = "figures", paste0(Sys.Date(), "_mean_species_composition_standardised_heath.svg"),
+       plot = plot_heath, width = 7, height = 5, dpi = 300)
+
+ggsave(path = "figures", paste0(Sys.Date(), "_mean_species_composition_standardized_bracken.svg"),
+       plot = plot_bracken, width = 7, height = 5, dpi = 300)
+
+#save our datafile containg standardized mesofauna abundances
+write.csv(d, "data/2025-08-19_standardized-mesofauna-data.csv")
 
 ####analyse mesofauna abundance per 100g dry soil ----
 hist(d$`Individuals per 100g dry soil`)
@@ -3882,15 +3967,6 @@ ggsave(path = "figures", paste0(Sys.Date(), "_neelidae_abundance.svg"), width = 
 
 
 
-
-
-
-
-#### space ----
-
-
-
-
 #### Week 1 + 2 alpha diversity metrics ----
 d <- readr::read_csv(
   here::here("data", "n = 10 Tullgren Extracts - Week 1 + 2 Extracts.csv")
@@ -4216,7 +4292,6 @@ figure
 
 
 
-#space break
 
 #### Week 1 extracts mesofauna NMDS ----
 d <- readr::read_csv(
@@ -4368,7 +4443,8 @@ rownames(d) <- d[,1]
 #just the morphospecies counts
 #spe <- d[,-(1:3)]
 #just the mite and springtail groups
-spe <- d[, (4:11)]
+#spe <- d[, (4:11)]
+spe <- d[, (37:44)]
 spe <- as.matrix(spe)
 
 #all morphospecies
@@ -4551,82 +4627,111 @@ plot(ano)
 
 
 
-#### Week 1 + 2 stacked barcharts of species groups ----
-#stacked barcharts showing how communities change across site, as % of total number of organisms
-# Load necessary libraries
-library(tidyverse)
 
+#### create new master doc containg mesofauna data added to the existing master file ----
 d <- readr::read_csv(
-  here::here("data", "n = 10 Tullgren Extracts - Week 1 + 2 Extracts.csv")
+  here::here("data", "2025-08-19_standardized-mesofauna-data.csv")
 ) 
+pca <- readr::read_csv(
+  here::here("data", "2025-03-19_PCA-data.csv"), show_col_types = FALSE
+) 
+
+df2_subset <- d[, c("Sample ID", names(d)[5:45])]
+
+# Step 2: Merge df1 with the selected columns from df2
+df_combined <- merge(pca, df2_subset, by = "Sample ID", all.x = TRUE)
+#remove unnecessary columns
+df_combined <- df_combined %>% select(-...1)   
+
+#save our master datafile
+write.csv(df_combined, "data/2025-08-19_dbRDA_masterfile.csv")
+
+#### dbRDA ----
+d <- readr::read_csv(
+  here::here("data", "2025-08-19_dbRDA_masterfile.csv")
+) 
+
+#define the community data frame
 #order samples by ID alphabetically
-d <- arrange(d, d["Sample ID"])
+
 d <- as.data.frame(d)
+#replace row index with sample names
+rownames(d) <- d[,1]
+#the community data frame
+cdf <- d[,(70:77)]
 #replace null (empty excell cell) with "0"
-d[is.na(d)] <- 0
-d <- d[,(0:11)]
+cdf[is.na(cdf)] <- 0
+cdf <- as.matrix(cdf)
 
-# Identify species columns (exclude metadata)
-species_cols <- setdiff(names(d), c("Sample ID", "Site", "Vegetation"))
+#explanatory data frame: paramters that differed significantly.  THese have different base units so we may want to standardize them e.g. by z scoring
+edf <- d[, c(30, 31, 36, 34)]
 
-# Step 1: Pivot to long format
-df_long <- d %>%
-  pivot_longer(cols = all_of(species_cols),
-               names_to = "Species",
-               values_to = "Abundance")
+#assign the treatments to relevant rows of the dataframe
+edf$treatment <- c(rep("Grassland Bracken Present",5),rep("Grassland Bracken Absent",5), rep("Heathland Bracken Present",5),rep("Heathland Bracken Absent",5), rep("Woodland Bracken Present", 5), rep("Woodland Bracken Absent", 5))
 
-# Step 2: Calculate proportional abundance within each Sample
-df_prop <- df_long %>%
-  group_by(`Sample ID`) %>%
-  mutate(Proportion = Abundance / sum(Abundance)) %>%
-  ungroup()
+#save the results of the dbRDA to a variable, looking at sample location effects only (longitude, latitude, elevation) - account for 18% of the variance in the microivert communities - but not the other 82%!
+dbrda_summary <- dbrda(formula = cdf ~ `Water content (% of wet soil mass)` + `Total Carbon (g kg-1)` + `CN ratio` + pH + `DOC Concentration (mg C g-1)` + `TNb Concentration (mg N g-1)` + `Zn (mg g-1)` + `Mn (mg g-1)` + `Vegetation Shannon` + `Vegetation Simpson`, edf, distance = "euclidean", sqrt.dist = FALSE, add = FALSE, dfun = vegdist, metaMDSdist = FALSE, na.action = na.exclude, subset = NULL)
 
-# Step 3: Merge in Site and Vegetation info
-df_meta <- d %>% select(`Sample ID`, Site, Vegetation) %>% distinct()
-df_prop <- df_prop %>% left_join(df_meta, by = "Sample ID")
-
-# Step 4: Aggregate to Site × Vegetation: compute mean proportion per species
-df_summary <- df_prop %>%
-  group_by(Site.x, Vegetation.x, Species) %>%
-  summarise(Mean_Proportion = mean(Proportion, na.rm = TRUE), .groups = "drop")
-#reorder the sites so they are plotted in the order we want
-df_summary$Site.x <- factor(df_summary$Site.x, levels = c(
-  "Haweswater", "Whiteside", "Widdybanks", 
-  "Brimham Moor", "Scarth Wood Moor", "Bridestones"
-))
-# Set custom species stacking order (bottom to top)
-df_summary$Species <- factor(df_summary$Species, levels = rev(c(
-  "Mesostigmata", "Oribatida", "Astigmatina", "Prostigmata", "Symphypleona", "Entomobryomorpha", "Poduromorpha", "Neelidae")))
+summary(dbrda_summary)
 
 
-# Split into two datasets: Heath and Bracken
-df_heath <- df_summary %>% filter(Vegetation.x == "Heather")
-df_bracken <- df_summary %>% filter(Vegetation.x == "Bracken")
+# Define treatment variable and convert to factor
+#treatment <- as.factor(edf$treatment)
 
-# Plot 1: Heath
-plot_heath <- ggplot(df_heath, aes(x = Site.x, y = Mean_Proportion, fill = Species)) +
-  geom_bar(stat = "identity") +
-  labs(title = "Mean Species Composition in Heath",
-       x = "Site", y = "Mean Proportional Abundance") +
-  theme_minimal() +
-  theme(axis.text.x = element_text(angle = 90))
+treatment <- factor(edf$treatment, levels = unique(edf$treatment))
+# Define custom colors and point shapes (pch) for the 6 treatments
+treatment_levels <- levels(treatment)
+#colours for each treatment
+colors =c("#999999", "#E69F00", "#56B4E9", "#009E73", "#CC79A7", "#0072B2")[seq_along(treatment_levels)]
+#shapes for point codes
+pchs<- c(15, 0, 16, 1, 17,2)[seq_along(treatment_levels)]
 
-# Plot 2: Bracken
-plot_bracken <- ggplot(df_bracken, aes(x = Site.x, y = Mean_Proportion, fill = Species)) +
-  geom_bar(stat = "identity") +
-  labs(title = "Mean Species Composition in Bracken",
-       x = "Site", y = "Mean Proportional Abundance") +
-  theme_minimal() +
-  theme(axis.text.x = element_text(angle = 90))
 
-# Save plots
-ggsave(path = "figures", paste0(Sys.Date(), "_mean_species_composition_heath.svg"),
-       plot = plot_heath, width = 7, height = 5, dpi = 300)
+# Get variance explained by each axis
+eig_vals <- eigenvals(dbrda_summary)
+var_explained <- eig_vals / sum(eig_vals) * 100
+axis_labels <- paste0("dbRDA", 1:2, " (", round(var_explained[1:2], 1), "%)")
 
-ggsave(path = "figures", paste0(Sys.Date(), "_mean_species_composition_bracken.svg"),
-       plot = plot_bracken, width = 7, height = 5, dpi = 300)
+# Set the output PDF file and dimensions (in inches)
+pdf("Figures/18_06_2025_dbRDA_plot.pdf", width = 7, height = 6)
 
-#see if there are significant differences between each group at each site/vegetation
-anova <- aov(d$`Neelidae` ~ d$Vegetation * d$Site)
-summary(anova)
+# Base plot: empty dbRDA ordination
+plot(dbrda_summary, type = "n", scaling = 2, , 
+     xlab = axis_labels[1], ylab = axis_labels[2])  # Use scaling = 2 for species-environment biplot
+
+# Add site points, colored by treatment
+for (i in seq_along(treatment_levels)) {
+  sel <- treatment == treatment_levels[i]
+  points(scores(dbrda_summary, display = "sites", scaling = 2)[sel, ], 
+         col = colors[i], pch = pchs[i], cex = 1.2)
+} 
+# --- Add ellipses around treatment groups ---
+ordiellipse(dbrda_summary, groups = treatment, display = "sites", kind = "se", conf = 0.95, draw = "polygon", col = colors, border = colors,lwd = 1.5,lty = 1, alpha = 60)  # transparency (0–255); needs vegan >= 2.6-4
+
+
+# Add legend
+legend("bottomright", legend = treatment_levels, 
+       col = colors, pch = pchs)
+
+# Extract biplot scores of environmental variables
+env_vectors <- scores(dbrda_summary, display = "bp", scaling = 2)
+# Scale factor to adjust vector length visually
+vec_multiplier <- ordiArrowMul(env_vectors)  # automatic scaling
+# Add arrows
+apply(env_vectors, 1, function(row) {
+  arrows(0, 0, row[1] * vec_multiplier, row[2] * vec_multiplier, 
+         length = 0.1, col = "black")
+})
+# Add vector labels
+text(env_vectors * vec_multiplier, labels = rownames(env_vectors), 
+     col = "black", pos = 4, cex = 0.8)
+
+dev.off()
+
+#is the model significant?
+anova(dbrda_summary)
+#test axes for significance
+anova(dbrda_summary, by = "axis", perm.max = 500)
+#test environmental variables for significance
+anova(dbrda_summary, by = "terms", perm.max = 500)
 
