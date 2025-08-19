@@ -3675,7 +3675,7 @@ ggsave(path = "figures", paste0(Sys.Date(), "_entomobryomorpha_abundance.svg"), 
 
 
 
-#### Entomobryomorpha abundance ANOVAs ----
+#### Poduromorpha abundance ANOVAs ----
 
 #transform the data to pass Shapiro
 hist(d$Poduromorpha)
@@ -3699,24 +3699,17 @@ shapiro.test(x = aov_residuals)
 summary(anova)
 #tukey's test to identify significant interactions
 tukey <- TukeyHSD(anova)
-print(tukey)
-
-
-
-
-
-
-
 #compact letter display
 cld <- multcompLetters4(anova, tukey)
 #compact letter display
 print(cld)
-
+#get the p values
+print(tukey)
 
 
 
 #graphing boxplots with bracken split from nonbracken
-poduro_bxp <-ggboxplot(d, x = "Site", y = "`Poduromorpha (log transformed)`", color = "Vegetation", ylab = "Poduromorpha abundance (log (x + 10) transformed)", palette = c("limegreen", "#AA4499"), lwd = 0.75) + theme(
+poduro_bxp <-ggboxplot(d, x = "Site", y = "`Poduromorpha (log transformed)`", color = "Vegetation", ylab = "Poduromorpha abundance (log (x + 1) transformed)", palette = c("limegreen", "#AA4499"), lwd = 0.75) + theme(
   #remove x axis label
   axis.title.x=element_blank(),
   # Remove panel border
@@ -3751,6 +3744,152 @@ ggsave(path = "figures", paste0(Sys.Date(), "_poduromorpha_abundance.svg"), widt
 
 
 #fucking space!
+
+#### Symphypleona abundance ANOVAs ----
+
+#transform the data to pass Shapiro
+hist(d$Symphypleona)
+d$`Symphypleona (log transformed)` <- (d$Symphypleona)^(1/3)
+hist(d$`Symphypleona (log transformed)`)
+#anova to see if key metrics differ between site/vegetation
+#anova
+anova <- aov(d$`Symphypleona (log transformed)` ~ d$Vegetation * d$Site)
+#check homogeneity of variance
+plot(anova, 1)
+#levene test.  if p value < 0.05, there is evidence to suggest that the variance across groups is statistically significantly different.
+leveneTest(d$`Symphypleona (log transformed)` ~ d$Vegetation*d$Site)
+#check normality.  
+plot(anova, 2)
+#conduct shapiro-wilk test on ANOVA residuals to test for normality
+#extract the residuals
+aov_residuals <- residuals(object = anova)
+#run shapiro-wilk test.  if p > 0.05 the data is normal
+shapiro.test(x = aov_residuals)
+
+summary(anova)
+#tukey's test to identify significant interactions
+tukey <- TukeyHSD(anova)
+#compact letter display
+cld <- multcompLetters4(anova, tukey)
+#compact letter display
+print(cld)
+#get the p values
+print(tukey)
+
+
+
+#graphing boxplots with bracken split from nonbracken
+symphy_bxp <-ggboxplot(d, x = "Site", y = "`Symphypleona (log transformed)`", color = "Vegetation", ylab = "Symphypleona abundance (cube root transformed)", palette = c("limegreen", "#AA4499"), lwd = 0.75) + theme(
+  #remove x axis label
+  axis.title.x=element_blank(),
+  # Remove panel border
+  panel.border = element_blank(),  
+  # Remove panel grid lines
+  panel.grid.major = element_blank(),
+  panel.grid.minor = element_blank(),
+  # Remove panel background
+  panel.background = element_blank(),
+  # Add axis line
+  axis.line = element_line(colour = "black", linewidth = 0.5),
+  #change colour and thickness of axis ticks
+  axis.ticks = element_line(colour = "black", linewidth = 0.5),
+  #change axis labels colour
+  axis.title.y = element_text(colour = "black"),
+  #change tick labels colour
+  axis.text.y = element_text(colour = "black"),
+  legend.title = element_blank()
+) 
+show(symphy_bxp)
+
+#save our plot
+ggsave(path = "figures", paste0(Sys.Date(), "_symphypleona_abundance.svg"), width = 10, height= 5, symphy_bxp)
+
+
+
+
+
+
+
+
+
+
+#fucking space!
+
+
+
+#space break
+
+#### Neelidae abundance ANOVAs ----
+
+#transform the data to pass Shapiro
+hist(d$Neelidae)
+d$`Neelidae (log transformed)` <- log(d$Neelidae + 1)
+hist(d$`Neelidae (log transformed)`)
+#anova to see if key metrics differ between site/vegetation
+#anova
+anova <- aov(d$`Neelidae (log transformed)` ~ d$Vegetation * d$Site)
+#check homogeneity of variance
+plot(anova, 1)
+#levene test.  if p value < 0.05, there is evidence to suggest that the variance across groups is statistically significantly different.
+leveneTest(d$`Neelidae (log transformed)` ~ d$Vegetation*d$Site)
+#check normality.  
+plot(anova, 2)
+#conduct shapiro-wilk test on ANOVA residuals to test for normality
+#extract the residuals
+aov_residuals <- residuals(object = anova)
+#run shapiro-wilk test.  if p > 0.05 the data is normal
+shapiro.test(x = aov_residuals)
+
+summary(anova)
+#tukey's test to identify significant interactions
+tukey <- TukeyHSD(anova)
+#compact letter display
+cld <- multcompLetters4(anova, tukey)
+#compact letter display
+print(cld)
+#get the p values
+print(tukey)
+
+
+
+#graphing boxplots with bracken split from nonbracken
+neeli_bxp <-ggboxplot(d, x = "Site", y = "`Neelidae (log transformed)`", color = "Vegetation", ylab = "Neelidae (log(x + 1) transformed)", palette = c("limegreen", "#AA4499"), lwd = 0.75) + theme(
+  #remove x axis label
+  axis.title.x=element_blank(),
+  # Remove panel border
+  panel.border = element_blank(),  
+  # Remove panel grid lines
+  panel.grid.major = element_blank(),
+  panel.grid.minor = element_blank(),
+  # Remove panel background
+  panel.background = element_blank(),
+  # Add axis line
+  axis.line = element_line(colour = "black", linewidth = 0.5),
+  #change colour and thickness of axis ticks
+  axis.ticks = element_line(colour = "black", linewidth = 0.5),
+  #change axis labels colour
+  axis.title.y = element_text(colour = "black"),
+  #change tick labels colour
+  axis.text.y = element_text(colour = "black"),
+  legend.title = element_blank()
+) 
+show(neeli_bxp)
+
+#save our plot
+ggsave(path = "figures", paste0(Sys.Date(), "_neelidae_abundance.svg"), width = 10, height= 5, neeli_bxp)
+
+
+
+
+
+
+
+
+
+#### space ----
+
+
+
 
 #### Week 1 + 2 alpha diversity metrics ----
 d <- readr::read_csv(
