@@ -2620,7 +2620,6 @@ fviz_pca_var(pca_result, col.var = "cos2",
 d <- readr::read_csv(
   here::here("data", "n = 10 Tullgren Extracts - Week 1 + 2 Extracts.csv")
 ) 
-
 #order samples by ID alphabetically
 d <- arrange(d, d["Sample ID"])
 d <- as.data.frame(d)
@@ -2628,6 +2627,7 @@ d <- as.data.frame(d)
 d[is.na(d)] <- 0
 #order the sites as they should appear on the graph from west to east
 d$Site <- factor(d$Site, levels = c("Whiteside", "Haweswater", "Widdybanks", "Brimham Moor", "Scarth Wood Moor", "Bridestones"))
+d$Vegetation <- factor(d$Vegetation, levels = c("Bracken", "Heather"))
 #total mesofauna abundances
 d$`Total Mesofauna Catch`<- rowSums(d[,4:11])
 #total invertebrate abundances
@@ -2652,9 +2652,142 @@ volume <- 0.1 * (pi*(0.025^2))
 d$CoreVolume <- volume
 #number of mesofauna per m3, to a depth of 10cm
 d$`1000s Individuals per m2 to 10 cm depth` <- ((d$`Total Mesofauna Catch`/d$CoreVolume)*0.1)/1000
+#standardize to dry soil mass
+#load data containg tullgren dry soil mass
+d_tdsm <- readr::read_csv(
+  here::here("data", "all-sites_dry-tullgren-soil-mass.csv")
+) 
+d$`Sample ID` <- gsub(" ", "-", d$`Sample ID`)
+#add the dry soil mass column
+d <- d %>%
+  left_join(d_tdsm %>% select(`Sample ID`, `Dry soil mass (g)`), by = "Sample ID")
+#calculate  individuals per g dry soil
+d$`Individuals per 100g dry soil` <- (d$`Total Mesofauna Catch`/d$`Dry soil mass (g)`)*100
+
 #plot abundances
 
 library(scales) # displays 100,000 as 100,000, not as 1e5
+
+figure <- ggboxplot(d, x = "Site", y = 'Individuals per 100g dry soil', color = "Vegetation", palette = c("limegreen", "#AA4499"), lwd = 0.75)  +
+  labs(y = expression("Individuals per 100 g dry soil")) + theme( #remove x axis label
+    axis.title.x=element_blank(),
+    # Remove panel border
+    panel.border = element_blank(),  
+    # Remove panel grid lines
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    # Remove panel background
+    panel.background = element_blank(),
+    # Add axis line
+    axis.line = element_line(colour = "black", linewidth = 0.5),
+    #change colour and thickness of axis ticks
+    axis.ticks = element_line(colour = "black", linewidth = 0.5),
+    #change axis labels colour
+    axis.title.y = element_text(colour = "black"),
+    #change tick labels colour
+    axis.text.y = element_text(colour = "black"),
+    legend.title = element_blank()
+  ) + scale_y_continuous(labels = label_comma())
+
+#display our plot
+figure
+
+ggsave(path = "figures", paste0(Sys.Date(), "_mesofauna_abundance_per_100_g_dry_soil.svg"), width = 10, height= 5, figure)
+
+
+####analyse mesofauna abundance per 100g dry soil ----
+hist(d$`Individuals per 100g dry soil`)
+#transform the data for a normal distribution
+d$`Mesofauna Individuals er 100 g dry soil log x plus 10 transformed` <- log(d$`Individuals per 100g dry soil` + 10)
+#the tranformation seems to have worked, giving us something resembling a normal distribution
+hist(d$`Mesofauna Individuals er 100 g dry soil log x plus 10 transformed`)
+
+#Type 1 two-way anova using data from all sites
+anova <- aov(d$`Mesofauna Individuals er 100 g dry soil log x plus 10 transformed` ~ d$Vegetation * d$Site)
+summary(anova)
+#tukey's test to identify significant interactions
+tukey <- TukeyHSD(anova)
+print(tukey)
+#compact letter display
+cld <- multcompLetters4(anova, tukey)
+#compact letter display
+print(cld)
+
+#check homogeneity of variance
+plot(anova, 1)
+#levene test.  if p value < 0.05, there is evidence to suggest that the variance across groups is statistically significantly different.
+leveneTest(d$`Mesofauna Individuals er 100 g dry soil log x plus 10 transformed` ~ d$Vegetation * d$Site)
+#check normality.  
+plot(anova, 2)
+#conduct shapiro-wilk test on ANOVA residuals to test for normality
+#extract the residuals
+aov_residuals <- residuals(object = anova)
+#run shapiro-wilk test.  if p > 0.05 the data is normal
+shapiro.test(x = aov_residuals)
+
+#### mesofauna abundance per 100 g dry soil, at each site ----
+
+#brimham 1:20, bridestones 21:40, hawswater 41:60, scarth wood 61:80, widdybanks 81:100, whiteside 101:120
+site <- d[(101:120),]
+hist(site$`Individuals per 100g dry soil`)
+#transform the data for a normal distribution
+site$`Mesofauna Individuals per 100 g dry soil log x plus 10 transformed` <- log(site$`Individuals per 100g dry soil` + 10)
+#the tranformation seems to have worked, giving us something resembling a normal distribution
+hist(site$`Mesofauna Individuals per 100 g dry soil log x plus 10 transformed`)
+
+#Type 1 two-way anova using data from all sites
+anova <- aov(site$`Mesofauna Individuals per 100 g dry soil` ~ site$Vegetation)
+#check homogeneity of variance
+plot(anova, 1)
+#levene test.  if p value < 0.05, there is evidence to suggest that the variance across groups is statistically significantly different.
+leveneTest(site$`Mesofauna Individuals per 100 g dry soil log x plus 10 transformed` ~ site$Vegetation)
+#check normality.  
+plot(anova, 2)
+#conduct shapiro-wilk test on ANOVA residuals to test for normality
+#extract the residuals
+aov_residuals <- residuals(object = anova)
+#run shapiro-wilk test.  if p > 0.05 the data is normal
+shapiro.test(x = aov_residuals)
+
+summary(anova)
+#tukey's test to identify significant interactions
+tukey <- TukeyHSD(anova)
+print(tukey)
+#compact letter display
+cld <- multcompLetters4(anova, tukey)
+#compact letter display
+print(cld)
+
+
+figure <- ggboxplot(site, x = "Vegetation", y = 'Individuals per 100g dry soil', palette = c("limegreen", "#AA4499"), lwd = 0.75)  +
+  labs(y = expression("Individuals per 100 g dry soil")) + theme( #remove x axis label
+    axis.title.x=element_blank(),
+    # Remove panel border
+    panel.border = element_blank(),  
+    # Remove panel grid lines
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    # Remove panel background
+    panel.background = element_blank(),
+    # Add axis line
+    axis.line = element_line(colour = "black", linewidth = 0.5),
+    #change colour and thickness of axis ticks
+    axis.ticks = element_line(colour = "black", linewidth = 0.5),
+    #change axis labels colour
+    axis.title.y = element_text(colour = "black"),
+    #change tick labels colour
+    axis.text.y = element_text(colour = "black"),
+    legend.title = element_blank()
+  ) + scale_y_continuous(labels = label_comma())
+
+#display our plot
+figure
+
+
+
+
+
+#### mesofauna abundance per m2 to 10 cm depth analysis ----
 
 figure <- ggboxplot(d, x = "Site", y = '1000s Individuals per m2 to 10 cm depth', color = "Vegetation", palette = c("limegreen", "#AA4499"), lwd = 0.75)  +
   labs(y = expression("1000 individuals per m"^2*" soil (to 10 cm depth)")) + theme( #remove x axis label
