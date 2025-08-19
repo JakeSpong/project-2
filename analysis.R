@@ -16,246 +16,246 @@ library(broom)
 library('FactoMineR') #for PCA visualisation
 
 #### NEw Mapping of Sample Locations ----
-library(ggplot2)
-library(rnaturalearth)
-library(rnaturalearthdata)
-library(sf)
-library(ggmap)
-
-#load the field data
-all_data <- readr::read_csv(
-  here::here("data", "all-sites_field-data.csv"), show_col_types = FALSE
-) 
-
-#extract the sample coordinates from the dataframe
-sample_coordinates <- data.frame(
-  Site = all_data$Site,
-  Vegetation = all_data$Vegetation,
-  Longitude = all_data$LongitudeE,
-  Latitude = all_data$LatitudeN
-)
-#the sample coordinates belonging to each site
-bridestones <- sample_coordinates[1:20, ]
-scarthwood <- sample_coordinates[21:40, ]
-brimham <- sample_coordinates[41:60, ]
-haweswater <- sample_coordinates[61:80,]
-whiteside <- sample_coordinates[81:100, ]
-widdybanks <- sample_coordinates[101:120,]
-
-# Calculate the bounding box surrounding the 30 sample coordinates
-bridestones_longitude_range_sample <- range(bridestones$Longitude)
-bridestones_latitude_range_sample <- range(bridestones$Latitude)
-# Calculate the bounding box surrounding the 30 sample coordinates
-scarthwood_longitude_range_sample <- range(scarthwood$Longitude)
-scarthwood_latitude_range_sample <- range(scarthwood$Latitude)
-# Calculate the bounding box surrounding the 30 sample coordinates
-brimham_longitude_range_sample <- range(brimham$Longitude)
-brimham_latitude_range_sample <- range(brimham$Latitude)
-# Calculate the bounding box surrounding the 30 sample coordinates
-haweswater_longitude_range_sample <- range(haweswater$Longitude)
-haweswater_latitude_range_sample <- range(haweswater$Latitude)
-# Calculate the bounding box surrounding the 30 sample coordinates
-whiteside_longitude_range_sample <- range(whiteside$Longitude)
-whiteside_latitude_range_sample <- range(whiteside$Latitude)
-# Calculate the bounding box surrounding the 30 sample coordinates
-widdybanks_longitude_range_sample <- range(widdybanks$Longitude)
-widdybanks_latitude_range_sample <- range(widdybanks$Latitude)
-
-
-# Register your Google API key
-register_google(key = "AIzaSyA42ZmX_RGv9dTA7PFy4UR0YIjxW3x0rUE")
-
-# Load the UK map from the rnaturalearth package
-uk_map <- ne_countries(scale = "medium", returnclass = "sf") %>%
-  filter(name == "United Kingdom")
-
-# Plot the UK map with only the bounding box
-UK_Sites <- ggplot(data = uk_map) +
-  geom_sf(fill = "lightblue") +  # UK map with light blue fill
-  geom_rect(
-    aes(xmin = bridestones_longitude_range_sample[1],
-        xmax = bridestones_longitude_range_sample[2],
-        ymin = bridestones_latitude_range_sample[1],
-        ymax = bridestones_latitude_range_sample[2]
-        ), 
-    color = "red", fill = NA, size = 2) +  # Add bounding box around the points
-  geom_rect(
-    aes(xmin = scarthwood_longitude_range_sample[1],
-        xmax = scarthwood_longitude_range_sample[2],
-        ymin = scarthwood_latitude_range_sample[1],
-        ymax = scarthwood_latitude_range_sample[2]
-    ), 
-    color = "red", fill = NA, size = 2) +
-  geom_rect(
-    aes(xmin = brimham_longitude_range_sample[1],
-        xmax = brimham_longitude_range_sample[2],
-        ymin = brimham_latitude_range_sample[1],
-        ymax = brimham_latitude_range_sample[2]
-    ), 
-    color = "red", fill = NA, size = 2) +
-  geom_rect(
-    aes(xmin = widdybanks_longitude_range_sample[1],
-        xmax = widdybanks_longitude_range_sample[2],
-        ymin = widdybanks_latitude_range_sample[1],
-        ymax = widdybanks_latitude_range_sample[2]
-    ), 
-    color = "red", fill = NA, size = 2) +
-  geom_rect(
-    aes(xmin = haweswater_longitude_range_sample[1],
-        xmax = haweswater_longitude_range_sample[2],
-        ymin = haweswater_latitude_range_sample[1],
-        ymax = haweswater_latitude_range_sample[2]
-    ), 
-    color = "red", fill = NA, size = 2) +
-  geom_rect(
-    aes(xmin = whiteside_longitude_range_sample[1],
-        xmax = whiteside_longitude_range_sample[2],
-        ymin = whiteside_latitude_range_sample[1],
-        ymax = whiteside_latitude_range_sample[2]
-    ), 
-    color = "red", fill = NA, size = 2) +
-  theme_minimal()
-#show the map
-show(UK_Sites)
-#save the UK map with Haweswater highlighted
-ggsave("figures/UK_Sites_boundingbox.svg", width = 8, height = 6)
-
-
-#map the sample coordinates at each site
-#bridestones
-# Get the Google Satellite map for the zoomed-in area based on the 30 sample coordinates
-bridestones_satellite <- get_map(location = c(lon = mean(bridestones$Longitude), 
-                                          lat = mean(bridestones$Latitude)),
-                             zoom = 15,  # Adjust zoom level for the desired zoom
-                             maptype = "satellite",  # Use the "satellite" map type
-                             source = "google")
-#plot the map
-bridestones_map <- ggmap(bridestones_satellite) +
-  geom_point(data = bridestones, aes(x = Longitude, y = Latitude, 
-                                 color = Vegetation, shape = Vegetation), size = 2) +
-  scale_color_manual(values = c("Bracken" = "green", "Heather" = "purple")) +  # Color by habitat
-  scale_shape_manual(values = c("Bracken" = 17, "Heather" = 16)) +  # Shape by site
-  theme_minimal() + 
-  theme(legend.position = "right") 
-#show the map
-show(bridestones_map)
-# Save the final map to a file
-ggsave("figures/bridestones_map.svg", plot = last_plot(), width = 7.5, height = 6, dpi = 300)
-
-#scarthwood
-# Get the Google Satellite map for the zoomed-in area based on the 30 sample coordinates
-scarthwood_satellite <- get_map(location = c(lon = mean(scarthwood$Longitude), 
-                                              lat = mean(scarthwood$Latitude)),
-                                 zoom = 15,  # Adjust zoom level for the desired zoom
-                                 maptype = "satellite",  # Use the "satellite" map type
-                                 source = "google")
-#plot the map
-scarthwood_map <- ggmap(scarthwood_satellite) +
-  geom_point(data = scarthwood, aes(x = Longitude, y = Latitude, 
-                                     color = Vegetation, shape = Vegetation), size = 2) +
-  scale_color_manual(values = c("Bracken" = "green", "Heather" = "purple")) +  # Color by habitat
-  scale_shape_manual(values = c("Bracken" = 17, "Heather" = 16)) +  # Shape by site
-  theme_minimal() + 
-  theme(legend.position = "right") 
-#show the map
-show(scarthwood_map)
-# Save the final map to a file
-ggsave("figures/scarthwood.svg", plot = last_plot(), width = 7.5, height = 6, dpi = 300)
-
-#brimham 
-# Get the Google Satellite map for the zoomed-in area based on the 30 sample coordinates
-brimham_satellite <- get_map(location = c(lon = mean(brimham$Longitude), 
-                                      lat = mean(brimham$Latitude)),
-                         zoom = 15,  # Adjust zoom level for the desired zoom
-                         maptype = "satellite",  # Use the "satellite" map type
-                         source = "google")
-  #plot the map
-brimham_map <- ggmap(brimham_satellite) +
-  geom_point(data = brimham, aes(x = Longitude, y = Latitude, 
-                                            color = Vegetation, shape = Vegetation), size = 2) +
-  scale_color_manual(values = c("Bracken" = "green", "Heather" = "purple")) +  # Color by habitat
-  scale_shape_manual(values = c("Bracken" = 17, "Heather" = 16)) +  # Shape by site
-  theme_minimal() + 
-  theme(legend.position = "right") 
-#show the map
-#show(brimham_map)
-# Save the final map to a file
-ggsave("figures/brimham_map.svg", plot = last_plot(), width = 7.5, height = 6, dpi = 300)
-
-#widdybanks
-# Get the Google Satellite map for the zoomed-in area based on the 30 sample coordinates
-widdybanks_satellite <- get_map(location = c(lon = mean(widdybanks$Longitude), 
-                                          lat = mean(widdybanks$Latitude)),
-                             zoom = 17,  # Adjust zoom level for the desired zoom
-                             maptype = "satellite",  # Use the "satellite" map type
-                             source = "google")
-#plot the map
-widdybanks_map <- ggmap(widdybanks_satellite) +
-  geom_point(data = widdybanks, aes(x = Longitude, y = Latitude, 
-                                 color = Vegetation, shape = Vegetation), size = 2) +
-  scale_color_manual(values = c("Bracken" = "green", "Heather" = "purple")) +  # Color by habitat
-  scale_shape_manual(values = c("Bracken" = 17, "Heather" = 16)) +  # Shape by site
-  theme_minimal() + 
-  theme(legend.position = "right") 
-#show the map
-show(widdybanks_map)
-# Save the final map to a file
-ggsave("figures/widdybanks_map.svg", plot = last_plot(), width = 7.5, height = 6, dpi = 300)
-
-#Haweswater
-# Get the Google Satellite map for the zoomed-in area based on the 30 sample coordinates
-haweswater_satellite <- get_map(location = c(lon = mean(haweswater$Longitude), 
-                                             lat = mean(haweswater$Latitude)),
-                                zoom = 15,  # Adjust zoom level for the desired zoom
-                                maptype = "satellite",  # Use the "satellite" map type
-                                source = "google")
-#plot the map
-haweswater_map <- ggmap(haweswater_satellite) +
-  geom_point(data = haweswater, aes(x = Longitude, y = Latitude, 
-                                    color = Vegetation, shape = Vegetation), size = 2) +
-  scale_color_manual(values = c("Bracken" = "green", "Heather" = "purple")) +  # Color by habitat
-  scale_shape_manual(values = c("Bracken" = 17, "Heather" = 16)) +  # Shape by site
-  theme_minimal() + 
-  theme(legend.position = "right") 
-#show the map
-show(haweswater_map)
-# Save the final map to a file
-ggsave("figures/haweswater_map.svg", plot = last_plot(), width = 7.5, height = 6, dpi = 300)
-
-#Whiteside
-# Get the Google Satellite map for the zoomed-in area based on the 30 sample coordinates
-whiteside_satellite <- get_map(location = c(lon = mean(whiteside$Longitude), 
-                                             lat = mean(whiteside$Latitude)),
-                                zoom = 17,  # Adjust zoom level for the desired zoom
-                                maptype = "satellite",  # Use the "satellite" map type
-                                source = "google")
-#plot the map
-whiteside_map <- ggmap(whiteside_satellite) +
-  geom_point(data = whiteside, aes(x = Longitude, y = Latitude, 
-                                    color = Vegetation, shape = Vegetation), size = 2) +
-  scale_color_manual(values = c("Bracken" = "green", "Heather" = "purple")) +  # Color by habitat
-  scale_shape_manual(values = c("Bracken" = 17, "Heather" = 16)) +  # Shape by site
-  theme_minimal() + 
-  theme(legend.position = "right") 
-#show the map
-show(whiteside_map)
-# Save the final map to a file
-ggsave("figures/whiteside_map.svg", plot = last_plot(), width = 7.5, height = 6, dpi = 300)
-
-
-#combine the two maps into a single figure
-maps_figure <- ggarrange(bridestones_map, scarthwood_map, brimham_map,                      widdybanks_map, haweswater_map, whiteside_map,
-                         labels = c("A", "B", "C", "D", "E", "F"),
-                         ncol = 2, nrow = 3,
-                         #the width of each panel of the multifigure plot
-                         widths = c(7,7),
-                         common.legend = TRUE
-)
-#show the plot in the Plots window
-show(maps_figure)
-#save the figure
-#ggsave("figures/Maps_panel_figure.svg", plot = last_plot(), width = 7.5, height = 6, dpi = 300)
-
+# library(ggplot2)
+# library(rnaturalearth)
+# library(rnaturalearthdata)
+# library(sf)
+# library(ggmap)
+# 
+# #load the field data
+# all_data <- readr::read_csv(
+#   here::here("data", "all-sites_field-data.csv"), show_col_types = FALSE
+# ) 
+# 
+# #extract the sample coordinates from the dataframe
+# sample_coordinates <- data.frame(
+#   Site = all_data$Site,
+#   Vegetation = all_data$Vegetation,
+#   Longitude = all_data$LongitudeE,
+#   Latitude = all_data$LatitudeN
+# )
+# #the sample coordinates belonging to each site
+# bridestones <- sample_coordinates[1:20, ]
+# scarthwood <- sample_coordinates[21:40, ]
+# brimham <- sample_coordinates[41:60, ]
+# haweswater <- sample_coordinates[61:80,]
+# whiteside <- sample_coordinates[81:100, ]
+# widdybanks <- sample_coordinates[101:120,]
+# 
+# # Calculate the bounding box surrounding the 30 sample coordinates
+# bridestones_longitude_range_sample <- range(bridestones$Longitude)
+# bridestones_latitude_range_sample <- range(bridestones$Latitude)
+# # Calculate the bounding box surrounding the 30 sample coordinates
+# scarthwood_longitude_range_sample <- range(scarthwood$Longitude)
+# scarthwood_latitude_range_sample <- range(scarthwood$Latitude)
+# # Calculate the bounding box surrounding the 30 sample coordinates
+# brimham_longitude_range_sample <- range(brimham$Longitude)
+# brimham_latitude_range_sample <- range(brimham$Latitude)
+# # Calculate the bounding box surrounding the 30 sample coordinates
+# haweswater_longitude_range_sample <- range(haweswater$Longitude)
+# haweswater_latitude_range_sample <- range(haweswater$Latitude)
+# # Calculate the bounding box surrounding the 30 sample coordinates
+# whiteside_longitude_range_sample <- range(whiteside$Longitude)
+# whiteside_latitude_range_sample <- range(whiteside$Latitude)
+# # Calculate the bounding box surrounding the 30 sample coordinates
+# widdybanks_longitude_range_sample <- range(widdybanks$Longitude)
+# widdybanks_latitude_range_sample <- range(widdybanks$Latitude)
+# 
+# 
+# # Register your Google API key
+# register_google(key = "AIzaSyA42ZmX_RGv9dTA7PFy4UR0YIjxW3x0rUE")
+# 
+# # Load the UK map from the rnaturalearth package
+# uk_map <- ne_countries(scale = "medium", returnclass = "sf") %>%
+#   filter(name == "United Kingdom")
+# 
+# # Plot the UK map with only the bounding box
+# UK_Sites <- ggplot(data = uk_map) +
+#   geom_sf(fill = "lightblue") +  # UK map with light blue fill
+#   geom_rect(
+#     aes(xmin = bridestones_longitude_range_sample[1],
+#         xmax = bridestones_longitude_range_sample[2],
+#         ymin = bridestones_latitude_range_sample[1],
+#         ymax = bridestones_latitude_range_sample[2]
+#         ), 
+#     color = "red", fill = NA, size = 2) +  # Add bounding box around the points
+#   geom_rect(
+#     aes(xmin = scarthwood_longitude_range_sample[1],
+#         xmax = scarthwood_longitude_range_sample[2],
+#         ymin = scarthwood_latitude_range_sample[1],
+#         ymax = scarthwood_latitude_range_sample[2]
+#     ), 
+#     color = "red", fill = NA, size = 2) +
+#   geom_rect(
+#     aes(xmin = brimham_longitude_range_sample[1],
+#         xmax = brimham_longitude_range_sample[2],
+#         ymin = brimham_latitude_range_sample[1],
+#         ymax = brimham_latitude_range_sample[2]
+#     ), 
+#     color = "red", fill = NA, size = 2) +
+#   geom_rect(
+#     aes(xmin = widdybanks_longitude_range_sample[1],
+#         xmax = widdybanks_longitude_range_sample[2],
+#         ymin = widdybanks_latitude_range_sample[1],
+#         ymax = widdybanks_latitude_range_sample[2]
+#     ), 
+#     color = "red", fill = NA, size = 2) +
+#   geom_rect(
+#     aes(xmin = haweswater_longitude_range_sample[1],
+#         xmax = haweswater_longitude_range_sample[2],
+#         ymin = haweswater_latitude_range_sample[1],
+#         ymax = haweswater_latitude_range_sample[2]
+#     ), 
+#     color = "red", fill = NA, size = 2) +
+#   geom_rect(
+#     aes(xmin = whiteside_longitude_range_sample[1],
+#         xmax = whiteside_longitude_range_sample[2],
+#         ymin = whiteside_latitude_range_sample[1],
+#         ymax = whiteside_latitude_range_sample[2]
+#     ), 
+#     color = "red", fill = NA, size = 2) +
+#   theme_minimal()
+# #show the map
+# show(UK_Sites)
+# #save the UK map with Haweswater highlighted
+# ggsave("figures/UK_Sites_boundingbox.svg", width = 8, height = 6)
+# 
+# 
+# #map the sample coordinates at each site
+# #bridestones
+# # Get the Google Satellite map for the zoomed-in area based on the 30 sample coordinates
+# bridestones_satellite <- get_map(location = c(lon = mean(bridestones$Longitude), 
+#                                           lat = mean(bridestones$Latitude)),
+#                              zoom = 15,  # Adjust zoom level for the desired zoom
+#                              maptype = "satellite",  # Use the "satellite" map type
+#                              source = "google")
+# #plot the map
+# bridestones_map <- ggmap(bridestones_satellite) +
+#   geom_point(data = bridestones, aes(x = Longitude, y = Latitude, 
+#                                  color = Vegetation, shape = Vegetation), size = 2) +
+#   scale_color_manual(values = c("Bracken" = "green", "Heather" = "purple")) +  # Color by habitat
+#   scale_shape_manual(values = c("Bracken" = 17, "Heather" = 16)) +  # Shape by site
+#   theme_minimal() + 
+#   theme(legend.position = "right") 
+# #show the map
+# show(bridestones_map)
+# # Save the final map to a file
+# ggsave("figures/bridestones_map.svg", plot = last_plot(), width = 7.5, height = 6, dpi = 300)
+# 
+# #scarthwood
+# # Get the Google Satellite map for the zoomed-in area based on the 30 sample coordinates
+# scarthwood_satellite <- get_map(location = c(lon = mean(scarthwood$Longitude), 
+#                                               lat = mean(scarthwood$Latitude)),
+#                                  zoom = 15,  # Adjust zoom level for the desired zoom
+#                                  maptype = "satellite",  # Use the "satellite" map type
+#                                  source = "google")
+# #plot the map
+# scarthwood_map <- ggmap(scarthwood_satellite) +
+#   geom_point(data = scarthwood, aes(x = Longitude, y = Latitude, 
+#                                      color = Vegetation, shape = Vegetation), size = 2) +
+#   scale_color_manual(values = c("Bracken" = "green", "Heather" = "purple")) +  # Color by habitat
+#   scale_shape_manual(values = c("Bracken" = 17, "Heather" = 16)) +  # Shape by site
+#   theme_minimal() + 
+#   theme(legend.position = "right") 
+# #show the map
+# show(scarthwood_map)
+# # Save the final map to a file
+# ggsave("figures/scarthwood.svg", plot = last_plot(), width = 7.5, height = 6, dpi = 300)
+# 
+# #brimham 
+# # Get the Google Satellite map for the zoomed-in area based on the 30 sample coordinates
+# brimham_satellite <- get_map(location = c(lon = mean(brimham$Longitude), 
+#                                       lat = mean(brimham$Latitude)),
+#                          zoom = 15,  # Adjust zoom level for the desired zoom
+#                          maptype = "satellite",  # Use the "satellite" map type
+#                          source = "google")
+#   #plot the map
+# brimham_map <- ggmap(brimham_satellite) +
+#   geom_point(data = brimham, aes(x = Longitude, y = Latitude, 
+#                                             color = Vegetation, shape = Vegetation), size = 2) +
+#   scale_color_manual(values = c("Bracken" = "green", "Heather" = "purple")) +  # Color by habitat
+#   scale_shape_manual(values = c("Bracken" = 17, "Heather" = 16)) +  # Shape by site
+#   theme_minimal() + 
+#   theme(legend.position = "right") 
+# #show the map
+# #show(brimham_map)
+# # Save the final map to a file
+# ggsave("figures/brimham_map.svg", plot = last_plot(), width = 7.5, height = 6, dpi = 300)
+# 
+# #widdybanks
+# # Get the Google Satellite map for the zoomed-in area based on the 30 sample coordinates
+# widdybanks_satellite <- get_map(location = c(lon = mean(widdybanks$Longitude), 
+#                                           lat = mean(widdybanks$Latitude)),
+#                              zoom = 17,  # Adjust zoom level for the desired zoom
+#                              maptype = "satellite",  # Use the "satellite" map type
+#                              source = "google")
+# #plot the map
+# widdybanks_map <- ggmap(widdybanks_satellite) +
+#   geom_point(data = widdybanks, aes(x = Longitude, y = Latitude, 
+#                                  color = Vegetation, shape = Vegetation), size = 2) +
+#   scale_color_manual(values = c("Bracken" = "green", "Heather" = "purple")) +  # Color by habitat
+#   scale_shape_manual(values = c("Bracken" = 17, "Heather" = 16)) +  # Shape by site
+#   theme_minimal() + 
+#   theme(legend.position = "right") 
+# #show the map
+# show(widdybanks_map)
+# # Save the final map to a file
+# ggsave("figures/widdybanks_map.svg", plot = last_plot(), width = 7.5, height = 6, dpi = 300)
+# 
+# #Haweswater
+# # Get the Google Satellite map for the zoomed-in area based on the 30 sample coordinates
+# haweswater_satellite <- get_map(location = c(lon = mean(haweswater$Longitude), 
+#                                              lat = mean(haweswater$Latitude)),
+#                                 zoom = 15,  # Adjust zoom level for the desired zoom
+#                                 maptype = "satellite",  # Use the "satellite" map type
+#                                 source = "google")
+# #plot the map
+# haweswater_map <- ggmap(haweswater_satellite) +
+#   geom_point(data = haweswater, aes(x = Longitude, y = Latitude, 
+#                                     color = Vegetation, shape = Vegetation), size = 2) +
+#   scale_color_manual(values = c("Bracken" = "green", "Heather" = "purple")) +  # Color by habitat
+#   scale_shape_manual(values = c("Bracken" = 17, "Heather" = 16)) +  # Shape by site
+#   theme_minimal() + 
+#   theme(legend.position = "right") 
+# #show the map
+# show(haweswater_map)
+# # Save the final map to a file
+# ggsave("figures/haweswater_map.svg", plot = last_plot(), width = 7.5, height = 6, dpi = 300)
+# 
+# #Whiteside
+# # Get the Google Satellite map for the zoomed-in area based on the 30 sample coordinates
+# whiteside_satellite <- get_map(location = c(lon = mean(whiteside$Longitude), 
+#                                              lat = mean(whiteside$Latitude)),
+#                                 zoom = 17,  # Adjust zoom level for the desired zoom
+#                                 maptype = "satellite",  # Use the "satellite" map type
+#                                 source = "google")
+# #plot the map
+# whiteside_map <- ggmap(whiteside_satellite) +
+#   geom_point(data = whiteside, aes(x = Longitude, y = Latitude, 
+#                                     color = Vegetation, shape = Vegetation), size = 2) +
+#   scale_color_manual(values = c("Bracken" = "green", "Heather" = "purple")) +  # Color by habitat
+#   scale_shape_manual(values = c("Bracken" = 17, "Heather" = 16)) +  # Shape by site
+#   theme_minimal() + 
+#   theme(legend.position = "right") 
+# #show the map
+# show(whiteside_map)
+# # Save the final map to a file
+# ggsave("figures/whiteside_map.svg", plot = last_plot(), width = 7.5, height = 6, dpi = 300)
+# 
+# 
+# #combine the two maps into a single figure
+# maps_figure <- ggarrange(bridestones_map, scarthwood_map, brimham_map,                      widdybanks_map, haweswater_map, whiteside_map,
+#                          labels = c("A", "B", "C", "D", "E", "F"),
+#                          ncol = 2, nrow = 3,
+#                          #the width of each panel of the multifigure plot
+#                          widths = c(7,7),
+#                          common.legend = TRUE
+# )
+# #show the plot in the Plots window
+# show(maps_figure)
+# #save the figure
+# #ggsave("figures/Maps_panel_figure.svg", plot = last_plot(), width = 7.5, height = 6, dpi = 300)
+# 
 
 
 #### Get average annaul rainfall at our sample locations ----
