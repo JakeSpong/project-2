@@ -2923,116 +2923,6 @@ d_moisture <- readr::read_csv(
 #missing this data 
 
 
-#### Week 1 + 2 alpha diversity metrics ----
-d <- readr::read_csv(
-  here::here("data", "n = 10 Tullgren Extracts - Week 1 + 2 Extracts.csv")
-) 
-#order samples by ID alphabetically
-d <- arrange(d, d["Sample ID"])
-d <- as.data.frame(d)
-#order the sites as they should appear on the graph from west to east
-d$Site <- factor(d$Site, levels = c("Whiteside", "Haweswater", "Widdybanks", "Brimham Moor", "Scarth Wood Moor", "Bridestones"))
-#replace null (empty excell cell) with "0"
-d[is.na(d)] <- 0
-#total mesofauna abundances
-d$`Total Mesofauna Catch`<- rowSums(d[,4:11])
-#total invertebrate abundances
-d$`Total Invertebrate Catch`<- rowSums(d[,4:27])
-#shannon diversity of the 8 mesofauna groups
-d$`Mesofauna Shannon` <- diversity(d[,4:11], "shannon")
-#simpson diversity of the 8 mesofauna groups
-d$`Mesofauna Simpson` <- diversity(d[,4:11], "simpson")
-
-#anova to see if key metrics differ between site/vegetation
-#anova
-anova <- aov(d$`Total Mesofauna Catch` ~ d$Vegetation * d$Site)
-summary(anova)
-#tukey's test to identify significant interactions
-tukey <- TukeyHSD(anova)
-print(tukey)
-#compact letter display
-cld <- multcompLetters4(anova, tukey)
-#compact letter display
-print(cld)
-
-#check homogeneity of variance
-plot(anova, 1)
-#levene test.  if p value < 0.05, there is evidence to suggest that the variance across groups is statistically significantly different.
-leveneTest(d$`Total Mesofauna Catch` ~ d$Vegetation*d$Site)
-#check normality.  
-plot(anova, 2)
-#conduct shapiro-wilk test on ANOVA residuals to test for normality
-#extract the residuals
-aov_residuals <- residuals(object = anova)
-#run shapiro-wilk test.  if p > 0.05 the data is normal
-shapiro.test(x = aov_residuals)
-
-
-
-anova <- aov(d$`Total Invertebrate Catch` ~ d$Vegetation * d$Site)
-summary(anova)
-#tukey's test to identify significant interactions
-tukey <- TukeyHSD(anova)
-print(tukey)
-#compact letter display
-cld <- multcompLetters4(anova, tukey)
-#compact letter display
-print(cld)
-
-anova <- aov(d$`Mesofauna Shannon` ~ d$Vegetation * d$Site)
-summary(anova)
-#tukey's test to identify significant interactions
-tukey <- TukeyHSD(anova)
-print(tukey)
-#compact letter display
-cld <- multcompLetters4(anova, tukey)
-#compact letter display
-print(cld)
-
-anova <- aov(d$`Mesofauna Simpson` ~ d$Vegetation * d$Site)
-summary(anova)
-#tukey's test to identify significant interactions
-tukey <- TukeyHSD(anova)
-print(tukey)
-#compact letter display
-cld <- multcompLetters4(anova, tukey)
-#compact letter display
-print(cld)
-
-anova <- aov(d$`Neelidae` ~ d$Vegetation * d$Site)
-summary(anova)
-#tukey's test to identify significant interactions
-tukey <- TukeyHSD(anova)
-print(tukey)
-#compact letter display
-cld <- multcompLetters4(anova, tukey)
-#compact letter display
-print(cld)
-
-
-#graphing boxplots with bracken split from nonbracken
-shannon_bxp <-ggboxplot(d, x = "Site", y = "Mesofauna Shannon", color = "Vegetation", ylab = "Shannon Diversity", palette = c("limegreen", "purple"), lwd = 0.75) + theme(
-  #remove x axis label
-  axis.title.x=element_blank(),
-  # Remove panel border
-  panel.border = element_blank(),  
-  # Remove panel grid lines
-  panel.grid.major = element_blank(),
-  panel.grid.minor = element_blank(),
-  # Remove panel background
-  panel.background = element_blank(),
-  # Add axis line
-  axis.line = element_line(colour = "black", linewidth = 0.5),
-  #change colour and thickness of axis ticks
-  axis.ticks = element_line(colour = "black", linewidth = 0.5),
-  #change axis labels colour
-  axis.title.y = element_text(colour = "black"),
-  #change tick labels colour
-  axis.text.y = element_text(colour = "black"),
-  legend.title = element_blank()
-) 
-show(shannon_bxp)
-
 #### Mesostigmata abundance ANOVAs ----
 
 #transform mesostig abundance data as there are many 0s
@@ -3680,11 +3570,63 @@ prostig_bxp <-ggboxplot(d, x = "Site", y = "`Prostigmata (log (x + 1) transforme
 show(prostig_bxp)
 
 
-#### mesofauna shannon ANOVAs ----
 
+#### Week 1 + 2 alpha diversity metrics ----
+d <- readr::read_csv(
+  here::here("data", "n = 10 Tullgren Extracts - Week 1 + 2 Extracts.csv")
+) 
+#order samples by ID alphabetically
+d <- arrange(d, d["Sample ID"])
+d <- as.data.frame(d)
+#order the sites as they should appear on the graph from west to east
+d$Site <- factor(d$Site, levels = c("Whiteside", "Haweswater", "Widdybanks", "Brimham Moor", "Scarth Wood Moor", "Bridestones"))
+#replace null (empty excell cell) with "0"
+d[is.na(d)] <- 0
+#total mesofauna abundances
+d$`Total Mesofauna Catch`<- rowSums(d[,4:11])
+#total invertebrate abundances
+d$`Total Invertebrate Catch`<- rowSums(d[,4:27])
+#shannon diversity of the 8 mesofauna groups
+d$`Mesofauna Shannon` <- diversity(d[,4:11], "shannon")
+#simpson diversity of the 8 mesofauna groups
+d$`Mesofauna Simpson` <- diversity(d[,4:11], "simpson")
 
 #anova to see if key metrics differ between site/vegetation
 #anova
+anova <- aov(d$`Total Mesofauna Catch` ~ d$Vegetation * d$Site)
+summary(anova)
+#tukey's test to identify significant interactions
+tukey <- TukeyHSD(anova)
+print(tukey)
+#compact letter display
+cld <- multcompLetters4(anova, tukey)
+#compact letter display
+print(cld)
+
+#check homogeneity of variance
+plot(anova, 1)
+#levene test.  if p value < 0.05, there is evidence to suggest that the variance across groups is statistically significantly different.
+leveneTest(d$`Total Mesofauna Catch` ~ d$Vegetation*d$Site)
+#check normality.  
+plot(anova, 2)
+#conduct shapiro-wilk test on ANOVA residuals to test for normality
+#extract the residuals
+aov_residuals <- residuals(object = anova)
+#run shapiro-wilk test.  if p > 0.05 the data is normal
+shapiro.test(x = aov_residuals)
+
+
+
+anova <- aov(d$`Total Invertebrate Catch` ~ d$Vegetation * d$Site)
+summary(anova)
+#tukey's test to identify significant interactions
+tukey <- TukeyHSD(anova)
+print(tukey)
+#compact letter display
+cld <- multcompLetters4(anova, tukey)
+#compact letter display
+print(cld)
+
 anova <- aov(d$`Mesofauna Shannon` ~ d$Vegetation * d$Site)
 summary(anova)
 #tukey's test to identify significant interactions
@@ -3695,25 +3637,6 @@ cld <- multcompLetters4(anova, tukey)
 #compact letter display
 print(cld)
 
-#check homogeneity of variance
-plot(anova, 1)
-#levene test.  if p value < 0.05, there is evidence to suggest that the variance across groups is statistically significantly different.
-leveneTest(d$`Mesofauna Shannon` ~ d$Vegetation*d$Site)
-#check normality.  
-plot(anova, 2)
-#conduct shapiro-wilk test on ANOVA residuals to test for normality
-#extract the residuals
-aov_residuals <- residuals(object = anova)
-#run shapiro-wilk test.  if p > 0.05 the data is normal
-shapiro.test(x = aov_residuals)
-
-
-
-
-#### nesofauna simpson ANOVAs ----
-
-#anova to see if key metrics differ between site/vegetation
-#anova
 anova <- aov(d$`Mesofauna Simpson` ~ d$Vegetation * d$Site)
 summary(anova)
 #tukey's test to identify significant interactions
@@ -3724,6 +3647,73 @@ cld <- multcompLetters4(anova, tukey)
 #compact letter display
 print(cld)
 
+anova <- aov(d$`Neelidae` ~ d$Vegetation * d$Site)
+summary(anova)
+#tukey's test to identify significant interactions
+tukey <- TukeyHSD(anova)
+print(tukey)
+#compact letter display
+cld <- multcompLetters4(anova, tukey)
+#compact letter display
+print(cld)
+
+
+#graphing boxplots with bracken split from nonbracken
+shannon_bxp <-ggboxplot(d, x = "Site", y = "Mesofauna Shannon", color = "Vegetation", ylab = "Shannon Diversity", palette = c("limegreen", "#AA4499"), lwd = 0.75) + theme(
+  #remove x axis label
+  axis.title.x=element_blank(),
+  # Remove panel border
+  panel.border = element_blank(),  
+  # Remove panel grid lines
+  panel.grid.major = element_blank(),
+  panel.grid.minor = element_blank(),
+  # Remove panel background
+  panel.background = element_blank(),
+  # Add axis line
+  axis.line = element_line(colour = "black", linewidth = 0.5),
+  #change colour and thickness of axis ticks
+  axis.ticks = element_line(colour = "black", linewidth = 0.5),
+  #change axis labels colour
+  axis.title.y = element_text(colour = "black"),
+  #change tick labels colour
+  axis.text.y = element_text(colour = "black"),
+  legend.title = element_blank()
+) 
+show(shannon_bxp)
+
+#save our plot
+ggsave(path = "figures", paste0(Sys.Date(), "_mesofauna_shannon.svg"), width = 10, height= 5, shannon_bxp)
+
+#graphing boxplots with bracken split from nonbracken
+simpson_bxp <-ggboxplot(d, x = "Site", y = "Mesofauna Simpson", color = "Vegetation", ylab = "Simpson Diversity", palette = c("limegreen", "#AA4499"), lwd = 0.75) + theme(
+  #remove x axis label
+  axis.title.x=element_blank(),
+  # Remove panel border
+  panel.border = element_blank(),  
+  # Remove panel grid lines
+  panel.grid.major = element_blank(),
+  panel.grid.minor = element_blank(),
+  # Remove panel background
+  panel.background = element_blank(),
+  # Add axis line
+  axis.line = element_line(colour = "black", linewidth = 0.5),
+  #change colour and thickness of axis ticks
+  axis.ticks = element_line(colour = "black", linewidth = 0.5),
+  #change axis labels colour
+  axis.title.y = element_text(colour = "black"),
+  #change tick labels colour
+  axis.text.y = element_text(colour = "black"),
+  legend.title = element_blank()
+) 
+show(simpson_bxp)
+
+#save our plot
+ggsave(path = "figures", paste0(Sys.Date(), "_mesofauna_simpson.svg"), width = 10, height= 5, simpson_bxp)
+
+#### all sites mesofauna Shannon ANOVAs ----
+#check data distribution
+hist(d$`Mesofauna Shannon`)
+anova <- aov(d$`Mesofauna Shannon` ~ d$Vegetation * d$Site)
 #check homogeneity of variance
 plot(anova, 1)
 #levene test.  if p value < 0.05, there is evidence to suggest that the variance across groups is statistically significantly different.
@@ -3735,6 +3725,111 @@ plot(anova, 2)
 aov_residuals <- residuals(object = anova)
 #run shapiro-wilk test.  if p > 0.05 the data is normal
 shapiro.test(x = aov_residuals)
+
+summary(anova)
+#tukey's test to identify significant interactions
+tukey <- TukeyHSD(anova)
+print(tukey)
+#compact letter display
+cld <- multcompLetters4(anova, tukey)
+#compact letter display
+print(cld)
+
+
+
+
+
+#### site specific mesofauna Shannon ANOVAS ----
+#brimham 1:20, bridestones 21:40, hawswater 41:60, scarth wood 61:80, widdybanks 81:100, whiteside 101:120
+site <- d[(1:20),]
+hist(site$`Mesofauna Shannon`)
+#transform the data for a normal distribution
+site$`Mesofauna Shannon trans` <- log(site$`Mesofauna Shannon` + 10)
+#the tranformation seems to have worked, giving us something resembling a normal distribution
+hist(site$`Mesofauna Shannon trans`)
+
+#Type 1 two-way anova using data from all sites
+anova <- aov(site$`Mesofauna Shannon trans` ~ site$Vegetation)
+#check homogeneity of variance
+plot(anova, 1)
+#levene test.  if p value < 0.05, there is evidence to suggest that the variance across groups is statistically significantly different.
+leveneTest(site$`Mesofauna Shannon trans` ~ site$Vegetation)
+#check normality.  
+plot(anova, 2)
+#conduct shapiro-wilk test on ANOVA residuals to test for normality
+#extract the residuals
+aov_residuals <- residuals(object = anova)
+#run shapiro-wilk test.  if p > 0.05 the data is normal
+shapiro.test(x = aov_residuals)
+
+summary(anova)
+#tukey's test to identify significant interactions
+tukey <- TukeyHSD(anova)
+print(tukey)
+#compact letter display
+cld <- multcompLetters4(anova, tukey)
+#compact letter display
+print(cld)
+
+
+figure <- ggboxplot(site, x = "Vegetation", y = 'Individuals per 100g dry soil', palette = c("limegreen", "#AA4499"), lwd = 0.75)  +
+  labs(y = expression("Individuals per 100 g dry soil")) + theme( #remove x axis label
+    axis.title.x=element_blank(),
+    # Remove panel border
+    panel.border = element_blank(),  
+    # Remove panel grid lines
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    # Remove panel background
+    panel.background = element_blank(),
+    # Add axis line
+    axis.line = element_line(colour = "black", linewidth = 0.5),
+    #change colour and thickness of axis ticks
+    axis.ticks = element_line(colour = "black", linewidth = 0.5),
+    #change axis labels colour
+    axis.title.y = element_text(colour = "black"),
+    #change tick labels colour
+    axis.text.y = element_text(colour = "black"),
+    legend.title = element_blank()
+  ) + scale_y_continuous(labels = label_comma())
+
+#display our plot
+figure
+
+ #or do t tests for site specific?
+#### all sites mesofauna simpson ANOVAs ----
+
+#anova to see if key metrics differ between site/vegetation
+#anova
+hist(d$`Mesofauna Simpson`)
+#transform the data - data transformations not working for SImpson
+d$`Mesofauna Simpson transformed` <- log10(d$`Mesofauna Simpson`)
+hist(d$`Mesofauna Simpson transformed`)
+
+anova <- aov(d$`Mesofauna Simpson` ~ d$Vegetation * d$Site)
+#check homogeneity of variance
+plot(anova, 1)
+#levene test.  if p value < 0.05, there is evidence to suggest that the variance across groups is statistically significantly different.
+leveneTest(d$`Mesofauna Simpson` ~ d$Vegetation*d$Site)
+#check normality.  
+plot(anova, 2)
+#conduct shapiro-wilk test on ANOVA residuals to test for normality
+#extract the residuals
+aov_residuals <- residuals(object = anova)
+#run shapiro-wilk test.  if p > 0.05 the data is normal
+shapiro.test(x = aov_residuals)
+
+
+summary(anova)
+#tukey's test to identify significant interactions
+tukey <- TukeyHSD(anova)
+print(tukey)
+#compact letter display
+cld <- multcompLetters4(anova, tukey)
+#compact letter display
+print(cld)
+
+
 
 
 
