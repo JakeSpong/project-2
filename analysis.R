@@ -2280,10 +2280,10 @@ DOMboxplotter <- function(d, wavelength){
   print(summary(anova))
   #tukey's test to identify significant interactions
   tukey <- TukeyHSD(anova)
-  print(tukey)
   #compact letter display
   cld <- multcompLetters4(anova, tukey)
   print(cld)
+  print(tukey)
   
   #check homogeneity of variance
   plot(anova, 1)
@@ -2373,18 +2373,11 @@ DOMboxplotter <- function(d, wavelength){
   
 }
 #list of wavelengths of interest
-wavelength_of_interest <- list(280)#list(250, 254, 260, 265, 272, 280, 285, 300, 340, 350, 365, 400, 436, 465)
-#plot the absorbance boxplot at the following given wavelengths
+wavelength_of_interest <- list(465)#list(250, 254, 260, 265, 272, 280, 285, 300, 340, 350, 365, 400, 436, 465)
+#plot the absorbance boxplot at the following given wavelengths, and gives stats
 for (wavelength in wavelength_of_interest){
   DOMboxplotter(d, wavelength)
 }
-
-
-
-
-
-
-
 
 #### Save SUVA data ----
 #read in the processed absorbance data
@@ -4638,7 +4631,8 @@ for(i in unique(treat)) {
     orditorp(example_NMDS$point[grep(i,treat),],display="sites", col=colors[grep(i,treat)], cex=0.7,air=0.01)
     #plots ellipse with ellipse centered on the centroid of the samples from the same treatment (and thus encapsulating 95% of the variance)
     ordiellipse(example_NMDS$point[grep(i,treat),],draw="polygon",
-                groups=treat[treat==i],col=colors[grep(i,treat)],label=F) } }
+                groups=treat[treat==i],col=colors[grep(i,treat)],label=F) } 
+}
 #specify legend manually
 legend(-1.2,-0.3, legend = c("Bracken", "Heather"), fill = c("#117733",  "#AA4499"))
 
