@@ -4729,6 +4729,11 @@ ano
 plot(ano)
 
 
+#SIMPER analysis
+simper.site <- simper(spe, idvs$Site)
+#check the output, rounded to 3 dp
+summary(simper.eastwest)$Haweswater_Whiteside %>%
+  round(3)
 
 
 
@@ -4777,7 +4782,7 @@ text(-1,0.3, paste("Stress = ", round(example_NMDS$stress, 3)))
 
 for(i in unique(treat)) {
   #we have added an if statement so we can chose which points and ellipses to plot at a time e.g. i == "Grassland Bracken".  If we want to plot all ellipses simultaneously, set i == i
-  if(i == "West"){
+  if(i == i){
     #change the colour of each site name so samples from the same treatment have the same colour
     orditorp(example_NMDS$point[grep(i,treat),],display="sites", col=colors[grep(i,treat)], cex=0.7,air=0.01)
     #plots ellipse with ellipse centered on the centroid of the samples from the same treatment (and thus encapsulating 95% of the variance)
@@ -4804,8 +4809,11 @@ ano = anosim(as.matrix(spe), grouping = idvs$Treatment, permutations = 9999, dis
 ano
 plot(ano)
 
-
-
+#SIMPER analysis
+simper.eastwest <- simper(spe, idvs$Treatment)
+#check the output, rounded to 3 dp
+summary(simper.eastwest)$East_West %>%
+  round(3)
 
 
 
