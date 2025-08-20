@@ -4293,7 +4293,69 @@ figure
 
 
 #### compare week 1 vs week 2 extracts----
+wk1 <- readr::read_csv(
+  here::here("data", "n = 10 Tullgren Extracts - Week 1 Extracts.csv")
+) 
+wk1$Week <- c(rep("Week 1", 120))
+wk1 <- as.data.frame(wk1)
+#replace null (empty excell cell) with "0"
+wk1[is.na(wk1)] <- 0
 
+wk1plus2 <- readr::read_csv(
+  here::here("data", "n = 10 Tullgren Extracts - Week 1 + 2 Extracts.csv")
+) 
+wk1plus2$Week <- c(rep("Week 1 + 2", 120))
+wk1plus2 <- as.data.frame(wk1plus2)
+#replace null (empty excell cell) with "0"
+wk1plus2[is.na(wk1plus2)] <- 0
+
+#compare abundances
+t.test(wk1$Mesostigmata, wk1plus2$Mesostigmata)
+t.test(wk1$Oribatida, wk1plus2$Oribatida)
+t.test(wk1$Astigmatina, wk1plus2$Astigmatina)
+t.test(wk1$Prostigmata, wk1plus2$Prostigmata)
+t.test(wk1$Entomobryomorpha, wk1plus2$Entomobryomorpha)
+t.test(wk1$Poduromorpha, wk1plus2$Poduromorpha)
+t.test(wk1$Symphypleona, wk1plus2$Symphypleona)
+t.test(wk1$Neelidae, wk1plus2$Neelidae)
+
+#compare totals
+wk1$`Total Mesofauna` <- rowSums(wk1[, 4:11])
+wk1plus2$`Total Mesofauna` <- rowSums(wk1plus2[, 4:11])
+t.test(wk1$`Total Mesofauna`, wk1plus2$`Total Mesofauna`)
+wk1$`Total Invert` <- rowSums(wk1[, 4:27])
+wk1plus2$`Total Invert` <- rowSums(wk1plus2[, 4:27])
+t.test(wk1$`Total Invert`, wk1plus2$`Total Invert`)
+
+#compare community composition
+
+
+combined_data <- rbind(wk1, wk1plus2)
+
+# Separate species data and metadata
+species_data <- combined_data[, !(names(combined_data) %in% "Week")]
+#just the counts
+species_data <- species_data[, 4:11]
+group <- combined_data$Week
+
+#test whether community composition differs between the weeks on all inverts
+adonis_result <- adonis2(species_data ~ group, method = "bray")
+print(adonis_result)
+#visualise the two
+nmds <- metaMDS(species_data, distance = "bray", k = 2, trymax = 100)
+plot(nmds, type = "n")
+
+# Add points by group
+points(nmds, display = "sites", col = as.factor(group), pch = 19)
+legend("topright", legend = unique(group), col = 1:length(unique(group)), pch = 19)
+
+#run an anosim - when grouping by vegetation
+ano = anosim(as.matrix(species_data), grouping = group, permutations = 9999, distance = "bray")
+# When interpreting these results you want to look at the ANOSIM statistic R and the Significance values. A Significance value less than 0.05 is generally considered to be statistically significant, and means the null hypothesis can be rejected. “The ANOSIM statistic “R” compares the mean of ranked dissimilarities between groups to the mean of ranked dissimilarities within groups. An R value close to “1.0” suggests dissimilarity between groups while an R value close to “0” suggests an even distribution of high and low ranks within and between groups” (GUSTAME). In other words, the higher the R value, the more dissimilar your groups are in terms of microbial community composition.
+ano
+plot(ano)
+
+#space
 
 #### Week 1 extracts mesofauna NMDS ----
 d <- readr::read_csv(
