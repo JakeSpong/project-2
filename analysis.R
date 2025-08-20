@@ -448,18 +448,9 @@ all_bxp <- ggarrange(richness_bxp, evenness_bxp, shannon_bxp, simpson_bxp,
 show(all_bxp)
 
 #### Vegetation richness ANOVAs ----
-
+hist(d$richness)
 #Type 1 two-way anova using data from all sites
 anova <- aov(d$richness ~ d$Vegetation*d$Site)
-summary(anova)
-#tukey's test to identify significant interactions
-tukey <- TukeyHSD(anova)
-print(tukey)
-#compact letter display
-cld <- multcompLetters4(anova, tukey)
-#compact letter display
-print(cld)
-
 #check homogeneity of variance
 plot(anova, 1)
 #levene test.  if p value < 0.05, there is evidence to suggest that the variance across groups is statistically significantly different.
@@ -471,6 +462,16 @@ plot(anova, 2)
 aov_residuals <- residuals(object = anova)
 #run shapiro-wilk test.  if p > 0.05 the data is normal
 shapiro.test(x = aov_residuals)
+
+summary(anova)
+#tukey's test to identify significant interactions
+tukey <- TukeyHSD(anova)
+print(tukey)
+#compact letter display
+cld <- multcompLetters4(anova, tukey)
+#compact letter display
+print(cld)
+
 
 #now analyse at each site
 
@@ -549,19 +550,10 @@ print(cld)
 
 
 #### Vegetation evenness ANOVAs----
-
+hist(d$evenness)
 
 #Type 1 two-way anova using data from all sites
 anova <- aov(d$evenness ~ d$Vegetation*d$Site)
-summary(anova)
-#tukey's test to identify significant interactions
-tukey <- TukeyHSD(anova)
-#print(tukey)
-#compact letter display
-cld <- multcompLetters4(anova, tukey)
-#compact letter display
-print(cld)
-
 #check homogeneity of variance
 plot(anova, 1)
 #levene test.  if p value < 0.05, there is evidence to suggest that the variance across groups is statistically significantly different.
@@ -573,6 +565,16 @@ plot(anova, 2)
 aov_residuals <- residuals(object = anova)
 #run shapiro-wilk test.  if p > 0.05 the data is normal
 shapiro.test(x = aov_residuals)
+
+summary(anova)
+#tukey's test to identify significant interactions
+tukey <- TukeyHSD(anova)
+#print(tukey)
+#compact letter display
+cld <- multcompLetters4(anova, tukey)
+#compact letter display
+print(cld)
+
 
 #now analyse at each site
 
@@ -651,18 +653,10 @@ print(cld)
 
 
 #### Veg shannon ANOVAs----
-
+hist(d$shannon)
 
 #Type 1 two-way anova using data from all sites
 anova <- aov(d$shannon ~ d$Vegetation*d$Site)
-summary(anova)
-#tukey's test to identify significant interactions
-tukey <- TukeyHSD(anova)
-#print(tukey)
-#compact letter display
-cld <- multcompLetters4(anova, tukey)
-#compact letter display
-print(cld)
 
 #check homogeneity of variance
 plot(anova, 1)
@@ -675,6 +669,16 @@ plot(anova, 2)
 aov_residuals <- residuals(object = anova)
 #run shapiro-wilk test.  if p > 0.05 the data is normal
 shapiro.test(x = aov_residuals)
+
+
+summary(anova)
+#tukey's test to identify significant interactions
+tukey <- TukeyHSD(anova)
+#print(tukey)
+#compact letter display
+cld <- multcompLetters4(anova, tukey)
+#compact letter display
+print(cld)
 
 #now analyse at each site
 
@@ -752,19 +756,10 @@ cld <- multcompLetters4(anova, tukey)
 print(cld)
 
 #### Veg simpson ANOVAs----
-
+hist(d$simpson)
 
 #Type 1 two-way anova using data from all sites
 anova <- aov(d$simpson ~ d$Vegetation*d$Site)
-summary(anova)
-#tukey's test to identify significant interactions
-tukey <- TukeyHSD(anova)
-#print(tukey)
-#compact letter display
-cld <- multcompLetters4(anova, tukey)
-#compact letter display
-print(cld)
-
 #check homogeneity of variance
 plot(anova, 1)
 #levene test.  if p value < 0.05, there is evidence to suggest that the variance across groups is statistically significantly different.
@@ -776,6 +771,18 @@ plot(anova, 2)
 aov_residuals <- residuals(object = anova)
 #run shapiro-wilk test.  if p > 0.05 the data is normal
 shapiro.test(x = aov_residuals)
+
+
+summary(anova)
+
+
+#tukey's test to identify significant interactions
+tukey <- TukeyHSD(anova)
+#print(tukey)
+#compact letter display
+cld <- multcompLetters4(anova, tukey)
+#compact letter display
+print(cld)
 
 #now analyse at each site
 
@@ -914,6 +921,11 @@ ano = anosim(as.matrix(spe), grouping = idvs$Vegetation, permutations = 9999, di
 ano
 
 
+
+
+
+
+
 #### Soil pH analysis ----
 d <- readr::read_csv(
   here::here("data-raw", "project-2-data-master", "individual", "2) Soil pH.csv")
@@ -951,14 +963,6 @@ ggsave(path = "figures", paste0(Sys.Date(), "_pH.svg"), width = 10, height= 5, p
 
 #Type 1 two-way anova using data from all sites
 anova <- aov(d$`pH` ~ d$Vegetation*d$Site)
-summary(anova)
-#tukey's test to identify significant interactions
-tukey <- TukeyHSD(anova)
-#print(tukey)
-#compact letter display
-cld <- multcompLetters4(anova, tukey)
-print(cld)
-
 #check homogeneity of variance
 plot(anova, 1)
 #levene test.  if p value < 0.05, there is evidence to suggest that the variance across groups is statistically significantly different.
@@ -970,6 +974,15 @@ plot(anova, 2)
 aov_residuals <- residuals(object = anova)
 #run shapiro-wilk test.  if p > 0.05 the data is normal
 shapiro.test(x = aov_residuals)
+
+summary(anova)
+#tukey's test to identify significant interactions
+tukey <- TukeyHSD(anova)
+#print(tukey)
+#compact letter display
+cld <- multcompLetters4(anova, tukey)
+print(cld)
+
 
 #now analyse at each site
 
@@ -1218,14 +1231,8 @@ ggsave(path = "figures", paste0(Sys.Date(), "_total-C.svg"), width = 10, height=
 
 
 #Type 1 two-way anova using data from all sites
+hist(d$`Drift Corr C (g per kg)`)
 anova <- aov(d$`Drift Corr C (g per kg)` ~ d$Vegetation*d$Site)
-summary(anova)
-#tukey's test to identify significant interactions
-tukey <- TukeyHSD(anova)
-print(tukey)
-#compact letter display
-cld <- multcompLetters4(anova, tukey)
-print(cld)
 
 #check homogeneity of variance
 plot(anova, 1)
@@ -1238,6 +1245,17 @@ plot(anova, 2)
 aov_residuals <- residuals(object = anova)
 #run shapiro-wilk test.  if p > 0.05 the data is normal
 shapiro.test(x = aov_residuals)
+
+
+summary(anova)
+#tukey's test to identify significant interactions
+tukey <- TukeyHSD(anova)
+print(tukey)
+#compact letter display
+cld <- multcompLetters4(anova, tukey)
+print(cld)
+
+
 
 #now analyse at each site
 
@@ -2198,18 +2216,23 @@ d <- merge(d, d_conc[, c("Sample ID", "NPOC (mg/l)")], by = "Sample ID", all.x =
 d$`Standardized Absorbance` <- d$Absorbance/d$`NPOC (mg/l)`
 # repeat at wavelengths of 250 (aromaticity, apparent molecular weight), 254 (aromaticity), 260 (hydrophobic C content), 265 (relative abundance of functional groups), 272 (aromaticity), 280 (hydrophobic C content, humification index, apparent molecular size), 285 (humification index), 300 (characterization of humic substances), 340 (colour), 350 (apparent molecular size), 365 (aromaticity, apparent molecular weight), 400 (humic substances characterization), 436 (quality indicator), 465 (relative abundance of functional groups)
 
-
 #function to plot data for DOM, requires dataframe d (with columns `Sample ID`, `Wavelength (nm)`, Absorbance, Standardized Absorbance) and wavelenth of interest
 DOMboxplotter <- function(d, wavelength){
+  
   #define the wavelength of interest
   wavelength_of_interest <- wavelength
+  
+  
   #filter data to extract absorbance at wavelength of interest
   abs <- d %>%
     filter(`Wavelength (nm)` == wavelength_of_interest) %>% #filter for specific wavelength
     select(`Sample ID`, `Standardized Absorbance`) #select the relevant columns
   
-  #add in habitat and vegetation factors
-  abs$Site <- c(rep("Whiteside",20), rep("Haweswater",20), rep("Widdybanks",20), rep("Brimham Rocks",20), rep("Scarth Wood Moor",20), rep("Bridestones",20))
+  
+  #order sites
+  abs <- arrange(abs, abs["Sample ID"])
+  abs$Site <- c(rep("Brimham Moor",20), rep("Bridestones",20), rep("Haweswater",20), rep("Scarth Wood Moor",20), rep("Widdybanks",20), rep("Whiteside",20))
+  
   
   abs$Vegetation <- c(rep("Bracken",10), rep("Heathland", 10),rep("Bracken",10), rep("Heathland", 10),rep("Bracken",10), rep("Heathland", 10),rep("Bracken",10), rep("Heathland", 10),rep("Bracken",10), rep("Heathland", 10),rep("Bracken",10), rep("Heathland", 10))
   
@@ -2218,7 +2241,7 @@ DOMboxplotter <- function(d, wavelength){
   #create string for y axis label
   yaxis_label <- paste("Absorbance at ", wavelength_of_interest, "nm")
   #reorder the sites so they show up on the plot from west (LHS) to east (RHS)
-  table$Site <- factor(table$Site, levels = c("Whiteside", "Haweswater", "Widdybanks", "Brimham Moor", "Scarth Wood Moor", "Bridestones"))
+  abs$Site <- factor(abs$Site, levels = c("Whiteside", "Haweswater", "Widdybanks", "Brimham Moor", "Scarth Wood Moor", "Bridestones"))
   
   #plot absorbance
   abs_bxp <- ggboxplot(abs, x = "Site", y = 'Standardized Absorbance', color = "Vegetation", palette = c("limegreen", "#AA4499"), lwd = 0.75)  +
@@ -2348,8 +2371,6 @@ DOMboxplotter <- function(d, wavelength){
   #compact letter display
   print(cld)
   
-  
-  
 }
 #list of wavelengths of interest
 wavelength_of_interest <- list(280)#list(250, 254, 260, 265, 272, 280, 285, 300, 340, 350, 365, 400, 436, 465)
@@ -2357,6 +2378,13 @@ wavelength_of_interest <- list(280)#list(250, 254, 260, 265, 272, 280, 285, 300,
 for (wavelength in wavelength_of_interest){
   DOMboxplotter(d, wavelength)
 }
+
+
+
+
+
+
+
 
 #### Save SUVA data ----
 #read in the processed absorbance data
@@ -2614,6 +2642,8 @@ fviz_cos2(pca_result, choice = "var", axes = 1:2)
 fviz_pca_var(pca_result, col.var = "cos2", 
              gradient.cols = c("black", "orange", "green"),
              repel = TRUE)
+
+
 
 
 
