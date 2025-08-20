@@ -4664,7 +4664,8 @@ cdf[is.na(cdf)] <- 0
 cdf <- as.matrix(cdf)
 
 #explanatory data frame: paramters that differed significantly.  THese have different base units so we may want to standardize them e.g. by z scoring
-edf <- d[, c(30, 31, 36, 34)]
+#moisture, pH, total C, total N, C:N ratio, alpha, SUVA.  Add WEOC, WEN to dataframe too and include
+edf <- d[, c(28, 29, 32, 33, 34, 35, 36)]
 
 #assign the treatments to relevant rows of the dataframe
 edf$treatment <- c(rep("Grassland Bracken Present",5),rep("Grassland Bracken Absent",5), rep("Heathland Bracken Present",5),rep("Heathland Bracken Absent",5), rep("Woodland Bracken Present", 5), rep("Woodland Bracken Absent", 5))
