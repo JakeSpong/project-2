@@ -4431,8 +4431,10 @@ plot(ano)
 
 #### Week 1 + 2 extracts mesofauna NMDS ----
 d <- readr::read_csv(
-  here::here("data", "n = 10 Tullgren Extracts - Week 1 + 2 Extracts.csv")
+  here::here("data", "2025-08-19_dbRDA_masterfile.csv")
 ) 
+d <- d[, c(1, 70, 71, 72, 73, 74, 75, 76,77)]
+
 #order samples by ID alphabetically
 d <- arrange(d, d["Sample ID"])
 d <- as.data.frame(d)
@@ -4444,24 +4446,15 @@ rownames(d) <- d[,1]
 #spe <- d[,-(1:3)]
 #just the mite and springtail groups
 #spe <- d[, (4:11)]
-spe <- d[, (37:44)]
-spe <- as.matrix(spe)
-
-#all morphospecies
-#spe <- all_data[,51:436]
-#replace row index with sample names
-rownames(spe) <- d[,1]
+spe <- d[, (2:9)]
 spe <- as.matrix(spe)
 
 #some initial data exploration
 
 #MANOVA - to determine if the treatment (bracken vs heath) signficiantly affects the functional groups
 #Mesostigmata, Oribatida, Astigmatina, Prostigmata, Symphypleona, Entomobryomorpha, Poduromorpha, Neelidae
-result = manova(cbind(Symphypleona, Entomobryomorpha, Poduromorpha, Neelidae) ~ Vegetation*Site, 
-                data = d)
-summary(result)
-
-
+#result = manova(cbind(Symphypleona, Entomobryomorpha, Poduromorpha, Neelidae) ~ Vegetation*Site, data = d)
+#summary(result)
 
 #k is the number of reduced dimensions
 #trymax sets the default number of iterations
@@ -4469,18 +4462,19 @@ example_NMDS <- metaMDS(spe, distance = "bray", k = 2, maxit = 999, trymax = 500
 #Shephard plot shows scatter around the regession between the interpoint distances in the final configuration (i.e. the distances between each pair of communities) against their original dissimilarities.  Large scatter around the line suggests the original dissimilarities are not well preserved in the reduced number of dimensions
 stressplot(example_NMDS)
 
+dev.new()
 #plot the NMDS
 plot(example_NMDS, col = "white")
 
 
 
 #assign the treatments to relevant rows of the dataframe
-treat=c(rep("Brimham Bracken",10),rep("Brimham Heath",10), rep("Bridestones Bracken",10),rep("Bridestones Heath",10), rep("Haweswater Bracken", 10), rep("Haweswater Heath", 10), rep("Widdybanks Bracken", 10), rep("Widdybanks Heath", 10), rep("Whiteside Bracken", 10), rep("Whiteside Heath", 10))
+treat=c(rep("Brimham Bracken",10),rep("Brimham Heath",10), rep("Bridestones Bracken",10),rep("Bridestones Heath",10), rep("Haweswater Bracken", 10), rep("Haweswater Heath", 10), rep("Scarth Wood Bracken", 10), rep("Scarth Wood Heath", 10), rep("Widdybanks Bracken", 10), rep("Widdybanks Heath", 10), rep("Whiteside Bracken", 10), rep("Whiteside Heath", 10))
 #set the colour for each treatment
 #colors =c(rep("#44AA99",5),rep("#117733",5), rep("#88CCEE",5),rep("#332288",5), rep("#AA4499", 5), rep("#882255", 5)) 
-colors =c(rep("#999999",10),rep("#E69F00",10), rep("#56B4E9",10),rep("#009E73",10), rep("#CC79A7", 10), rep("#0072B2", 10), rep("black",10),rep("green",10), rep("purple", 10), rep("red", 10)) 
+colors =c(rep("#999999",20),rep("#E69F00",20), rep("#56B4E9",20),rep("#009E73",20), rep("#CC79A7", 20), rep("#0072B2", 20)) 
 #shapes for point codes
-pchs<- c(rep(15, 10), rep(0, 10), rep(16, 10), rep(1, 10), rep(17, 10), rep(2, 10), rep(18, 10), rep(3, 10), rep(19, 10), rep(4, 10))
+pchs<- c(rep(15, 10), rep(0, 10), rep(16, 10), rep(1, 10), rep(17, 10), rep(2, 10), rep(18, 10), rep(3, 10), rep(19, 10), rep(4, 10), rep(20, 10), rep(5, 10))
 
 #colors =c(rep("green",10),rep("purple",10), rep("green",10),rep("purple",10),rep("green",10),rep("purple",10),rep("green",10),rep("purple",10),rep("green",10),rep("purple",10),rep("green",10),rep("purple",10)) 
 
@@ -4500,12 +4494,17 @@ for(i in unique(treat)) {
     ordiellipse(example_NMDS$point[grep(i,treat),],kind = "se", conf = 0.95, draw="polygon",
                 groups=treat[treat==i],col=colors[grep(i,treat)],label=F) } }
 
-legend(-1.3,0.4, legend=c("Brimham Bracken", "Brimham Heath", "Bridestones Bracken", "Bridestones Heath", "Haweswater Bracken", "Haweswater Heath", "Widdybanks Bracken", "Widdybanks Heath", "Whiteside Bracken", "Whiteside Heath"), col = c("#999999", "#E69F00", "#56B4E9", "#009E73", "#CC79A7", "#0072B2", "black", "green", "purple", "red"), pch = c(15, 0,16,1,17,2, 18, 3, 19, 4))
+legend(-1.2,-0.1, legend=c("Brimham Bracken", "Brimham Heath", "Bridestones Bracken", "Bridestones Heath", "Haweswater Bracken", "Haweswater Heath", "Scarth Wood Bracken", "Scarth Wood Heath", "Widdybanks Bracken", "Widdybanks Heath", "Whiteside Bracken", "Whiteside Heath"), col = c("#999999", "#999999","#E69F00","#E69F00", "#56B4E9", "#56B4E9", "#009E73","#009E73", "#CC79A7","#CC79A7", "#0072B2","#0072B2"), pch = c(15, 0,16,1,17,2, 18, 3, 19, 4, 20, 5))
+
+
+#split into one NMDS for bracken to see if there is convergence, one for heather to see if there is convergence
 
 ####now NMDS just with bracken vs non bracken, never mind the site----
 d <- readr::read_csv(
-  here::here("data", "n = 10 Tullgren Extracts - Week 1 + 2 Extracts.csv")
+  here::here("data", "2025-08-19_dbRDA_masterfile.csv")
 ) 
+d <- d[, c(1, 4, 70, 71, 72, 73, 74, 75, 76,77)]
+
 #order samples by ID alphabetically
 d <- arrange(d, d["Vegetation"])
 d <- as.data.frame(d)
@@ -4516,13 +4515,8 @@ rownames(d) <- d[,1]
 #just the morphospecies counts
 #spe <- d[,-(1:3)]
 #just the mite and springtail groups
-spe <- d[, (4:11)]
-spe <- as.matrix(spe)
-
-#all morphospecies
-#spe <- all_data[,51:436]
-#replace row index with sample names
-rownames(spe) <- d[,1]
+#spe <- d[, (4:11)]
+spe <- d[, (3:10)]
 spe <- as.matrix(spe)
 
 #make sure our variables are coded as factors
@@ -4541,7 +4535,7 @@ plot(example_NMDS, col = "white")
 treat=c(rep("Bracken",60),rep("Heather",60))
 #set the colour for each treatment
 colors=c(rep("#117733",60), rep("#AA4499", 60))
-text(-1,2, paste("Stress = ", round(example_NMDS$stress, 3)))
+text(-1,0.3, paste("Stress = ", round(example_NMDS$stress, 3)))
 
 for(i in unique(treat)) {
   #we have added an if statement so we can chose which points and ellipses to plot at a time e.g. i == "Grassland Bracken".  If we want to plot all ellipses simultaneously, set i == i
@@ -4552,9 +4546,104 @@ for(i in unique(treat)) {
     ordiellipse(example_NMDS$point[grep(i,treat),],draw="polygon",
                 groups=treat[treat==i],col=colors[grep(i,treat)],label=F) } }
 #specify legend manually
-legend(0.8,-0.4, legend = c("Bracken", "Heather"), fill = c("#117733",  "#AA4499"))
+legend(-1.2,-0.3, legend = c("Bracken", "Heather"), fill = c("#117733",  "#AA4499"))
 
 #save the file using Export -> Save As Image -> 
+
+
+
+# do PERMANOVA analysis
+#data frame containing the independent variables (Habitat, Vegetation) we shall be using in our PERMANOVA
+idvs <- d[,(2:3)]
+#run the permanova
+morph_permanova <- adonis2(spe ~ Vegetation, idvs, permutations = 999, method = "bray", by = "terms")
+morph_permanova
+
+
+#run an anosim - when grouping by vegetation
+ano = anosim(as.matrix(spe), grouping = idvs$Vegetation, permutations = 9999, distance = "bray")
+# When interpreting these results you want to look at the ANOSIM statistic R and the Significance values. A Significance value less than 0.05 is generally considered to be statistically significant, and means the null hypothesis can be rejected. “The ANOSIM statistic “R” compares the mean of ranked dissimilarities between groups to the mean of ranked dissimilarities within groups. An R value close to “1.0” suggests dissimilarity between groups while an R value close to “0” suggests an even distribution of high and low ranks within and between groups” (GUSTAME). In other words, the higher the R value, the more dissimilar your groups are in terms of microbial community composition.
+ano
+plot(ano)
+
+
+
+
+
+####now NMDS with just the sites, no vegetation----
+d <- readr::read_csv(
+  here::here("data", "2025-08-19_dbRDA_masterfile.csv")
+)
+#using standardized msofauna abundances
+#d <- d[, c(1, 23, 70, 71, 72, 73, 74, 75, 76,77)]
+#using raw abundances
+d <- d[, c(1, 23, 37, 38, 39, 40, 41, 42, 43, 44)]
+
+
+#order samples from east to west
+d$Site <- factor(d$Site, levels = c("Bridestones", "Scarth Wood Moor", "Brimham Moor", "Widdybanks", "Haweswater", "Whiteside"), labels = c("Bridestones", "Scarth Wood Moor", "Brimham Moor", "Widdybanks", "Haweswater", "Whiteside"))
+d <- arrange(d, d["Site"])
+d <- as.data.frame(d)
+#replace null (empty excell cell) with "0"
+d[is.na(d)] <- 0
+#replace row index with sample names
+rownames(d) <- d[,1]
+#just the morphospecies counts
+#spe <- d[,-(1:3)]
+#just the mite and springtail groups
+#spe <- d[, (4:11)]
+spe <- d[, (3:10)]
+spe <- as.matrix(spe)
+
+
+#k is the number of reduced dimensions
+#trymax sets the default number of iterations
+example_NMDS <- metaMDS(spe, distance = "bray", k = 2, maxit = 999, trymax = 500)
+#Shephard plot shows scatter around the regession between the interpoint distances in the final configuration (i.e. the distances between each pair of communities) against their original dissimilarities.  Large scatter around the line suggests the original dissimilarities are not well preserved in the reduced number of dimensions
+stressplot(example_NMDS)
+#set dimensions of new graphics window
+#dev.new(width = 719, height = 412, unit = "px")
+#plot the NMDS
+plot(example_NMDS, col = "white")
+#assign the treatments to relevant rows of the dataframe
+treat=c(rep("Bridestones",20),rep("Scarth Wood Moor",20),rep("Brimham Moor",20),rep("Widdybanks",20), rep("Haweswater",20),rep("Whiteside",20))
+#set the colour for each treatment
+colors=c(rep("red",20), rep("yellow", 20), rep("green", 20), rep("blue", 20), rep("purple", 20), rep("violet", 20))
+text(-1,0.3, paste("Stress = ", round(example_NMDS$stress, 3)))
+
+for(i in unique(treat)) {
+  #we have added an if statement so we can chose which points and ellipses to plot at a time e.g. i == "Grassland Bracken".  If we want to plot all ellipses simultaneously, set i == i
+  if(i == i){
+    #change the colour of each site name so samples from the same treatment have the same colour
+    orditorp(example_NMDS$point[grep(i,treat),],display="sites", col=colors[grep(i,treat)], cex=0.7,air=0.01)
+    #plots ellipse with ellipse centered on the centroid of the samples from the same treatment (and thus encapsulating 95% of the variance)
+    ordiellipse(example_NMDS$point[grep(i,treat),],draw="polygon",
+                groups=treat[treat==i],col=colors[grep(i,treat)],label=F) } }
+#specify legend manually
+legend(-1.2,-0.15, legend = c("Bridestones", "Scarth Wood", "Brimham", "Widdybanks", "Haweswater", "Whiteside"), fill = c("red",  "yellow", "green", "blue", "purple", "violet"))
+
+#save the file using Export -> Save As Image -> 
+
+
+
+# do PERMANOVA analysis
+#data frame containing the independent variables (Habitat, Vegetation) we shall be using in our PERMANOVA
+idvs <- d[,(1:2)]
+#run the permanova
+morph_permanova <- adonis2(spe ~ Site, idvs, permutations = 999, method = "bray", by = "terms")
+morph_permanova
+
+
+#run an anosim - when grouping by vegetation
+ano = anosim(as.matrix(spe), grouping = idvs$Site, permutations = 9999, distance = "bray")
+# When interpreting these results you want to look at the ANOSIM statistic R and the Significance values. A Significance value less than 0.05 is generally considered to be statistically significant, and means the null hypothesis can be rejected. “The ANOSIM statistic “R” compares the mean of ranked dissimilarities between groups to the mean of ranked dissimilarities within groups. An R value close to “1.0” suggests dissimilarity between groups while an R value close to “0” suggests an even distribution of high and low ranks within and between groups” (GUSTAME). In other words, the higher the R value, the more dissimilar your groups are in terms of microbial community composition.
+ano
+plot(ano)
+
+
+
+
+
 
 
 ####overlay mesofauna morphotypes (instrinsic variables)----
@@ -4657,21 +4746,25 @@ d <- readr::read_csv(
 d <- as.data.frame(d)
 #replace row index with sample names
 rownames(d) <- d[,1]
-#the community data frame
+#the community data frame for standardized abundances - with thsi we can explain approx 35% of the variance
 cdf <- d[,(70:77)]
+#community dataframe for raw abundances - with this we can explain only 15% of the variance
+#cdf <- d[, (37:44)]
+
 #replace null (empty excell cell) with "0"
 cdf[is.na(cdf)] <- 0
 cdf <- as.matrix(cdf)
 
 #explanatory data frame: paramters that differed significantly.  THese have different base units so we may want to standardize them e.g. by z scoring
-#moisture, pH, total C, total N, C:N ratio, alpha, SUVA.  Add WEOC, WEN to dataframe too and include
-edf <- d[, c(28, 29, 32, 33, 34, 35, 36)]
+#altitude, %bracken, %heather, moisture, pH, latitude, longitude, TNb, total C, total N, C:N ratio, alpha, SUVA.  Add WEOC, WEN to dataframe too and include
+edf <- d[, c(5, 6, 7, 21, 22, 28, 29, 30, 31, 32, 33, 34, 35, 36)]
 
 #assign the treatments to relevant rows of the dataframe
-edf$treatment <- c(rep("Grassland Bracken Present",5),rep("Grassland Bracken Absent",5), rep("Heathland Bracken Present",5),rep("Heathland Bracken Absent",5), rep("Woodland Bracken Present", 5), rep("Woodland Bracken Absent", 5))
+edf$treatment <- c(rep("Brimham Bracken",10),rep("Brimham Heather",10), rep("Bridestones Bracken",10),rep("Bridestones Heather",10), rep("Haweswater Bracken", 10), rep("Haweswater Heather", 10), rep("Scarth Wood Bracken",10),rep("Scarth Wood Heather",10), rep("Widdybanks Bracken",10),rep("Widdybanks Heather",10), rep("Whiteside Bracken", 10), rep("Whiteside Heather", 10))
 
 #save the results of the dbRDA to a variable, looking at sample location effects only (longitude, latitude, elevation) - account for 18% of the variance in the microivert communities - but not the other 82%!
-dbrda_summary <- dbrda(formula = cdf ~ `Water content (% of wet soil mass)` + `Total Carbon (g kg-1)` + `CN ratio` + pH + `DOC Concentration (mg C g-1)` + `TNb Concentration (mg N g-1)` + `Zn (mg g-1)` + `Mn (mg g-1)` + `Vegetation Shannon` + `Vegetation Simpson`, edf, distance = "euclidean", sqrt.dist = FALSE, add = FALSE, dfun = vegdist, metaMDSdist = FALSE, na.action = na.exclude, subset = NULL)
+#dbrda_summary <- dbrda(formula = cdf ~ `Altitude (m)` + `Pteridium aquilinium`+ `Calunna vulgaris`+ `Soil Moisture (% fresh soil mass)` + `pH` + `LatitudeN` + `LongitudeE` + `NPOC (mg C g-1)` + `TNb (mg N g-1)` + `Drift Corr C (g per kg)`+ `Drift Corr N (g per kg)` + `CN ratio` + `alpha` + `SUVA (L mg-1 cm-1)`, edf, distance = "euclidean", sqrt.dist = FALSE, add = FALSE, dfun = vegdist, metaMDSdist = FALSE, na.action = na.exclude, subset = NULL)
+dbrda_summary <- dbrda(formula = cdf ~ `Altitude (m)` + `Soil Moisture (% fresh soil mass)` + `LongitudeE` + `NPOC (mg C g-1)` + `Drift Corr N (g per kg)`, edf, distance = "euclidean", sqrt.dist = FALSE, add = FALSE, dfun = vegdist, metaMDSdist = FALSE, na.action = na.exclude, subset = NULL)
 
 summary(dbrda_summary)
 
@@ -4683,9 +4776,9 @@ treatment <- factor(edf$treatment, levels = unique(edf$treatment))
 # Define custom colors and point shapes (pch) for the 6 treatments
 treatment_levels <- levels(treatment)
 #colours for each treatment
-colors =c("#999999", "#E69F00", "#56B4E9", "#009E73", "#CC79A7", "#0072B2")[seq_along(treatment_levels)]
+colors =c("#999999","#999999", "#E69F00", "#E69F00", "#56B4E9","#56B4E9", "#009E73","#009E73", "#CC79A7", "#CC79A7", "#0072B2","#0072B2")[seq_along(treatment_levels)]
 #shapes for point codes
-pchs<- c(15, 0, 16, 1, 17,2)[seq_along(treatment_levels)]
+pchs<- c(15, 0, 16, 1, 17,2, 18, 3, 19, 4, 20, 5)[seq_along(treatment_levels)]
 
 
 # Get variance explained by each axis
@@ -4693,9 +4786,9 @@ eig_vals <- eigenvals(dbrda_summary)
 var_explained <- eig_vals / sum(eig_vals) * 100
 axis_labels <- paste0("dbRDA", 1:2, " (", round(var_explained[1:2], 1), "%)")
 
-# Set the output PDF file and dimensions (in inches)
-pdf("Figures/18_06_2025_dbRDA_plot.pdf", width = 7, height = 6)
 
+
+dev.new()
 # Base plot: empty dbRDA ordination
 plot(dbrda_summary, type = "n", scaling = 2, , 
      xlab = axis_labels[1], ylab = axis_labels[2])  # Use scaling = 2 for species-environment biplot
@@ -4711,7 +4804,7 @@ ordiellipse(dbrda_summary, groups = treatment, display = "sites", kind = "se", c
 
 
 # Add legend
-legend("bottomright", legend = treatment_levels, 
+legend(x = 35, y = 85, legend = treatment_levels, 
        col = colors, pch = pchs)
 
 # Extract biplot scores of environmental variables
@@ -4729,6 +4822,7 @@ text(env_vectors * vec_multiplier, labels = rownames(env_vectors),
 
 dev.off()
 
+summary(dbrda_summary)
 #is the model significant?
 anova(dbrda_summary)
 #test axes for significance
