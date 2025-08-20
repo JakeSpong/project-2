@@ -4292,6 +4292,8 @@ figure
 
 
 
+#### compare week 1 vs week 2 extracts----
+
 
 #### Week 1 extracts mesofauna NMDS ----
 d <- readr::read_csv(
@@ -4639,6 +4641,84 @@ ano = anosim(as.matrix(spe), grouping = idvs$Site, permutations = 9999, distance
 # When interpreting these results you want to look at the ANOSIM statistic R and the Significance values. A Significance value less than 0.05 is generally considered to be statistically significant, and means the null hypothesis can be rejected. “The ANOSIM statistic “R” compares the mean of ranked dissimilarities between groups to the mean of ranked dissimilarities within groups. An R value close to “1.0” suggests dissimilarity between groups while an R value close to “0” suggests an even distribution of high and low ranks within and between groups” (GUSTAME). In other words, the higher the R value, the more dissimilar your groups are in terms of microbial community composition.
 ano
 plot(ano)
+
+
+
+
+
+
+
+#### NMDS eastern three vs western three sites----
+d <- readr::read_csv(
+  here::here("data", "2025-08-19_dbRDA_masterfile.csv")
+)
+#using standardized msofauna abundances
+#d <- d[, c(1, 23, 70, 71, 72, 73, 74, 75, 76,77)]
+#using raw abundances
+d <- d[, c(1, 23, 37, 38, 39, 40, 41, 42, 43, 44)]
+
+
+#order samples from east to west
+d$Site <- factor(d$Site, levels = c("Bridestones", "Scarth Wood Moor", "Brimham Moor", "Widdybanks", "Haweswater", "Whiteside"), labels = c("Bridestones", "Scarth Wood Moor", "Brimham Moor", "Widdybanks", "Haweswater", "Whiteside"))
+d <- arrange(d, d["Site"])
+d <- as.data.frame(d)
+#replace null (empty excell cell) with "0"
+d[is.na(d)] <- 0
+#replace row index with sample names
+rownames(d) <- d[,1]
+#just the morphospecies counts
+#spe <- d[,-(1:3)]
+#just the mite and springtail groups
+#spe <- d[, (4:11)]
+spe <- d[, (3:10)]
+spe <- as.matrix(spe)
+
+
+#k is the number of reduced dimensions
+#trymax sets the default number of iterations
+example_NMDS <- metaMDS(spe, distance = "bray", k = 2, maxit = 999, trymax = 500)
+#Shephard plot shows scatter around the regession between the interpoint distances in the final configuration (i.e. the distances between each pair of communities) against their original dissimilarities.  Large scatter around the line suggests the original dissimilarities are not well preserved in the reduced number of dimensions
+stressplot(example_NMDS)
+#set dimensions of new graphics window
+#dev.new(width = 719, height = 412, unit = "px")
+#plot the NMDS
+plot(example_NMDS, col = "white")
+#assign the treatments to relevant rows of the dataframe
+treat=c(rep("East",60),rep("West",60))
+#set the colour for each treatment
+colors=c(rep("red",60), rep("blue", 60))
+text(-1,0.3, paste("Stress = ", round(example_NMDS$stress, 3)))
+
+for(i in unique(treat)) {
+  #we have added an if statement so we can chose which points and ellipses to plot at a time e.g. i == "Grassland Bracken".  If we want to plot all ellipses simultaneously, set i == i
+  if(i == "West"){
+    #change the colour of each site name so samples from the same treatment have the same colour
+    orditorp(example_NMDS$point[grep(i,treat),],display="sites", col=colors[grep(i,treat)], cex=0.7,air=0.01)
+    #plots ellipse with ellipse centered on the centroid of the samples from the same treatment (and thus encapsulating 95% of the variance)
+    ordiellipse(example_NMDS$point[grep(i,treat),],draw="polygon",
+                groups=treat[treat==i],col=colors[grep(i,treat)],label=F) } }
+#specify legend manually
+legend(-1.2,-0.3, legend = c("East", "West"), fill = c("red",  "blue"))
+#save the file using Export -> Save As Image -> 
+
+
+
+# do PERMANOVA analysis
+#data frame containing the independent variables (Habitat, Vegetation) we shall be using in our PERMANOVA
+idvs <- d[,(1:2)]
+idvs$Treatment <- treat
+#run the permanova
+morph_permanova <- adonis2(spe ~ Treatment, idvs, permutations = 999, method = "bray", by = "terms")
+morph_permanova
+
+
+#run an anosim - when grouping by vegetation
+ano = anosim(as.matrix(spe), grouping = idvs$Treatment, permutations = 9999, distance = "bray")
+# When interpreting these results you want to look at the ANOSIM statistic R and the Significance values. A Significance value less than 0.05 is generally considered to be statistically significant, and means the null hypothesis can be rejected. “The ANOSIM statistic “R” compares the mean of ranked dissimilarities between groups to the mean of ranked dissimilarities within groups. An R value close to “1.0” suggests dissimilarity between groups while an R value close to “0” suggests an even distribution of high and low ranks within and between groups” (GUSTAME). In other words, the higher the R value, the more dissimilar your groups are in terms of microbial community composition.
+ano
+plot(ano)
+
+
 
 
 
