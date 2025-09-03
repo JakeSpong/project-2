@@ -4918,6 +4918,12 @@ d <- readr::read_csv(
 #order samples by ID alphabetically
 
 d <- as.data.frame(d)
+#convert the sample date to an appropriate format
+d$`Sample Date` <- as.Date(d$`Date Sampled`, format = "%d/%m/%Y")
+#convert to Julian date for linear temporal trends
+d$julian <- scale(as.numeric(d$`Sample Date`))
+
+
 #replace row index with sample names
 rownames(d) <- d[,1]
 #the community data frame for standardized abundances - with thsi we can explain approx 35% of the variance
@@ -4930,14 +4936,17 @@ cdf[is.na(cdf)] <- 0
 cdf <- as.matrix(cdf)
 
 #explanatory data frame: paramters that differed significantly.  THese have different base units so we may want to standardize them e.g. by z scoring
-#altitude, %bracken, %heather, moisture, pH, latitude, longitude, TNb, total C, total N, C:N ratio, alpha, SUVA.  Add WEOC, WEN to dataframe too and include
-edf <- d[, c(5, 6, 7, 21, 22, 28, 29, 30, 31, 32, 33, 34, 35, 36)]
+#altitude, %bracken, %heather, moisture, pH, latitude, longitude, TNb, total C, total N, C:N ratio, alpha, SUVA.  Add WEOC, WEN to dataframe too, and date
+edf <- d[, c(5, 6, 7, 21, 22, 28, 29, 30, 31, 32, 33, 34, 35, 36, 79)]
 
 #assign the treatments to relevant rows of the dataframe
 edf$treatment <- c(rep("Brimham Bracken",10),rep("Brimham Heather",10), rep("Bridestones Bracken",10),rep("Bridestones Heather",10), rep("Haweswater Bracken", 10), rep("Haweswater Heather", 10), rep("Scarth Wood Bracken",10),rep("Scarth Wood Heather",10), rep("Widdybanks Bracken",10),rep("Widdybanks Heather",10), rep("Whiteside Bracken", 10), rep("Whiteside Heather", 10))
 
-#save the results of the dbRDA to a variable, looking at sample location effects only (longitude, latitude, elevation) - account for 18% of the variance in the microivert communities - but not the other 82%!
-#dbrda_summary <- dbrda(formula = cdf ~ `Altitude (m)` + `Pteridium aquilinium`+ `Calunna vulgaris`+ `Soil Moisture (% fresh soil mass)` + `pH` + `LatitudeN` + `LongitudeE` + `NPOC (mg C g-1)` + `TNb (mg N g-1)` + `Drift Corr C (g per kg)`+ `Drift Corr N (g per kg)` + `CN ratio` + `alpha` + `SUVA (L mg-1 cm-1)`, edf, distance = "euclidean", sqrt.dist = FALSE, add = FALSE, dfun = vegdist, metaMDSdist = FALSE, na.action = na.exclude, subset = NULL)
+#all explanatory factors modelled
+
+dbrda_summary <- dbrda(formula = cdf ~ `Altitude (m)` + `Pteridium aquilinium`+ `Calunna vulgaris`+ `Soil Moisture (% fresh soil mass)` + `pH` + `LatitudeN` + `LongitudeE` + `NPOC (mg C g-1)` + `TNb (mg N g-1)` + `Drift Corr C (g per kg)`+ `Drift Corr N (g per kg)` + `CN ratio` + `alpha` + `SUVA (L mg-1 cm-1)`  + `julian` , edf, distance = "euclidean", sqrt.dist = FALSE, add = FALSE, dfun = vegdist, metaMDSdist = FALSE, na.action = na.exclude, subset = NULL)
+
+#just the environmental factors that are significant
 dbrda_summary <- dbrda(formula = cdf ~ `Altitude (m)` + `Soil Moisture (% fresh soil mass)` + `LongitudeE` + `NPOC (mg C g-1)` + `Drift Corr N (g per kg)`, edf, distance = "euclidean", sqrt.dist = FALSE, add = FALSE, dfun = vegdist, metaMDSdist = FALSE, na.action = na.exclude, subset = NULL)
 
 summary(dbrda_summary)
