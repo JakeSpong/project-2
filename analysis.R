@@ -2693,8 +2693,8 @@ d$`Individuals per 100g dry soil` <- (d$`Total Mesofauna Catch`/d$`Dry soil mass
 
 library(scales) # displays 100,000 as 100,000, not as 1e5
 
-figure <- ggboxplot(d, x = "Site", y = 'Individuals per 100g dry soil', color = "Vegetation", palette = c("limegreen", "#AA4499"), lwd = 0.75)  +
-  labs(y = expression("Individuals per 100 g dry soil")) + theme( #remove x axis label
+figure <- ggboxplot(d, x = "Site", y = 'Total Mesofauna Catch', color = "Vegetation", palette = c("limegreen", "#AA4499"), lwd = 0.75)  +
+  labs(y = expression("Total Mesofauna Catch")) + theme( #remove x axis label
     axis.title.x=element_blank(),
     # Remove panel border
     panel.border = element_blank(),  
@@ -2720,22 +2720,22 @@ figure
 ggsave(path = "figures", paste0(Sys.Date(), "_mesofauna_abundance_per_100_g_dry_soil.svg"), width = 10, height= 5, figure)
 
 
-#stacked barcharts showing how communities change across site, as % of total number of organisms.  Standardized by dry soil mass?
+#stacked barcharts showing how communities change across site, as % of total number of organisms.
 
-d$`Mesostigmata per 100 g dry soil mass` <- (d$Mesostigmata/d$`Dry soil mass (g)`)*100
-d$`Oribatida per 100 g dry soil mass` <- (d$Oribatida/d$`Dry soil mass (g)`)*100
-d$`Astigmatina per 100 g dry soil mass` <- (d$Astigmatina/d$`Dry soil mass (g)`)*100
-d$`Prostigmata per 100 g dry soil mass` <- (d$Prostigmata/d$`Dry soil mass (g)`)*100
-d$`Entomobryomorpha per 100 g dry soil mass` <- (d$Entomobryomorpha/d$`Dry soil mass (g)`)*100
-d$`Poduromorpha per 100 g dry soil mass` <- (d$Poduromorpha/d$`Dry soil mass (g)`)*100
-d$`Symphypleona per 100 g dry soil mass` <- (d$Symphypleona/d$`Dry soil mass (g)`)*100
-d$`Neelidae per 100 g dry soil mass` <- (d$Neelidae/d$`Dry soil mass (g)`)*100
+#d$`Mesostigmata per 100 g dry soil mass` <- (d$Mesostigmata/d$`Dry soil mass (g)`)*100
+#d$`Oribatida per 100 g dry soil mass` <- (d$Oribatida/d$`Dry soil mass (g)`)*100
+#d$`Astigmatina per 100 g dry soil mass` <- (d$Astigmatina/d$`Dry soil mass (g)`)*100
+#d$`Prostigmata per 100 g dry soil mass` <- (d$Prostigmata/d$`Dry soil mass (g)`)*100
+#d$`Entomobryomorpha per 100 g dry soil mass` <- (d$Entomobryomorpha/d$`Dry soil mass (g)`)*100
+#d$`Poduromorpha per 100 g dry soil mass` <- (d$Poduromorpha/d$`Dry soil mass (g)`)*100
+#d$`Symphypleona per 100 g dry soil mass` <- (d$Symphypleona/d$`Dry soil mass (g)`)*100
+#d$`Neelidae per 100 g dry soil mass` <- (d$Neelidae/d$`Dry soil mass (g)`)*100
 
 
 # Load necessary libraries
 library(tidyverse)
 
-spe <- d[,c(1,2,3, 37, 38, 39, 40, 41, 42, 43, 44)]
+spe <- d[,c(1,2,3, 4,5,6,7,8,9,10,11)]
 
 # Identify species columns (exclude metadata)
 species_cols <- setdiff(names(spe), c("Sample ID", "Site", "Vegetation"))
@@ -2762,12 +2762,12 @@ df_summary <- df_prop %>%
   summarise(Mean_Proportion = mean(Proportion, na.rm = TRUE), .groups = "drop")
 #reorder the sites so they are plotted in the order we want
 df_summary$Site.x <- factor(df_summary$Site.x, levels = c(
-  "Haweswater", "Whiteside", "Widdybanks", 
+ "Whiteside",  "Haweswater",  "Widdybanks", 
   "Brimham Moor", "Scarth Wood Moor", "Bridestones"
 ))
 # Set custom species stacking order (bottom to top)
 df_summary$Species <- factor(df_summary$Species, levels = rev(c(
-  "Mesostigmata per 100 g dry soil mass", "Oribatida per 100 g dry soil mass", "Astigmatina per 100 g dry soil mass", "Prostigmata per 100 g dry soil mass", "Entomobryomorpha per 100 g dry soil mass", "Poduromorpha per 100 g dry soil mass", "Symphypleona per 100 g dry soil mass",  "Neelidae per 100 g dry soil mass")))
+  "Mesostigmata", "Oribatida", "Astigmatina", "Prostigmata", "Entomobryomorpha", "Poduromorpha", "Symphypleona",  "Neelidae")))
 
 
 # Split into two datasets: Heath and Bracken
@@ -2794,11 +2794,30 @@ show(plot_heath)
 show(plot_bracken)
 
 # Save plots
-ggsave(path = "figures", paste0(Sys.Date(), "_mean_species_composition_standardised_heath.svg"),
+ggsave(path = "figures", paste0(Sys.Date(), "_mean_species_composition_raw_heath.svg"),
        plot = plot_heath, width = 7, height = 5, dpi = 300)
 
-ggsave(path = "figures", paste0(Sys.Date(), "_mean_species_composition_standardized_bracken.svg"),
+ggsave(path = "figures", paste0(Sys.Date(), "_mean_species_composition_raw_bracken.svg"),
        plot = plot_bracken, width = 7, height = 5, dpi = 300)
+
+
+#run a binomial GLMM
+library(lme4)
+
+glmm_model <- glmer(
+  Mean_Proportion ~ Species * Vegetation.x + (1 | Site.x),
+  family = binomial,
+  data = df_summary
+)
+
+summary(glmm_model)
+
+
+
+
+
+
+
 
 #save our datafile containg standardized mesofauna abundances
 write.csv(d, "data/2025-08-19_standardized-mesofauna-data.csv")
@@ -4908,6 +4927,18 @@ df_combined <- df_combined %>% select(-...1)
 
 #save our master datafile
 write.csv(df_combined, "data/2025-08-19_dbRDA_masterfile.csv")
+
+#### re analyse data following first paper results review 20/10/2025 onwards ----
+d <- readr::read_csv(
+  here::here("data", "2025-08-19_dbRDA_masterfile.csv")
+) 
+d <- as.data.frame(d)
+
+#first, check which environmental variables differ between bracken and heather across all samples
+
+
+
+
 
 #### dbRDA ----
 d <- readr::read_csv(
