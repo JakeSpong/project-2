@@ -2805,9 +2805,9 @@ ggsave(path = "figures", paste0(Sys.Date(), "_mean_species_composition_raw_brack
 library(lme4)
 
 glmm_model <- glmer(
-  Mean_Proportion ~ Species * Vegetation.x + (1 | Site.x),
+  Proportion ~ Species * Vegetation.x + (1 | Site.x),
   family = binomial,
-  data = df_summary
+  data = df_prop
 )
 
 summary(glmm_model)
@@ -4539,7 +4539,7 @@ plot(ano)
 d <- readr::read_csv(
   here::here("data", "2025-08-19_dbRDA_masterfile.csv")
 ) 
-d <- d[, c(1, 70, 71, 72, 73, 74, 75, 76,77)]
+d <- d[, c(1, 37, 38, 39, 40, 41, 42, 43, 44)]
 
 #order samples by ID alphabetically
 d <- arrange(d, d["Sample ID"])
@@ -4609,7 +4609,7 @@ legend(-1.2,-0.1, legend=c("Brimham Bracken", "Brimham Heath", "Bridestones Brac
 d <- readr::read_csv(
   here::here("data", "2025-08-19_dbRDA_masterfile.csv")
 ) 
-d <- d[, c(1, 4, 70, 71, 72, 73, 74, 75, 76,77)]
+d <- d[, c(1, 4, 37, 38, 39, 40, 41, 42, 43, 44)]
 
 #order samples by ID alphabetically
 d <- arrange(d, d["Vegetation"])
@@ -4928,18 +4928,6 @@ df_combined <- df_combined %>% select(-...1)
 #save our master datafile
 write.csv(df_combined, "data/2025-08-19_dbRDA_masterfile.csv")
 
-#### re analyse data following first paper results review 20/10/2025 onwards ----
-d <- readr::read_csv(
-  here::here("data", "2025-08-19_dbRDA_masterfile.csv")
-) 
-d <- as.data.frame(d)
-
-#first, check which environmental variables differ between bracken and heather across all samples
-
-
-
-
-
 #### dbRDA ----
 d <- readr::read_csv(
   here::here("data", "2025-08-19_dbRDA_masterfile.csv")
@@ -4958,7 +4946,7 @@ d$julian <- scale(as.numeric(d$`Sample Date`))
 #replace row index with sample names
 rownames(d) <- d[,1]
 #the community data frame for standardized abundances - with thsi we can explain approx 35% of the variance
-cdf <- d[,(70:77)]
+cdf <- d[,(37:44)]
 #community dataframe for raw abundances - with this we can explain only 15% of the variance
 #cdf <- d[, (37:44)]
 
@@ -4968,14 +4956,18 @@ cdf <- as.matrix(cdf)
 
 #explanatory data frame: paramters that differed significantly.  THese have different base units so we may want to standardize them e.g. by z scoring
 #altitude, %bracken, %heather, moisture, pH, latitude, longitude, TNb, total C, total N, C:N ratio, alpha, SUVA.  Add WEOC, WEN to dataframe too, and date
-edf <- d[, c(5, 6, 7, 21, 22, 28, 29, 30, 31, 32, 33, 34, 35, 36, 79)]
+edf <- d[, c(4, 5, 6, 7, 21, 22, 28, 29, 30, 31, 32, 33, 34, 35, 36, 79)]
 
 #assign the treatments to relevant rows of the dataframe
-edf$treatment <- c(rep("Brimham Bracken",10),rep("Brimham Heather",10), rep("Bridestones Bracken",10),rep("Bridestones Heather",10), rep("Haweswater Bracken", 10), rep("Haweswater Heather", 10), rep("Scarth Wood Bracken",10),rep("Scarth Wood Heather",10), rep("Widdybanks Bracken",10),rep("Widdybanks Heather",10), rep("Whiteside Bracken", 10), rep("Whiteside Heather", 10))
-
+#edf$treatment <- c(rep("Brimham Bracken",10),rep("Brimham Heather",10), rep("Bridestones Bracken",10),rep("Bridestones Heather",10), rep("Haweswater Bracken", 10), rep("Haweswater Heather", 10), rep("Scarth Wood Bracken",10),rep("Scarth Wood Heather",10), rep("Widdybanks Bracken",10),rep("Widdybanks Heather",10), rep("Whiteside Bracken", 10), rep("Whiteside Heather", 10))
+#edf$treatment <- c(rep("Bracken",10),rep("Heather",10), rep("Bracken",10),rep("Heather",10), rep("Bracken", 10), rep("Heather", 10), rep("Bracken",10),rep("Heather",10), rep("Bracken",10),rep("Heather",10), rep("Bracken", 10), rep("Heather", 10))
 #all explanatory factors modelled
 
-dbrda_summary <- dbrda(formula = cdf ~ `Altitude (m)` + `Pteridium aquilinium`+ `Calunna vulgaris`+ `Soil Moisture (% fresh soil mass)` + `pH` + `LatitudeN` + `LongitudeE` + `NPOC (mg C g-1)` + `TNb (mg N g-1)` + `Drift Corr C (g per kg)`+ `Drift Corr N (g per kg)` + `CN ratio` + `alpha` + `SUVA (L mg-1 cm-1)`  + `julian` , edf, distance = "euclidean", sqrt.dist = FALSE, add = FALSE, dfun = vegdist, metaMDSdist = FALSE, na.action = na.exclude, subset = NULL)
+#check factors for correlation e.g. are elevation and LongitudeE correlated? seems likely!
+
+
+
+dbrda_summary <- dbrda(formula = cdf ~ `Elevation (m)` + `Soil Moisture (% fresh soil mass)` + `pH` + `LatitudeN` + `LongitudeE` + `NPOC (mg C g-1)` + `TNb (mg N g-1)` + `Drift Corr C (g per kg)`+ `Drift Corr N (g per kg)` + `CN ratio` + `alpha` + `SUVA (L mg-1 cm-1)`  + `julian` , edf, distance = "euclidean", sqrt.dist = FALSE, add = FALSE, dfun = vegdist, metaMDSdist = FALSE, na.action = na.exclude, subset = NULL)
 
 #just the environmental factors that are significant
 dbrda_summary <- dbrda(formula = cdf ~ `Altitude (m)` + `Soil Moisture (% fresh soil mass)` + `LongitudeE` + `NPOC (mg C g-1)` + `Drift Corr N (g per kg)`, edf, distance = "euclidean", sqrt.dist = FALSE, add = FALSE, dfun = vegdist, metaMDSdist = FALSE, na.action = na.exclude, subset = NULL)
@@ -4986,13 +4978,15 @@ summary(dbrda_summary)
 # Define treatment variable and convert to factor
 #treatment <- as.factor(edf$treatment)
 
-treatment <- factor(edf$treatment, levels = unique(edf$treatment))
+treatment <- factor(edf$Vegetation, levels = unique(edf$Vegetation))
 # Define custom colors and point shapes (pch) for the 6 treatments
 treatment_levels <- levels(treatment)
 #colours for each treatment
-colors =c("#999999","#999999", "#E69F00", "#E69F00", "#56B4E9","#56B4E9", "#009E73","#009E73", "#CC79A7", "#CC79A7", "#0072B2","#0072B2")[seq_along(treatment_levels)]
+#colors =c("#999999","#999999", "#E69F00", "#E69F00", "#56B4E9","#56B4E9", "#009E73","#009E73", "#CC79A7", "#CC79A7", "#0072B2","#0072B2")[seq_along(treatment_levels)]
+colors = c("#117733", "#AA4499")
 #shapes for point codes
-pchs<- c(15, 0, 16, 1, 17,2, 18, 3, 19, 4, 20, 5)[seq_along(treatment_levels)]
+#pchs<- c(15, 0, 16, 1, 17,2, 18, 3, 19, 4, 20, 5)[seq_along(treatment_levels)]
+pchs<- c(15, 16)[seq_along(treatment_levels)]
 
 
 # Get variance explained by each axis
