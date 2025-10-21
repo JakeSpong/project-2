@@ -5050,9 +5050,6 @@ library("dplyr")
 library("geosphere")
 library("ncdf4.helpers")
 
-nc_file <- nc_open(here::here("CEDA data/groundfrost_hadukgrid_uk_1km_ann_202401-202412.nc"))
-groundfrost <- ncvar_get(nc_file, "groundfrost")
-latitude <- ncvar_get(nc_file, "latitude")
 
 #get the lat and long of each site
 all_data <- readr::read_csv(
@@ -5076,7 +5073,7 @@ widdybanks <- sample_coordinates[101:120,]
 
 #dataframe containing the average longitude and latitude of each site
 sites <- data.frame(
-  Site = c("Bridestones", "Scarth Wood", "Brimham", "Widdybanks", "Haweswater", "Whiteside"),
+  Site = c("Bridestones", "Scarth Wood Moor", "Brimham Moor", "Widdybanks", "Haweswater", "Whiteside"),
   Latitude = c(mean(bridestones$Latitude), mean(scarthwood$Latitude), mean(brimham$Latitude), mean(widdybanks$Latitude), mean(haweswater$Latitude), mean(whiteside$Latitude)),
   Longitude = c(mean(bridestones$Longitude), mean(scarthwood$Longitude), mean(brimham$Longitude), mean(widdybanks$Longitude), mean(haweswater$Longitude), mean(whiteside$Longitude))
 )
@@ -5205,3 +5202,22 @@ names(combined_df)[names(combined_df) == "snowLying"] <- "Snow lying days"
 
 #save the combined_df file
 write.csv(combined_df, "data/hydrological-data-2024-annual-average.csv")
+
+#### append hydrological data to master file ----
+#load existing materfile
+d <- as.data.frame(readr::read_csv(
+  here::here("data", "2025-08-19_dbRDA_masterfile.csv")
+))
+#load hydrological data
+hydro <- as.data.frame(readr::read_csv(
+  here::here("data", "hydrological-data-2024-annual-average.csv")
+))
+#combine
+df_joined <- left_join(d, hydro, by = "Site")
+#save
+write.csv(df_joined, "data/2025-10-21_all-variables_masterfile.csv")
+
+#### analyse the hydrological gradient ----
+d <- as.data.frame(readr::read_csv(
+  here::here("data", "2025-10-21_all-variables_masterfile.csv")
+))
