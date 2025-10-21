@@ -23,44 +23,44 @@ library('FactoMineR') #for PCA visualisation
 # library(ggmap)
 # 
 # #load the field data
-# all_data <- readr::read_csv(
-#   here::here("data", "all-sites_field-data.csv"), show_col_types = FALSE
-# ) 
-# 
-# #extract the sample coordinates from the dataframe
-# sample_coordinates <- data.frame(
-#   Site = all_data$Site,
-#   Vegetation = all_data$Vegetation,
-#   Longitude = all_data$LongitudeE,
-#   Latitude = all_data$LatitudeN
-# )
-# #the sample coordinates belonging to each site
-# bridestones <- sample_coordinates[1:20, ]
-# scarthwood <- sample_coordinates[21:40, ]
-# brimham <- sample_coordinates[41:60, ]
-# haweswater <- sample_coordinates[61:80,]
-# whiteside <- sample_coordinates[81:100, ]
-# widdybanks <- sample_coordinates[101:120,]
-# 
-# # Calculate the bounding box surrounding the 30 sample coordinates
-# bridestones_longitude_range_sample <- range(bridestones$Longitude)
-# bridestones_latitude_range_sample <- range(bridestones$Latitude)
-# # Calculate the bounding box surrounding the 30 sample coordinates
-# scarthwood_longitude_range_sample <- range(scarthwood$Longitude)
-# scarthwood_latitude_range_sample <- range(scarthwood$Latitude)
-# # Calculate the bounding box surrounding the 30 sample coordinates
-# brimham_longitude_range_sample <- range(brimham$Longitude)
-# brimham_latitude_range_sample <- range(brimham$Latitude)
-# # Calculate the bounding box surrounding the 30 sample coordinates
-# haweswater_longitude_range_sample <- range(haweswater$Longitude)
-# haweswater_latitude_range_sample <- range(haweswater$Latitude)
-# # Calculate the bounding box surrounding the 30 sample coordinates
-# whiteside_longitude_range_sample <- range(whiteside$Longitude)
-# whiteside_latitude_range_sample <- range(whiteside$Latitude)
-# # Calculate the bounding box surrounding the 30 sample coordinates
-# widdybanks_longitude_range_sample <- range(widdybanks$Longitude)
-# widdybanks_latitude_range_sample <- range(widdybanks$Latitude)
-# 
+all_data <- readr::read_csv(
+  here::here("data", "all-sites_field-data.csv"), show_col_types = FALSE
+)
+
+#extract the sample coordinates from the dataframe
+sample_coordinates <- data.frame(
+  Site = all_data$Site,
+  Vegetation = all_data$Vegetation,
+  Longitude = all_data$LongitudeE,
+  Latitude = all_data$LatitudeN
+)
+#the sample coordinates belonging to each site
+bridestones <- sample_coordinates[1:20, ]
+scarthwood <- sample_coordinates[21:40, ]
+brimham <- sample_coordinates[41:60, ]
+haweswater <- sample_coordinates[61:80,]
+whiteside <- sample_coordinates[81:100, ]
+widdybanks <- sample_coordinates[101:120,]
+
+# Calculate the bounding box surrounding the 30 sample coordinates
+bridestones_longitude_range_sample <- range(bridestones$Longitude)
+bridestones_latitude_range_sample <- range(bridestones$Latitude)
+# Calculate the bounding box surrounding the 30 sample coordinates
+scarthwood_longitude_range_sample <- range(scarthwood$Longitude)
+scarthwood_latitude_range_sample <- range(scarthwood$Latitude)
+# Calculate the bounding box surrounding the 30 sample coordinates
+brimham_longitude_range_sample <- range(brimham$Longitude)
+brimham_latitude_range_sample <- range(brimham$Latitude)
+# Calculate the bounding box surrounding the 30 sample coordinates
+haweswater_longitude_range_sample <- range(haweswater$Longitude)
+haweswater_latitude_range_sample <- range(haweswater$Latitude)
+# Calculate the bounding box surrounding the 30 sample coordinates
+whiteside_longitude_range_sample <- range(whiteside$Longitude)
+whiteside_latitude_range_sample <- range(whiteside$Latitude)
+# Calculate the bounding box surrounding the 30 sample coordinates
+widdybanks_longitude_range_sample <- range(widdybanks$Longitude)
+widdybanks_latitude_range_sample <- range(widdybanks$Latitude)
+
 # 
 # # Register your Google API key
 # register_google(key = "AIzaSyA42ZmX_RGv9dTA7PFy4UR0YIjxW3x0rUE")
@@ -4967,10 +4967,12 @@ edf <- d[, c(4, 5, 6, 7, 21, 22, 28, 29, 30, 31, 32, 33, 34, 35, 36, 79)]
 
 
 
+
 dbrda_summary <- dbrda(formula = cdf ~ `Elevation (m)` + `Soil Moisture (% fresh soil mass)` + `pH` + `LatitudeN` + `LongitudeE` + `NPOC (mg C g-1)` + `TNb (mg N g-1)` + `Drift Corr C (g per kg)`+ `Drift Corr N (g per kg)` + `CN ratio` + `alpha` + `SUVA (L mg-1 cm-1)`  + `julian` , edf, distance = "euclidean", sqrt.dist = FALSE, add = FALSE, dfun = vegdist, metaMDSdist = FALSE, na.action = na.exclude, subset = NULL)
 
+
 #just the environmental factors that are significant
-dbrda_summary <- dbrda(formula = cdf ~ `Altitude (m)` + `Soil Moisture (% fresh soil mass)` + `LongitudeE` + `NPOC (mg C g-1)` + `Drift Corr N (g per kg)`, edf, distance = "euclidean", sqrt.dist = FALSE, add = FALSE, dfun = vegdist, metaMDSdist = FALSE, na.action = na.exclude, subset = NULL)
+dbrda_summary <- dbrda(formula = cdf ~ `Elevation (m)` + `Soil Moisture (% fresh soil mass)` + `LongitudeE` + `CN ratio`, edf, distance = "euclidean", sqrt.dist = FALSE, add = FALSE, dfun = vegdist, metaMDSdist = FALSE, na.action = na.exclude, subset = NULL)
 
 summary(dbrda_summary)
 
@@ -5038,3 +5040,168 @@ anova(dbrda_summary, by = "axis", perm.max = 500)
 #test environmental variables for significance
 anova(dbrda_summary, by = "terms", perm.max = 500)
 
+
+
+
+#### hydrological gradient data ----
+library("ncdf4") #for reading in .nc files
+library("lubridate") #for dealing with time
+library("dplyr")
+library("geosphere")
+library("ncdf4.helpers")
+
+nc_file <- nc_open(here::here("CEDA data/groundfrost_hadukgrid_uk_1km_ann_202401-202412.nc"))
+groundfrost <- ncvar_get(nc_file, "groundfrost")
+latitude <- ncvar_get(nc_file, "latitude")
+
+#get the lat and long of each site
+all_data <- readr::read_csv(
+  here::here("data", "all-sites_field-data.csv"), show_col_types = FALSE
+)
+
+#extract the sample coordinates from the dataframe
+sample_coordinates <- data.frame(
+  Site = all_data$Site,
+  Vegetation = all_data$Vegetation,
+  Longitude = all_data$LongitudeE,
+  Latitude = all_data$LatitudeN
+)
+#the sample coordinates belonging to each site
+bridestones <- sample_coordinates[1:20, ]
+scarthwood <- sample_coordinates[21:40, ]
+brimham <- sample_coordinates[41:60, ]
+haweswater <- sample_coordinates[61:80,]
+whiteside <- sample_coordinates[81:100, ]
+widdybanks <- sample_coordinates[101:120,]
+
+#dataframe containing the average longitude and latitude of each site
+sites <- data.frame(
+  Site = c("Bridestones", "Scarth Wood", "Brimham", "Widdybanks", "Haweswater", "Whiteside"),
+  Latitude = c(mean(bridestones$Latitude), mean(scarthwood$Latitude), mean(brimham$Latitude), mean(widdybanks$Latitude), mean(haweswater$Latitude), mean(whiteside$Latitude)),
+  Longitude = c(mean(bridestones$Longitude), mean(scarthwood$Longitude), mean(brimham$Longitude), mean(widdybanks$Longitude), mean(haweswater$Longitude), mean(whiteside$Longitude))
+)
+
+
+# the files we wish to load for our gradient
+files <- list(
+  `groundfrost` = here::here("CEDA data/groundfrost_hadukgrid_uk_1km_ann_202401-202412.nc"),
+  `hurs` = here::here("CEDA data/hurs_hadukgrid_uk_1km_ann_202401-202412.nc"),
+ `rainfall` = here::here("CEDA data/rainfall_hadukgrid_uk_1km_ann_202401-202412.nc"),
+  `pv` = here::here("CEDA data/pv_hadukgrid_uk_1km_ann_202401-202412.nc"),
+ `snowLying` = here::here("CEDA data/snowLying_hadukgrid_uk_1km_ann_202401-202412.nc")
+)
+
+#function to extract the data at the correct location
+extract_variable_at_sites <- function(ncfile_path, varname, sites_df) {
+  nc <- nc_open(ncfile_path)
+  
+  # Get variable
+  var <- ncvar_get(nc, varname)
+  
+  # Get dimensions of the variable
+  var_dims <- dim(var)
+  num_dims <- length(var_dims)
+  
+  # Get lat/lon grid
+  lat_grid <- ncvar_get(nc, "latitude")
+  lon_grid <- ncvar_get(nc, "longitude")
+  
+  # Get time (if it exists)
+  if ("time" %in% names(nc$dim)) {
+    time_vals <- ncvar_get(nc, "time")
+    time_units <- ncatt_get(nc, "time", "units")$value
+    origin_string <- sub(".*since ", "", time_units)
+    
+    # Handle "hours since"
+    if (grepl("hour", time_units, ignore.case = TRUE)) {
+      datetime <- as.POSIXct(time_vals * 3600, origin = origin_string, tz = "UTC")
+    } else if (grepl("day", time_units, ignore.case = TRUE)) {
+      datetime <- as.POSIXct(time_vals * 86400, origin = origin_string, tz = "UTC")
+    } else {
+      stop(paste("Unsupported time units:", time_units))
+    }
+    
+    # Get Date
+    date <- as.Date(datetime)
+  } else {
+    date <- as.Date("1970-01-01")  # fallback if no time dim
+  }
+  
+  
+  
+  # Fill value handling
+  fill_value <- ncatt_get(nc, varname, "_FillValue")
+  fill_value <- if (!is.null(fill_value$value)) fill_value$value else NA
+  
+  nc_close(nc)
+  
+  # Build grid mapping (X, Y, index)
+  grid_points <- data.frame(
+    X = as.vector(lon_grid),
+    Y = as.vector(lat_grid),
+    IndexX = rep(1:dim(lon_grid)[1], times = dim(lon_grid)[2]),
+    IndexY = rep(1:dim(lon_grid)[2], each = dim(lon_grid)[1])
+  )
+  
+  result <- data.frame()
+  
+  for (i in 1:nrow(sites_df)) {
+    site_lat <- sites_df$Latitude[i]
+    site_lon <- sites_df$Longitude[i]
+    
+    distances <- distHaversine(cbind(grid_points$X, grid_points$Y), c(site_lon, site_lat))
+    nearest <- which.min(distances)
+    ix <- grid_points$IndexX[nearest]
+    iy <- grid_points$IndexY[nearest]
+    
+    # Extract variable based on its dimensions
+    if (num_dims == 3) {
+      value <- var[ix, iy, 1]  # [X, Y, time]
+    } else if (num_dims == 2) {
+      value <- var[ix, iy]  # [X, Y]
+    } else {
+      stop(paste("Unsupported number of dimensions:", num_dims))
+    }
+    
+    if (!is.na(fill_value) && value == fill_value) {
+      value <- NA
+    }
+    
+    result <- rbind(result, data.frame(
+      Site = sites_df$Site[i],
+      Latitude = site_lat,
+      Longitude = site_lon,
+      Date = date,
+      Value = value
+    ))
+  }
+  
+  names(result)[ncol(result)] <- varname
+  return(result)
+}
+
+
+# Start with the first variable
+combined_df <- extract_variable_at_sites(files[[1]], names(files)[1], sites)
+
+# Join the rest
+for (i in 2:length(files)) {
+  varname <- names(files)[i]
+  filepath <- files[[i]]
+  
+  var_df <- extract_variable_at_sites(filepath, varname, sites)
+  
+  combined_df <- left_join(combined_df, var_df, by = c("Site", "Latitude", "Longitude", "Date"))
+}
+
+
+#rename the columns to something more useful
+# Rename by name
+names(combined_df)[names(combined_df) == "groundfrost"] <- "Groundfrost days"
+names(combined_df)[names(combined_df) == "hurs"] <- "Relative humidity (%)"
+names(combined_df)[names(combined_df) == "rainfall"] <- "Total rainfall (mm)"
+names(combined_df)[names(combined_df) == "pv"] <- "Partial pressure of water vapour (hPa)"
+names(combined_df)[names(combined_df) == "snowLying"] <- "Snow lying days"
+
+#save the combined_df file
+write.csv(combined_df, "data/hydrological-data-2024-annual-average.csv")
