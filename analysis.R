@@ -1,4 +1,4 @@
-usethis::use_git()
+#usethis::use_git()
 
 ## Setup ----
 # Load libraries
@@ -14,6 +14,7 @@ library(multcompView) #for significant difference letters
 library(gitcreds)
 library(broom)
 library('FactoMineR') #for PCA visualisation
+library(ggrepel) #avoid overlap in text labels when doing the PCA
 
 #### NEw Mapping of Sample Locations ----
 # library(ggplot2)
@@ -5190,6 +5191,8 @@ d <- as.data.frame(readr::read_csv(
   here::here("data", "2025-10-21_all-variables_masterfile.csv")
 ))
 d <- d[-1]
+#make sure our variables are coded as factors
+d$Vegetation <- factor(d$Vegetation, levels = c("Bracken", "Heather"), labels = c("Bracken", "Heather"))
 
 #convert the sample date to an appropriate format
 d$`Sample Date` <- as.Date(d$`Date Sampled`, format = "%d/%m/%Y")
@@ -5210,7 +5213,96 @@ cdf <- as.matrix(cdf)
 
 #explanatory data frame: paramters that differed significantly.  THese have different base units so we may want to standardize them e.g. by z scoring
 #altitude, %bracken, %heather, moisture, pH, latitude, longitude, TNb, total C, total N, C:N ratio, alpha, SUVA.  Add WEOC, WEN to dataframe too, and date
-edf <- d[, c(4, 5, 6, 7, 21, 22, 28, 29, 30, 31, 32, 33, 34, 35, 36, 78, 79, 80, 81, 82, 84)]
+edf <- d[, c(5, 6, 7, 21, 22, 28, 29, 30, 31, 32, 33, 34, 35, 36, 78, 79, 80, 81, 82, 84)]
+
+#PCA of edf to see if any explanatory factors are highly correlated
+correlation_check <- cor(edf)
+cor(edf)
+# Step 2: Remove columns with all NA
+env_data_clean <- edf[, colSums(!is.na(edf)) > 0]
+
+# Step 3: Remove columns with zero or near-zero variance
+# Use a small threshold to catch nearly constant columns
+# env_data_clean <- env_data_clean[, apply(env_data_clean, 2, function(x) {
+#   x <- x[is.finite(x)]  # remove Infs
+#   if (length(x) == 0) return(FALSE)
+#   sd_val <- sd(x, na.rm = TRUE)
+#   return(!is.na(sd_val) && sd_val > 1e-8)
+# })]
+
+# Step 4: Drop rows with any NA (PCA can't handle them)
+env_data_clean <- na.omit(env_data_clean)
+
+# Step 5: Scale and run PCA
+scaled_env_data <- scale(env_data_clean)
+pca_result <- prcomp(scaled_env_data, center = TRUE, scale. = TRUE)
+
+# Step 6: View results
+summary(pca_result)
+
+#sample_ids <- d$`Sample ID`[as.numeric(rownames(env_data_clean))]
+
+pca_scores <- as.data.frame(pca_result$x)
+pca_scores$SampleID <- d$`Sample ID`
+pca_scores$Vegetation <- d$Vegetation
+
+#plot the loadings
+# Extract loadings for PC1 and PC2
+loadings <- as.data.frame(pca_result$rotation[, 1:2])
+loadings$Variable <- rownames(loadings)
+
+# Plot loadings as arrows from origin
+ggplot(loadings, aes(x = PC1, y = PC2, label = Variable)) +
+  geom_segment(aes(x = 0, y = 0, xend = PC1, yend = PC2),
+               arrow = arrow(length = unit(0.3, "cm")), color = "blue") +
+  geom_text(hjust = 0.5, vjust = -0.7, size = 4) +
+  xlim(c(min(loadings$PC1, 0) * 1.1, max(loadings$PC1, 0) * 1.1)) +
+  ylim(c(min(loadings$PC2, 0) * 1.1, max(loadings$PC2, 0) * 1.1)) +
+  labs(title = "PCA Loadings Plot (PC1 & PC2)", x = "PC1", y = "PC2") +
+  theme_minimal()
+
+
+#visualize the biplot
+# Extract PCA scores and add SampleID if you have it
+#pca_scores <- as.data.frame(pca_result$x[, 1:2])
+#if (exists("sample_ids")) pca_scores$SampleID <- sample_ids
+
+# Scale loadings for plotting (to match score scale roughly)
+loadings_scaled <- loadings
+scale_factor <- min(
+  (max(pca_scores$PC2) - min(pca_scores$PC2)) / (max(loadings$PC2) - min(loadings$PC2)),
+  (max(pca_scores$PC1) - min(pca_scores$PC1)) / (max(loadings$PC1) - min(loadings$PC1))
+)
+loadings_scaled$PC1 <- loadings$PC1 * scale_factor * 0.7
+loadings_scaled$PC2 <- loadings$PC2 * scale_factor * 0.7
+
+pca_scores$Vegetation <- factor(pca_scores$Vegetation)
+#add variance explained by each PC
+# Calculate proportion of variance explained
+pca_var <- pca_result$sdev^2
+pca_var_explained <- round(100 * pca_var / sum(pca_var), 1)  # in %
+#number sites so we can easily tell which are from which site
+id_map <- c("Bridestones" = 1, "Scarth Wood Moor" = 2, "Brimham Moor" = 3, "Widdybanks" = 4, "Haweswater" = 5, "Whiteside" = 6)
+pca_scores$Site <- d$Site
+pca_scores$Site <- id_map[pca_scores$Site]
+
+
+
+# Plot
+ggplot() +
+  geom_point(data = pca_scores, aes(x = PC1, y = PC2, color = Vegetation), size = 3) +
+  geom_text(data = pca_scores, aes(x = PC1, y = PC2, label = Site), vjust = -1) +
+  geom_segment(data = loadings_scaled, aes(x = 0, y = 0, xend = PC1, yend = PC2),
+               arrow = arrow(length = unit(0.3, "cm")), color = "red") +
+  geom_text(data = loadings_scaled, aes(x = PC1, y = PC2, label = Variable),
+            color = "black", hjust = 0.5, vjust = -0.7) +
+  labs(x = paste0("PC1 (", pca_var_explained[1], "%)"),
+    y = paste0("PC2 (", pca_var_explained[2], "%)"),
+    color = "Vegetation"
+  ) + scale_color_manual(values = c("Bracken" = "forestgreen", "Heather" = "purple")) +
+  theme_minimal()
+
+
 
 #assign the treatments to relevant rows of the dataframe
 #edf$treatment <- c(rep("Brimham Bracken",10),rep("Brimham Heather",10), rep("Bridestones Bracken",10),rep("Bridestones Heather",10), rep("Haweswater Bracken", 10), rep("Haweswater Heather", 10), rep("Scarth Wood Bracken",10),rep("Scarth Wood Heather",10), rep("Widdybanks Bracken",10),rep("Widdybanks Heather",10), rep("Whiteside Bracken", 10), rep("Whiteside Heather", 10))
