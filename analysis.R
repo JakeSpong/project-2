@@ -2680,15 +2680,15 @@ d$CoreVolume <- volume
 d$`1000s Individuals per m2 to 10 cm depth` <- ((d$`Total Mesofauna Catch`/d$CoreVolume)*0.1)/1000
 #standardize to dry soil mass
 #load data containg tullgren dry soil mass
-d_tdsm <- readr::read_csv(
-  here::here("data", "all-sites_dry-tullgren-soil-mass.csv")
-) 
+# d_tdsm <- readr::read_csv(
+#   here::here("data", "all-sites_dry-tullgren-soil-mass.csv")
+# ) 
 d$`Sample ID` <- gsub(" ", "-", d$`Sample ID`)
 #add the dry soil mass column
-d <- d %>%
-  left_join(d_tdsm %>% select(`Sample ID`, `Dry soil mass (g)`), by = "Sample ID")
+# d <- d %>%
+#   left_join(d_tdsm %>% select(`Sample ID`, `Dry soil mass (g)`), by = "Sample ID")
 #calculate  individuals per g dry soil
-d$`Individuals per 100g dry soil` <- (d$`Total Mesofauna Catch`/d$`Dry soil mass (g)`)*100
+#d$`Individuals per 100g dry soil` <- (d$`Total Mesofauna Catch`/d$`Dry soil mass (g)`)*100
 
 #plot abundances
 
@@ -2716,9 +2716,9 @@ figure <- ggboxplot(d, x = "Site", y = 'Total Mesofauna Catch', color = "Vegetat
   ) + scale_y_continuous(labels = label_comma())
 
 #display our plot
-figure
+show(figure)
 
-ggsave(path = "figures", paste0(Sys.Date(), "_mesofauna_abundance_per_100_g_dry_soil.svg"), width = 10, height= 5, figure)
+ggsave(path = "figures", paste0(Sys.Date(), "_mesofauna_abundance_raw.svg"), width = 10, height= 5, figure)
 
 
 #stacked barcharts showing how communities change across site, as % of total number of organisms.
@@ -2802,36 +2802,19 @@ ggsave(path = "figures", paste0(Sys.Date(), "_mean_species_composition_raw_brack
        plot = plot_bracken, width = 7, height = 5, dpi = 300)
 
 
-#run a binomial GLMM
-library(lme4)
-
-glmm_model <- glmer(
-  Proportion ~ Species * Vegetation.x + (1 | Site.x),
-  family = binomial,
-  data = df_prop
-)
-
-summary(glmm_model)
-
-
-
-
-
-
-
 
 #save our datafile containg standardized mesofauna abundances
 write.csv(d, "data/2025-08-19_standardized-mesofauna-data.csv")
 
 ####analyse mesofauna abundance per 100g dry soil ----
-hist(d$`Individuals per 100g dry soil`)
+hist(d$`Total Mesofauna Catch`)
 #transform the data for a normal distribution
-d$`Mesofauna Individuals er 100 g dry soil log x plus 10 transformed` <- log(d$`Individuals per 100g dry soil` + 10)
+#d$`Total Mesofauna Catch log x` <- log(d$`Total Mesofauna Catch` + 10)
 #the tranformation seems to have worked, giving us something resembling a normal distribution
-hist(d$`Mesofauna Individuals er 100 g dry soil log x plus 10 transformed`)
+hist(d$`Total Mesofauna Catch`)
 
 #Type 1 two-way anova using data from all sites
-anova <- aov(d$`Mesofauna Individuals er 100 g dry soil log x plus 10 transformed` ~ d$Vegetation * d$Site)
+anova <- aov(d$`Total Mesofauna Catch` ~ d$Vegetation * d$Site)
 summary(anova)
 #tukey's test to identify significant interactions
 tukey <- TukeyHSD(anova)
@@ -2844,7 +2827,7 @@ print(cld)
 #check homogeneity of variance
 plot(anova, 1)
 #levene test.  if p value < 0.05, there is evidence to suggest that the variance across groups is statistically significantly different.
-leveneTest(d$`Mesofauna Individuals er 100 g dry soil log x plus 10 transformed` ~ d$Vegetation * d$Site)
+leveneTest(d$`Total Mesofauna Catch` ~ d$Vegetation * d$Site)
 #check normality.  
 plot(anova, 2)
 #conduct shapiro-wilk test on ANOVA residuals to test for normality
@@ -2852,6 +2835,66 @@ plot(anova, 2)
 aov_residuals <- residuals(object = anova)
 #run shapiro-wilk test.  if p > 0.05 the data is normal
 shapiro.test(x = aov_residuals)
+
+
+#get total numbers of mites/springtails
+d$`Total Mites` = (d$Mesostigmata + d$Oribatida + d$Astigmatina + d$Prostigmata)
+d$`Total Collembola` = (d$Symphypleona + d$Neelidae + d$Entomobryomorpha + d$Poduromorpha)
+
+#the tranformation seems to have worked, giving us something resembling a normal distribution
+hist(d$`Total Mites`)
+d$`Total Mites logplus10` <- log(d$`Total Mites` + 10)
+hist(d$`Total Mites log + 10`)
+#Type 1 two-way anova using data from all sites
+anova <- aov(d$`Total Mites logplus10` ~ d$Vegetation * d$Site)
+summary(anova)
+#tukey's test to identify significant interactions
+tukey <- TukeyHSD(anova)
+print(tukey)
+#compact letter display
+cld <- multcompLetters4(anova, tukey)
+#compact letter display
+print(cld)
+
+#check homogeneity of variance
+plot(anova, 1)
+#levene test.  if p value < 0.05, there is evidence to suggest that the variance across groups is statistically significantly different.
+leveneTest(d$`Total Mites logplus10` ~ d$Vegetation * d$Site)
+#check normality.  
+plot(anova, 2)
+#conduct shapiro-wilk test on ANOVA residuals to test for normality
+#extract the residuals
+aov_residuals <- residuals(object = anova)
+#run shapiro-wilk test.  if p > 0.05 the data is normal
+shapiro.test(x = aov_residuals)
+
+#the tranformation seems to have worked, giving us something resembling a normal distribution
+hist(d$`Total Collembola`)
+d$`Total Collembola logplus10` <- log(d$`Total Collembola` + 10)
+hist(d$`Total Collembola logplus10`)
+#Type 1 two-way anova using data from all sites
+anova <- aov(d$`Total Collembola logplus10` ~ d$Vegetation * d$Site)
+summary(anova)
+#tukey's test to identify significant interactions
+tukey <- TukeyHSD(anova)
+print(tukey)
+#compact letter display
+cld <- multcompLetters4(anova, tukey)
+#compact letter display
+print(cld)
+
+#check homogeneity of variance
+plot(anova, 1)
+#levene test.  if p value < 0.05, there is evidence to suggest that the variance across groups is statistically significantly different.
+leveneTest(d$`Total Collembola logplus10` ~ d$Vegetation * d$Site)
+#check normality.  
+plot(anova, 2)
+#conduct shapiro-wilk test on ANOVA residuals to test for normality
+#extract the residuals
+aov_residuals <- residuals(object = anova)
+#run shapiro-wilk test.  if p > 0.05 the data is normal
+shapiro.test(x = aov_residuals)
+
 
 #### mesofauna abundance per 100 g dry soil, at each site ----
 
@@ -5310,11 +5353,9 @@ ggplot() +
 #all explanatory factors modelled
 
 #check factors for correlation e.g. are elevation and LongitudeE correlated? seems likely!
-
-
-
-
-dbrda_summary <- dbrda(formula = cdf ~ `Elevation (m)` + `Soil Moisture (% fresh soil mass)` + `pH` + `LatitudeN` + `LongitudeE` + `NPOC (mg C g-1)` + `TNb (mg N g-1)` + `Drift Corr C (g per kg)`+ `Drift Corr N (g per kg)` + `CN ratio` + `alpha` + `SUVA (L mg-1 cm-1)` + `Groundfrost days` + `Relative humidity (%)` + `Total rainfall (mm)` + `Partial pressure of water vapour (hPa)` + `Snow lying days`  + `julian` , edf, distance = "euclidean", sqrt.dist = FALSE, add = FALSE, dfun = vegdist, metaMDSdist = FALSE, na.action = na.exclude, subset = NULL)
+scaled_env_data <- as.data.frame(scaled_env_data)
+#dbRDA using normaliesd environmental factors
+dbrda_summary <- dbrda(formula = cdf ~ `pH` + `LatitudeN` + `LongitudeE` + `NPOC (mg C g-1)` + `TNb (mg N g-1)` + `Drift Corr C (g per kg)` + `CN ratio` + `alpha` + `SUVA (L mg-1 cm-1)` + `Groundfrost days` + `Relative humidity (%)` + `Total rainfall (mm)` + `Snow lying days`  + `julian` , scaled_env_data, distance = "euclidean", sqrt.dist = FALSE, add = FALSE, dfun = vegdist, metaMDSdist = FALSE, na.action = na.exclude, subset = NULL)
 
 
 #just the environmental factors that are significant
@@ -5326,7 +5367,7 @@ summary(dbrda_summary)
 # Define treatment variable and convert to factor
 #treatment <- as.factor(edf$treatment)
 
-treatment <- factor(edf$Vegetation, levels = unique(edf$Vegetation))
+treatment <- factor(d$Vegetation, levels = unique(d$Vegetation))
 # Define custom colors and point shapes (pch) for the 6 treatments
 treatment_levels <- levels(treatment)
 #colours for each treatment
@@ -5360,7 +5401,7 @@ ordiellipse(dbrda_summary, groups = treatment, display = "sites", kind = "se", c
 
 
 # Add legend
-legend(x = 35, y = 85, legend = treatment_levels, 
+legend(x = 10, y = 18, legend = treatment_levels, 
        col = colors, pch = pchs)
 
 # Extract biplot scores of environmental variables
@@ -5385,6 +5426,21 @@ anova(dbrda_summary)
 anova(dbrda_summary, by = "axis", perm.max = 500)
 #test environmental variables for significance
 anova(dbrda_summary, by = "terms", perm.max = 500)
+
+#### glms of mesofauna function groups in response to vegetation and latitude ----
+
+
+#run a binomial GLMM
+library(lme4)
+
+glmm_model <- glmer(
+  Mesostigmata ~  Vegetation + (1 | Site),
+  family = binomial,
+  data = d
+)
+
+summary(glmm_model)
+
 
 
 
