@@ -2642,7 +2642,7 @@ fviz_pca_var(pca_result, col.var = "cos2",
 
 
 
-#### Invertebrate catch percetnage breakdown  and standardozed abundances ----
+#### Invertebrate catch percetnage breakdown ----
 d <- readr::read_csv(
   here::here("data", "n = 10 Tullgren Extracts - Week 1 + 2 Extracts.csv")
 ) 
@@ -2667,6 +2667,86 @@ print(sum(d$`Total Invertebrate Catch`))
 d$`Percentage Mites` = ((d$Mesostigmata + d$Oribatida + d$Astigmatina + d$Prostigmata)/(d$`Total Invertebrate Catch`))*100
 d$`Percentage Collembola` = ((d$Symphypleona + d$Neelidae + d$Entomobryomorpha + d$Poduromorpha)/d$`Total Invertebrate Catch`)*100
 d$`Percentage Other` = (100-d$`Percentage Collembola` - d$`Percentage Mites`)
+
+d$`Proportion Mesostigmata` <- (d$Mesostigmata/d$`Total Mesofauna Catch`)
+d$`Proportion Oribatida` <- (d$Oribatida/d$`Total Mesofauna Catch`)
+d$`Proportion Astigmatina` <- (d$Astigmatina/d$`Total Mesofauna Catch`)
+d$`Proportion Prostigmata` <- (d$Prostigmata/d$`Total Mesofauna Catch`)
+d$`Proportion Entomobryomorpha` <- (d$Entomobryomorpha/d$`Total Mesofauna Catch`)
+d$`Proportion Poduromorpha` <- (d$Poduromorpha/d$`Total Mesofauna Catch`)
+d$`Proportion Symphypleona` <- (d$Symphypleona/d$`Total Mesofauna Catch`)
+d$`Proportion Neelidae` <- (d$Neelidae/d$`Total Mesofauna Catch`)
+
+# Load necessary libraries
+library(tidyverse)
+
+spe <- d[,c(1,2,3, 33, 34, 35, 36, 37, 38, 39, 40)]
+#rename columns
+names(spe)[names(spe) == "Proportion Mesostigmata"] <- "Mesostigmata"
+names(spe)[names(spe) == "Proportion Oribatida"] <- "Oribatida"
+names(spe)[names(spe) == "Proportion Astigmatina"] <- "Astigmatina"
+names(spe)[names(spe) == "Proportion Prostigmata"] <- "Prostigmata"
+names(spe)[names(spe) == "Proportion Entomobryomorpha"] <- "Entomobryomorpha"
+names(spe)[names(spe) == "Proportion Poduromorpha"] <- "Poduromorpha"
+names(spe)[names(spe) == "Proportion Symphypleona"] <- "Symphypleona"
+names(spe)[names(spe) == "Proportion Neelidae"] <- "Neelidae"
+# Identify species columns (exclude metadata)
+species_cols <- setdiff(names(spe), c("Sample ID", "Site", "Vegetation"))
+
+# ivot to long format
+df_long <- spe %>%
+  pivot_longer(cols = all_of(species_cols),
+               names_to = "Functional Group",
+               values_to = "Percentage of total mesofauna catch")
+
+# Step 4: Aggregate to Site × Vegetation: compute mean proportion per species
+df_summary <- df_long %>%
+  group_by(Site, Vegetation, `Functional Group`) %>%
+  summarise(Mean_Proportion = mean(`Percentage of total mesofauna catch`, na.rm = TRUE), .groups = "drop")
+
+#reorder the sites so they are plotted in the order we want
+df_summary$Site <- factor(df_summary$Site, levels = c(
+  "Whiteside",  "Haweswater",  "Widdybanks", 
+  "Brimham Moor", "Scarth Wood Moor", "Bridestones"
+))
+
+# Set custom species stacking order (bottom to top)
+df_summary$`Functional Group` <- factor(df_summary$`Functional Group`, levels = rev(c(
+  "Mesostigmata", "Oribatida", "Astigmatina", "Prostigmata", "Entomobryomorpha", "Poduromorpha", "Symphypleona",  "Neelidae")))
+
+
+# Split into two datasets: Heath and Bracken
+df_heath <- df_summary %>% filter(Vegetation == "Heather")
+df_bracken <- df_summary %>% filter(Vegetation == "Bracken")
+
+# Plot 1: Heath
+plot_heath <- ggplot(df_heath, aes(x = Site, y = Mean_Proportion, fill = `Functional Group`)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Mean Species Composition in Heath",
+       x = "Site", y = "Mean Proportional Abundance") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90))
+
+# Plot 2: Bracken
+plot_bracken <- ggplot(df_bracken, aes(x = Site, y = Mean_Proportion, fill = `Functional Group`)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Mean Species Composition in Bracken",
+       x = "Site", y = "Mean Proportional Abundance") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90))
+
+show(plot_heath)
+show(plot_bracken)
+
+# Save plots
+ggsave(path = "figures", paste0(Sys.Date(), "_mean_species_composition_raw_heath.svg"),
+       plot = plot_heath, width = 7, height = 5, dpi = 300)
+
+ggsave(path = "figures", paste0(Sys.Date(), "_mean_species_composition_raw_bracken.svg"),
+       plot = plot_bracken, width = 7, height = 5, dpi = 300)
+
+
+
 
 #we are printing multiple lines so use cat()
 cat("Min mite percentage: ", min(d$`Percentage Mites`), "Max mite percentage: ", max(d$`Percentage Mites`),"Min collembola percentage: ", min(d$`Percentage Collembola`), "Max collembola percentage: ", max(d$`Percentage Collembola`), "Min other invert percentage: ", min(d$`Percentage Other`), "Max other invert percentage: ", max(d$`Percentage Other`))
@@ -2720,91 +2800,47 @@ show(figure)
 
 ggsave(path = "figures", paste0(Sys.Date(), "_mesofauna_abundance_raw.svg"), width = 10, height= 5, figure)
 
-
-#stacked barcharts showing how communities change across site, as % of total number of organisms.
-
-#d$`Mesostigmata per 100 g dry soil mass` <- (d$Mesostigmata/d$`Dry soil mass (g)`)*100
-#d$`Oribatida per 100 g dry soil mass` <- (d$Oribatida/d$`Dry soil mass (g)`)*100
-#d$`Astigmatina per 100 g dry soil mass` <- (d$Astigmatina/d$`Dry soil mass (g)`)*100
-#d$`Prostigmata per 100 g dry soil mass` <- (d$Prostigmata/d$`Dry soil mass (g)`)*100
-#d$`Entomobryomorpha per 100 g dry soil mass` <- (d$Entomobryomorpha/d$`Dry soil mass (g)`)*100
-#d$`Poduromorpha per 100 g dry soil mass` <- (d$Poduromorpha/d$`Dry soil mass (g)`)*100
-#d$`Symphypleona per 100 g dry soil mass` <- (d$Symphypleona/d$`Dry soil mass (g)`)*100
-#d$`Neelidae per 100 g dry soil mass` <- (d$Neelidae/d$`Dry soil mass (g)`)*100
+#### glms of mesofauna function groups in response to vegetation and latitude ----
 
 
-# Load necessary libraries
-library(tidyverse)
+#run a binomial GLMM
+library(lme4)
 
-spe <- d[,c(1,2,3, 4,5,6,7,8,9,10,11)]
+#a dataframe for each functional group
+df_meso <- df_long %>% filter(`Functional Group` == "Mesostigmata")
+df_orib <- df_long %>% filter(`Functional Group` == "Oribatida")
+df_asti <- df_long %>% filter(`Functional Group` == "Astigmatina")
+df_pros <- df_long %>% filter(`Functional Group` == "Prostigmata")
+df_ento <- df_long %>% filter(`Functional Group` == "Entomobryomorpha")
+df_podu <- df_long %>% filter(`Functional Group` == "Poduromorpha")
+df_symp <- df_long %>% filter(`Functional Group` == "Symphypleona")
+df_neel <- df_long %>% filter(`Functional Group` == "Neelidae")
+#need to transform data to meet gaussian assumption?
+hist(log(df_meso$`Percentage of total mesofauna catch`))
+#model using glm
+meso_model <- glm(`Percentage of total mesofauna catch` ~ Vegetation*Site, data = df_meso, family = binomial)
+summary(meso_model)
 
-# Identify species columns (exclude metadata)
-species_cols <- setdiff(names(spe), c("Sample ID", "Site", "Vegetation"))
+orib_model <- glm(`Percentage of total mesofauna catch` ~ Vegetation*Site, data = df_orib, family = binomial)
+summary(orib_model)
 
-# Step 1: Pivot to long format
-df_long <- spe %>%
-  pivot_longer(cols = all_of(species_cols),
-               names_to = "Species",
-               values_to = "Abundance")
+asti_model <- glm(`Percentage of total mesofauna catch` ~ Vegetation*Site, data = df_asti, family = binomial)
+summary(asti_model)
 
-# Step 2: Calculate proportional abundance within each Sample
-df_prop <- df_long %>%
-  group_by(`Sample ID`) %>%
-  mutate(Proportion = Abundance / sum(Abundance)) %>%
-  ungroup()
+pros_model <- glm(`Percentage of total mesofauna catch` ~ Vegetation*Site, data = df_pros, family = binomial)
+summary(pros_model)
 
-# Step 3: Merge in Site and Vegetation info
-df_meta <- spe %>% select(`Sample ID`, Site, Vegetation) %>% distinct()
-df_prop <- df_prop %>% left_join(df_meta, by = "Sample ID")
+ento_model <- glm(`Percentage of total mesofauna catch` ~ Vegetation*Site, data = df_ento, family = binomial)
+summary(ento_model)
 
-# Step 4: Aggregate to Site × Vegetation: compute mean proportion per species
-df_summary <- df_prop %>%
-  group_by(Site.x, Vegetation.x, Species) %>%
-  summarise(Mean_Proportion = mean(Proportion, na.rm = TRUE), .groups = "drop")
-#reorder the sites so they are plotted in the order we want
-df_summary$Site.x <- factor(df_summary$Site.x, levels = c(
- "Whiteside",  "Haweswater",  "Widdybanks", 
-  "Brimham Moor", "Scarth Wood Moor", "Bridestones"
-))
-# Set custom species stacking order (bottom to top)
-df_summary$Species <- factor(df_summary$Species, levels = rev(c(
-  "Mesostigmata", "Oribatida", "Astigmatina", "Prostigmata", "Entomobryomorpha", "Poduromorpha", "Symphypleona",  "Neelidae")))
+podu_model <- glm(`Percentage of total mesofauna catch` ~ Vegetation*Site, data = df_podu, family = binomial)
+summary(podu_model)
 
+symp_model <- glm(`Percentage of total mesofauna catch` ~ Vegetation*Site, data = df_symp, family = binomial)
+summary(symp_model)
 
-# Split into two datasets: Heath and Bracken
-df_heath <- df_summary %>% filter(Vegetation.x == "Heather")
-df_bracken <- df_summary %>% filter(Vegetation.x == "Bracken")
-
-# Plot 1: Heath
-plot_heath <- ggplot(df_heath, aes(x = Site.x, y = Mean_Proportion, fill = Species)) +
-  geom_bar(stat = "identity") +
-  labs(title = "Mean Species Composition in Heath",
-       x = "Site", y = "Mean Proportional Abundance") +
-  theme_minimal() +
-  theme(axis.text.x = element_text(angle = 90))
-
-# Plot 2: Bracken
-plot_bracken <- ggplot(df_bracken, aes(x = Site.x, y = Mean_Proportion, fill = Species)) +
-  geom_bar(stat = "identity") +
-  labs(title = "Mean Species Composition in Bracken",
-       x = "Site", y = "Mean Proportional Abundance") +
-  theme_minimal() +
-  theme(axis.text.x = element_text(angle = 90))
-
-show(plot_heath)
-show(plot_bracken)
-
-# Save plots
-ggsave(path = "figures", paste0(Sys.Date(), "_mean_species_composition_raw_heath.svg"),
-       plot = plot_heath, width = 7, height = 5, dpi = 300)
-
-ggsave(path = "figures", paste0(Sys.Date(), "_mean_species_composition_raw_bracken.svg"),
-       plot = plot_bracken, width = 7, height = 5, dpi = 300)
-
-
-
-#save our datafile containg standardized mesofauna abundances
-write.csv(d, "data/2025-08-19_standardized-mesofauna-data.csv")
+neel_model <- glm(`Percentage of total mesofauna catch` ~ Vegetation*Site, data = df_neel, family = binomial)
+summary(neel_model)
 
 ####analyse mesofauna abundance per 100g dry soil ----
 hist(d$`Total Mesofauna Catch`)
@@ -5427,19 +5463,7 @@ anova(dbrda_summary, by = "axis", perm.max = 500)
 #test environmental variables for significance
 anova(dbrda_summary, by = "terms", perm.max = 500)
 
-#### glms of mesofauna function groups in response to vegetation and latitude ----
 
-
-#run a binomial GLMM
-library(lme4)
-
-glmm_model <- glmer(
-  Mesostigmata ~  Vegetation + (1 | Site),
-  family = binomial,
-  data = d
-)
-
-summary(glmm_model)
 
 
 
