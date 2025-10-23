@@ -2693,16 +2693,37 @@ names(spe)[names(spe) == "Proportion Neelidae"] <- "Neelidae"
 # Identify species columns (exclude metadata)
 species_cols <- setdiff(names(spe), c("Sample ID", "Site", "Vegetation"))
 
-# ivot to long format
+# pivot to long format
 df_long <- spe %>%
   pivot_longer(cols = all_of(species_cols),
                names_to = "Functional Group",
-               values_to = "Percentage of total mesofauna catch")
+               values_to = "Percentage_of_total_mesofauna_catch")
+
+# get mean for each group, just between heather and bracken
+df_summary_veg <- df_long %>%
+  group_by(Vegetation, `Functional Group`) %>%
+  summarise(Mean_Proportion = mean(Percentage_of_total_mesofauna_catch, na.rm = TRUE), .groups = "drop")
+
+# Set custom species stacking order (bottom to top)
+df_summary_veg$`Functional Group` <- factor(df_summary_veg$`Functional Group`, levels = rev(c(
+  "Mesostigmata", "Oribatida", "Astigmatina", "Prostigmata", "Entomobryomorpha", "Poduromorpha", "Symphypleona",  "Neelidae")))
+
+plot_veg <- ggplot(df_summary_veg, aes(x = Vegetation, y = Mean_Proportion, fill = `Functional Group`)) +
+  geom_bar(stat = "identity") +
+  labs(x = "Habitat", y = "Mean Proportional Abundance") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 0))
+
+show(plot_veg)
+
+# Save plots
+ggsave(path = "figures", paste0(Sys.Date(), "_mean_species_composition_raw_veg.svg"),
+       plot = plot_veg, width = 7, height = 5, dpi = 300)
 
 # Step 4: Aggregate to Site × Vegetation: compute mean proportion per species
 df_summary <- df_long %>%
   group_by(Site, Vegetation, `Functional Group`) %>%
-  summarise(Mean_Proportion = mean(`Percentage of total mesofauna catch`, na.rm = TRUE), .groups = "drop")
+  summarise(Mean_Proportion = mean(Percentage_of_total_mesofauna_catch, na.rm = TRUE), .groups = "drop")
 
 #reorder the sites so they are plotted in the order we want
 df_summary$Site <- factor(df_summary$Site, levels = c(
@@ -2804,7 +2825,21 @@ ggsave(path = "figures", paste0(Sys.Date(), "_mesofauna_abundance_raw.svg"), wid
 
 
 #run a binomial GLMM
-library(lme4)
+library(glmm)
+
+#df containing just sample code and longitude
+d <- as.data.frame(readr::read_csv(
+  here::here("data", "2025-10-21_all-variables_masterfile.csv")
+))
+#add in dash to sample IDs to ensure consisting formatting
+df_long$`Sample ID` <- gsub(" ", "-", df_long$`Sample ID`)
+df_longitude <- d[, c(2,23)]
+#append longitude column for east-west gradient
+df_long <- left_join(df_long, df_longitude, by  = c("Sample ID"))
+#our GLMM can't handle 0s and 1s, so adjust the data slightly
+#df_long$Percentage_of_total_mesofauna_catch[df_long$Percentage_of_total_mesofauna_catch == 0] <- 0.001
+#df_long$Percentage_of_total_mesofauna_catch[df_long$Percentage_of_total_mesofauna_catch == 1] <- 0.999
+
 
 #a dataframe for each functional group
 df_meso <- df_long %>% filter(`Functional Group` == "Mesostigmata")
@@ -2815,32 +2850,273 @@ df_ento <- df_long %>% filter(`Functional Group` == "Entomobryomorpha")
 df_podu <- df_long %>% filter(`Functional Group` == "Poduromorpha")
 df_symp <- df_long %>% filter(`Functional Group` == "Symphypleona")
 df_neel <- df_long %>% filter(`Functional Group` == "Neelidae")
-#need to transform data to meet gaussian assumption?
-hist(log(df_meso$`Percentage of total mesofauna catch`))
-#model using glm
-meso_model <- glm(`Percentage of total mesofauna catch` ~ Vegetation*Site, data = df_meso, family = binomial)
-summary(meso_model)
 
-orib_model <- glm(`Percentage of total mesofauna catch` ~ Vegetation*Site, data = df_orib, family = binomial)
-summary(orib_model)
+library(glmmTMB)
+library(ggeffects)
+meso_model <- glmmTMB(
+  Percentage_of_total_mesofauna_catch ~ LongitudeE * Vegetation,
+  data = df_meso,
+  family = beta_family(link = "logit"),
+  ziformula = ~1  # models the zero-inflation part
+)
+#summary(model)
+pred <- ggpredict(meso_model, terms = c("LongitudeE [all]", "Vegetation"))
 
-asti_model <- glm(`Percentage of total mesofauna catch` ~ Vegetation*Site, data = df_asti, family = binomial)
-summary(asti_model)
+meso_plot <- ggplot(pred, aes(x, predicted, colour = group)) +
+  geom_point(data = df_meso, aes(x = LongitudeE, y = Percentage_of_total_mesofauna_catch,
+                            colour = Vegetation),
+             alpha = 0.4, size = 2, position = position_jitter(width = 0.03, height = 0)) +
+  geom_line(size = 1.2) +
+  geom_ribbon(aes(ymin = conf.low, ymax = conf.high, fill = group),
+              alpha = 0.2, colour = NA)  +
+  scale_colour_manual(values = c("Bracken" = "#228B22", "Heather" = "#800080")) +
+  scale_fill_manual(values = c("Bracken" = "#228B22", "Heather" = "#800080")) +
+  labs(
+    x = "Longitude",
+    y = "Mesostigmata\nproportional abundance",
+    colour = "Vegetation",
+    fill = "Vegetation") +
+  theme_minimal(base_size = 14)  +
+  theme(
+    legend.position = "top",
+    plot.title = element_text(face = "bold")
+  )
 
-pros_model <- glm(`Percentage of total mesofauna catch` ~ Vegetation*Site, data = df_pros, family = binomial)
-summary(pros_model)
+show(meso_plot)
 
-ento_model <- glm(`Percentage of total mesofauna catch` ~ Vegetation*Site, data = df_ento, family = binomial)
-summary(ento_model)
+orib_model <- glmmTMB(
+  Percentage_of_total_mesofauna_catch ~ LongitudeE * Vegetation,
+  data = df_orib,
+  family = beta_family(link = "logit"),
+  ziformula = ~1  # models the zero-inflation part
+)
+#summary(model)
+pred <- ggpredict(orib_model, terms = c("LongitudeE [all]", "Vegetation"))
 
-podu_model <- glm(`Percentage of total mesofauna catch` ~ Vegetation*Site, data = df_podu, family = binomial)
-summary(podu_model)
+orib_plot <- ggplot(pred, aes(x, predicted, colour = group)) +
+  geom_point(data = df_orib, aes(x = LongitudeE, y = Percentage_of_total_mesofauna_catch,
+                                 colour = Vegetation),
+             alpha = 0.4, size = 2, position = position_jitter(width = 0.03, height = 0)) +
+  geom_line(size = 1.2) +
+  geom_ribbon(aes(ymin = conf.low, ymax = conf.high, fill = group),
+              alpha = 0.2, colour = NA)  +
+  scale_colour_manual(values = c("Bracken" = "#228B22", "Heather" = "#800080")) +
+  scale_fill_manual(values = c("Bracken" = "#228B22", "Heather" = "#800080")) +
+  labs(
+    x = "Longitude",
+    y = "Oribatida\nproportional abundance",
+    colour = "Vegetation",
+    fill = "Vegetation") +
+  theme_minimal(base_size = 14)  +
+  theme(
+    legend.position = "top",
+    plot.title = element_text(face = "bold")
+  )
+show(orib_plot)
 
-symp_model <- glm(`Percentage of total mesofauna catch` ~ Vegetation*Site, data = df_symp, family = binomial)
-summary(symp_model)
 
-neel_model <- glm(`Percentage of total mesofauna catch` ~ Vegetation*Site, data = df_neel, family = binomial)
-summary(neel_model)
+asti_model <- glmmTMB(
+  Percentage_of_total_mesofauna_catch ~ LongitudeE * Vegetation,
+  data = df_asti,
+  family = beta_family(link = "logit"),
+  ziformula = ~1  # models the zero-inflation part
+)
+#summary(model)
+pred <- ggpredict(asti_model, terms = c("LongitudeE [all]", "Vegetation"))
+
+asti_plot <- ggplot(pred, aes(x, predicted, colour = group)) +
+  geom_point(data = df_asti, aes(x = LongitudeE, y = Percentage_of_total_mesofauna_catch,
+                                 colour = Vegetation),
+             alpha = 0.4, size = 2, position = position_jitter(width = 0.03, height = 0)) +
+  geom_line(size = 1.2) +
+  geom_ribbon(aes(ymin = conf.low, ymax = conf.high, fill = group),
+              alpha = 0.2, colour = NA)  +
+  scale_colour_manual(values = c("Bracken" = "#228B22", "Heather" = "#800080")) +
+  scale_fill_manual(values = c("Bracken" = "#228B22", "Heather" = "#800080")) +
+  labs(
+    x = "Longitude",
+    y = "Astigmatina\nproportional abundance",
+    colour = "Vegetation",
+    fill = "Vegetation") +
+  theme_minimal(base_size = 14)  +
+  theme(
+    legend.position = "top",
+    plot.title = element_text(face = "bold")
+  )
+
+show(asti_plot)
+
+pros_model <- glmmTMB(
+  Percentage_of_total_mesofauna_catch ~ LongitudeE * Vegetation,
+  data = df_pros,
+  family = beta_family(link = "logit"),
+  ziformula = ~1  # models the zero-inflation part
+)
+#summary(model)
+pred <- ggpredict(pros_model, terms = c("LongitudeE [all]", "Vegetation"))
+
+pros_plot <- ggplot(pred, aes(x, predicted, colour = group)) +
+  geom_point(data = df_pros, aes(x = LongitudeE, y = Percentage_of_total_mesofauna_catch,
+                                 colour = Vegetation),
+             alpha = 0.4, size = 2, position = position_jitter(width = 0.03, height = 0)) +
+  geom_line(size = 1.2) +
+  geom_ribbon(aes(ymin = conf.low, ymax = conf.high, fill = group),
+              alpha = 0.2, colour = NA)  +
+  scale_colour_manual(values = c("Bracken" = "#228B22", "Heather" = "#800080")) +
+  scale_fill_manual(values = c("Bracken" = "#228B22", "Heather" = "#800080")) +
+  labs(
+    x = "Longitude",
+    y = "Prostigmata\nproportional abundance",
+    colour = "Vegetation",
+    fill = "Vegetation") +
+  theme_minimal(base_size = 14)  +
+  theme(
+    legend.position = "top",
+    plot.title = element_text(face = "bold")
+  )
+show(pros_plot)
+
+ento_model <- glmmTMB(
+  Percentage_of_total_mesofauna_catch ~ LongitudeE * Vegetation,
+  data = df_ento,
+  family = beta_family(link = "logit"),
+  ziformula = ~1  # models the zero-inflation part
+)
+#summary(model)
+pred <- ggpredict(ento_model, terms = c("LongitudeE [all]", "Vegetation"))
+
+ento_plot <- ggplot(pred, aes(x, predicted, colour = group)) +
+  geom_point(data = df_ento, aes(x = LongitudeE, y = Percentage_of_total_mesofauna_catch,
+                                 colour = Vegetation),
+             alpha = 0.4, size = 2, position = position_jitter(width = 0.03, height = 0)) +
+  geom_line(size = 1.2) +
+  geom_ribbon(aes(ymin = conf.low, ymax = conf.high, fill = group),
+              alpha = 0.2, colour = NA)  +
+  scale_colour_manual(values = c("Bracken" = "#228B22", "Heather" = "#800080")) +
+  scale_fill_manual(values = c("Bracken" = "#228B22", "Heather" = "#800080")) +
+  labs(
+    x = "Longitude",
+    y = "Entomobryomorpha\nproportional abundance",
+    colour = "Vegetation",
+    fill = "Vegetation") +
+  theme_minimal(base_size = 14)  +
+  theme(
+    legend.position = "top",
+    plot.title = element_text(face = "bold")
+  )
+show(ento_plot)
+
+podu_model <- glmmTMB(
+  Percentage_of_total_mesofauna_catch ~ LongitudeE * Vegetation,
+  data = df_podu,
+  family = beta_family(link = "logit"),
+  ziformula = ~1  # models the zero-inflation part
+)
+#summary(model)
+pred <- ggpredict(podu_model, terms = c("LongitudeE [all]", "Vegetation"))
+
+podu_plot <- ggplot(pred, aes(x, predicted, colour = group)) +
+  geom_point(data = df_podu, aes(x = LongitudeE, y = Percentage_of_total_mesofauna_catch,
+                                 colour = Vegetation),
+             alpha = 0.4, size = 2, position = position_jitter(width = 0.03, height = 0)) +
+  geom_line(size = 1.2) +
+  geom_ribbon(aes(ymin = conf.low, ymax = conf.high, fill = group),
+              alpha = 0.2, colour = NA)  +
+  scale_colour_manual(values = c("Bracken" = "#228B22", "Heather" = "#800080")) +
+  scale_fill_manual(values = c("Bracken" = "#228B22", "Heather" = "#800080")) +
+  labs(
+    x = "Longitude",
+    y = "Poduromorpha\nproportional abundance",
+    colour = "Vegetation",
+    fill = "Vegetation") +
+  theme_minimal(base_size = 14)  +
+  theme(
+    legend.position = "top",
+    plot.title = element_text(face = "bold")
+  )
+show(podu_plot)
+
+symp_model <- glmmTMB(
+  Percentage_of_total_mesofauna_catch ~ LongitudeE * Vegetation,
+  data = df_symp,
+  family = beta_family(link = "logit"),
+  ziformula = ~1  # models the zero-inflation part
+)
+#summary(model)
+pred <- ggpredict(symp_model, terms = c("LongitudeE [all]", "Vegetation"))
+
+symp_plot <- ggplot(pred, aes(x, predicted, colour = group)) +
+  geom_point(data = df_symp, aes(x = LongitudeE, y = Percentage_of_total_mesofauna_catch,
+                                 colour = Vegetation),
+             alpha = 0.4, size = 2, position = position_jitter(width = 0.03, height = 0)) +
+  geom_line(size = 1.2) +
+  geom_ribbon(aes(ymin = conf.low, ymax = conf.high, fill = group),
+              alpha = 0.2, colour = NA)  +
+  scale_colour_manual(values = c("Bracken" = "#228B22", "Heather" = "#800080")) +
+  scale_fill_manual(values = c("Bracken" = "#228B22", "Heather" = "#800080")) +
+  labs(
+    x = "Longitude",
+    y = "Symphypleona\nproportional abundance",
+    colour = "Vegetation",
+    fill = "Vegetation") +
+  theme_minimal(base_size = 14)  +
+  theme(
+    legend.position = "top",
+    plot.title = element_text(face = "bold")
+  )
+show(symp_plot)
+
+neel_model <- glmmTMB(
+  Percentage_of_total_mesofauna_catch ~ LongitudeE * Vegetation,
+  data = df_neel,
+  family = beta_family(link = "logit"),
+  ziformula = ~1  # models the zero-inflation part
+)
+#summary(model)
+pred <- ggpredict(neel_model, terms = c("LongitudeE [all]", "Vegetation"))
+
+neel_plot <- ggplot(pred, aes(x, predicted, colour = group)) +
+  geom_point(data = df_neel, aes(x = LongitudeE, y = Percentage_of_total_mesofauna_catch,
+                                 colour = Vegetation),
+             alpha = 0.4, size = 2, position = position_jitter(width = 0.03, height = 0)) +
+  geom_line(size = 1.2) +
+  geom_ribbon(aes(ymin = conf.low, ymax = conf.high, fill = group),
+              alpha = 0.2, colour = NA)  +
+  scale_colour_manual(values = c("Bracken" = "#228B22", "Heather" = "#800080")) +
+  scale_fill_manual(values = c("Bracken" = "#228B22", "Heather" = "#800080")) +
+  labs(
+    x = "Longitude",
+    y = "Neelidae\n proportional abundance",
+    colour = "Vegetation",
+    fill = "Vegetation") +
+  theme_minimal(base_size = 14)  +
+  theme(
+    legend.position = "top",
+    plot.title = element_text(face = "bold")
+  )
+
+show(neel_plot)
+
+#combine plots into a single figure
+mite_models <- ggarrange(meso_plot, orib_plot, asti_plot, pros_plot,
+                         labels = c("A", "B", "C", "D"),
+                         ncol = 2, nrow = 2,
+                         #the width of each panel of the multifigure plot
+                         widths = c(7,7),
+                         common.legend = TRUE)
+#combine plots into a single figure
+springtail_models <- ggarrange(ento_plot, podu_plot, symp_plot, neel_plot,
+                         labels = c("A", "B", "C", "D"),
+                         ncol = 2, nrow = 2,
+                         #the width of each panel of the multifigure plot
+                         widths = c(7,7),
+                         common.legend = TRUE)
+#show the plot in the Plots window
+show(mite_models)
+show(springtail_models)
+#save the figure
+ggsave("figures/mite_models.svg", plot = mite_models, width = 7.5, height = 6, dpi = 300)
+ggsave("figures/springtail_models.svg", plot = springtail_models, width = 7.5, height = 6, dpi = 300)
 
 ####analyse mesofauna abundance per 100g dry soil ----
 hist(d$`Total Mesofauna Catch`)
