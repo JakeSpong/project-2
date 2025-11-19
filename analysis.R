@@ -2821,11 +2821,8 @@ show(figure)
 
 ggsave(path = "figures", paste0(Sys.Date(), "_mesofauna_abundance_raw.svg"), width = 10, height= 5, figure)
 
-#### glms of mesofauna function groups in response to vegetation and latitude ----
+#### glmms of mesofauna function groups in response to vegetation and latitude (needs previous tab to work) ----
 
-
-#run a binomial GLMM
-library(glmm)
 
 #df containing just sample code and longitude
 d <- as.data.frame(readr::read_csv(
@@ -2854,12 +2851,13 @@ df_neel <- df_long %>% filter(`Functional Group` == "Neelidae")
 library(glmmTMB)
 library(ggeffects)
 meso_model <- glmmTMB(
-  Percentage_of_total_mesofauna_catch ~ LongitudeE * Vegetation,
+  Percentage_of_total_mesofauna_catch ~ LongitudeE*Vegetation,
   data = df_meso,
   family = beta_family(link = "logit"),
   ziformula = ~1  # models the zero-inflation part
 )
-#summary(model)
+summary(meso_model)
+meso_model
 pred <- ggpredict(meso_model, terms = c("LongitudeE [all]", "Vegetation"))
 
 meso_plot <- ggplot(pred, aes(x, predicted, colour = group)) +
@@ -2890,7 +2888,7 @@ orib_model <- glmmTMB(
   family = beta_family(link = "logit"),
   ziformula = ~1  # models the zero-inflation part
 )
-#summary(model)
+summary(orib_model)
 pred <- ggpredict(orib_model, terms = c("LongitudeE [all]", "Vegetation"))
 
 orib_plot <- ggplot(pred, aes(x, predicted, colour = group)) +
@@ -2921,7 +2919,7 @@ asti_model <- glmmTMB(
   family = beta_family(link = "logit"),
   ziformula = ~1  # models the zero-inflation part
 )
-#summary(model)
+summary(asti_model)
 pred <- ggpredict(asti_model, terms = c("LongitudeE [all]", "Vegetation"))
 
 asti_plot <- ggplot(pred, aes(x, predicted, colour = group)) +
@@ -3012,7 +3010,7 @@ podu_model <- glmmTMB(
   family = beta_family(link = "logit"),
   ziformula = ~1  # models the zero-inflation part
 )
-#summary(model)
+summary(podu_model)
 pred <- ggpredict(podu_model, terms = c("LongitudeE [all]", "Vegetation"))
 
 podu_plot <- ggplot(pred, aes(x, predicted, colour = group)) +
@@ -3114,7 +3112,7 @@ springtail_models <- ggarrange(ento_plot, podu_plot, symp_plot, neel_plot,
 #show the plot in the Plots window
 show(mite_models)
 show(springtail_models)
-#save the figure
+#save the figure- 
 ggsave("figures/mite_models.svg", plot = mite_models, width = 7.5, height = 6, dpi = 300)
 ggsave("figures/springtail_models.svg", plot = springtail_models, width = 7.5, height = 6, dpi = 300)
 
@@ -5541,7 +5539,7 @@ ggplot() +
   labs(title = "PCA Biplot", x = "PC1", y = "PC2") +
   theme_minimal()
 
-#### dbRDA ----
+#### PCA and dbRDA (figures 2 and 3) ----
 d <- as.data.frame(readr::read_csv(
   here::here("data", "2025-10-21_all-variables_masterfile.csv")
 ))
@@ -5637,7 +5635,7 @@ pca_scores$Vegetation <- factor(pca_scores$Vegetation)
 pca_var <- pca_result$sdev^2
 pca_var_explained <- round(100 * pca_var / sum(pca_var), 1)  # in %
 #number sites so we can easily tell which are from which site
-id_map <- c("Bridestones" = 1, "Scarth Wood Moor" = 2, "Brimham Moor" = 3, "Widdybanks" = 4, "Haweswater" = 5, "Whiteside" = 6)
+id_map <- c("Bridestones" = 6, "Scarth Wood Moor" = 5, "Brimham Moor" = 4, "Widdybanks" = 3, "Haweswater" = 2, "Whiteside" = 1)
 pca_scores$Site <- d$Site
 pca_scores$Site <- id_map[pca_scores$Site]
 
