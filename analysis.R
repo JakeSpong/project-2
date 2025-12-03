@@ -2871,7 +2871,7 @@ meso_plot <- ggplot(pred, aes(x, predicted, colour = group)) +
   scale_fill_manual(values = c("Bracken" = "#228B22", "Heather" = "#800080")) +
   labs(
     x = "Longitude",
-    y = "Mesostigmata\nproportional abundance",
+    y = "Mesostigmata",
     colour = "Vegetation",
     fill = "Vegetation") +
   theme_minimal(base_size = 14)  +
@@ -2902,7 +2902,7 @@ orib_plot <- ggplot(pred, aes(x, predicted, colour = group)) +
   scale_fill_manual(values = c("Bracken" = "#228B22", "Heather" = "#800080")) +
   labs(
     x = "Longitude",
-    y = "Oribatida\nproportional abundance",
+    y = "Oribatida",
     colour = "Vegetation",
     fill = "Vegetation") +
   theme_minimal(base_size = 14)  +
@@ -2933,7 +2933,7 @@ asti_plot <- ggplot(pred, aes(x, predicted, colour = group)) +
   scale_fill_manual(values = c("Bracken" = "#228B22", "Heather" = "#800080")) +
   labs(
     x = "Longitude",
-    y = "Astigmatina\nproportional abundance",
+    y = "Astigmatina",
     colour = "Vegetation",
     fill = "Vegetation") +
   theme_minimal(base_size = 14)  +
@@ -2964,7 +2964,7 @@ pros_plot <- ggplot(pred, aes(x, predicted, colour = group)) +
   scale_fill_manual(values = c("Bracken" = "#228B22", "Heather" = "#800080")) +
   labs(
     x = "Longitude",
-    y = "Prostigmata\nproportional abundance",
+    y = "Prostigmata",
     colour = "Vegetation",
     fill = "Vegetation") +
   theme_minimal(base_size = 14)  +
@@ -2994,7 +2994,7 @@ ento_plot <- ggplot(pred, aes(x, predicted, colour = group)) +
   scale_fill_manual(values = c("Bracken" = "#228B22", "Heather" = "#800080")) +
   labs(
     x = "Longitude",
-    y = "Entomobryomorpha\nproportional abundance",
+    y = "Entomobryomorpha",
     colour = "Vegetation",
     fill = "Vegetation") +
   theme_minimal(base_size = 14)  +
@@ -3024,7 +3024,7 @@ podu_plot <- ggplot(pred, aes(x, predicted, colour = group)) +
   scale_fill_manual(values = c("Bracken" = "#228B22", "Heather" = "#800080")) +
   labs(
     x = "Longitude",
-    y = "Poduromorpha\nproportional abundance",
+    y = "Poduromorpha",
     colour = "Vegetation",
     fill = "Vegetation") +
   theme_minimal(base_size = 14)  +
@@ -3054,7 +3054,7 @@ symp_plot <- ggplot(pred, aes(x, predicted, colour = group)) +
   scale_fill_manual(values = c("Bracken" = "#228B22", "Heather" = "#800080")) +
   labs(
     x = "Longitude",
-    y = "Symphypleona\nproportional abundance",
+    y = "Symphypleona",
     colour = "Vegetation",
     fill = "Vegetation") +
   theme_minimal(base_size = 14)  +
@@ -3084,7 +3084,7 @@ neel_plot <- ggplot(pred, aes(x, predicted, colour = group)) +
   scale_fill_manual(values = c("Bracken" = "#228B22", "Heather" = "#800080")) +
   labs(
     x = "Longitude",
-    y = "Neelidae\n proportional abundance",
+    y = "Neelidae",
     colour = "Vegetation",
     fill = "Vegetation") +
   theme_minimal(base_size = 14)  +
@@ -3109,12 +3109,24 @@ springtail_models <- ggarrange(ento_plot, podu_plot, symp_plot, neel_plot,
                          #the width of each panel of the multifigure plot
                          widths = c(7,7),
                          common.legend = TRUE)
+poster_models <- ggarrange(ento_plot, podu_plot, symp_plot, neel_plot, meso_plot, orib_plot, asti_plot,
+                           labels = c("A", "B", "C", "D", "E", "F", "G"),
+                           ncol = 2, nrow = 4,
+                           #the width of each panel of the multifigure plot
+                           widths = c(8,8),
+                           common.legend = TRUE)
+
+show(poster_models)
+
+#save the figure- 
+ggsave("figures/poster_models.pdf", plot = poster_models, width = 8, height = 7, dpi = 300)
+
 #show the plot in the Plots window
 show(mite_models)
 show(springtail_models)
 #save the figure- 
-ggsave("figures/mite_models.svg", plot = mite_models, width = 7.5, height = 6, dpi = 300)
-ggsave("figures/springtail_models.svg", plot = springtail_models, width = 7.5, height = 6, dpi = 300)
+ggsave("figures/mite_models.pdf", plot = mite_models, width = 7.5, height = 6, dpi = 300)
+ggsave("figures/springtail_models.pdf", plot = springtail_models, width = 7.5, height = 6, dpi = 300)
 
 ####analyse mesofauna abundance per 100g dry soil ----
 hist(d$`Total Mesofauna Catch`)
@@ -5664,8 +5676,8 @@ ggplot() +
 
 #check factors for correlation e.g. are elevation and LongitudeE correlated? seems likely!
 scaled_env_data <- as.data.frame(scaled_env_data)
-#dbRDA using normaliesd environmental factors
-dbrda_summary <- dbrda(formula = cdf ~ `pH` + `LatitudeN` + `LongitudeE` + `NPOC (mg C g-1)` + `TNb (mg N g-1)` + `Drift Corr C (g per kg)` + `CN ratio` + `alpha` + `SUVA (L mg-1 cm-1)` + `Groundfrost days` + `Relative humidity (%)` + `Total rainfall (mm)` + `Snow lying days`  + `julian` , scaled_env_data, distance = "euclidean", sqrt.dist = FALSE, add = FALSE, dfun = vegdist, metaMDSdist = FALSE, na.action = na.exclude, subset = NULL)
+#dbRDA using normaliesd environmental factors, removed julian
+dbrda_summary <- dbrda(formula = cdf ~ `pH` + `LatitudeN` + `LongitudeE` + `NPOC (mg C g-1)` + `TNb (mg N g-1)` + `Drift Corr C (g per kg)` + `CN ratio` + `alpha` + `SUVA (L mg-1 cm-1)` + `Groundfrost days` + `Relative humidity (%)` + `Total rainfall (mm)` + `Snow lying days` , scaled_env_data, distance = "euclidean", sqrt.dist = FALSE, add = FALSE, dfun = vegdist, metaMDSdist = FALSE, na.action = na.exclude, subset = NULL)
 
 
 #just the environmental factors that are significant
@@ -5686,7 +5698,8 @@ colors = c("#117733", "#AA4499")
 #shapes for point codes
 #pchs<- c(15, 0, 16, 1, 17,2, 18, 3, 19, 4, 20, 5)[seq_along(treatment_levels)]
 pchs<- c(15, 16)[seq_along(treatment_levels)]
-
+# Define cex values (make squares smaller, circles normal)
+cexs <- c(1.2, 1.2)[seq_along(treatment_levels)]  # adjust sizes as needed
 
 # Get variance explained by each axis
 eig_vals <- eigenvals(dbrda_summary)
@@ -5704,7 +5717,7 @@ plot(dbrda_summary, type = "n", scaling = 2, ,
 for (i in seq_along(treatment_levels)) {
   sel <- treatment == treatment_levels[i]
   points(scores(dbrda_summary, display = "sites", scaling = 2)[sel, ], 
-         col = colors[i], pch = pchs[i], cex = 1.2)
+         col = colors[i], pch = pchs[i], cex = cexs[i])
 } 
 # --- Add ellipses around treatment groups ---
 ordiellipse(dbrda_summary, groups = treatment, display = "sites", kind = "se", conf = 0.95, draw = "polygon", col = colors, border = colors,lwd = 1.5,lty = 1, alpha = 60)  # transparency (0–255); needs vegan >= 2.6-4
