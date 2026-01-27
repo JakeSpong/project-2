@@ -2642,6 +2642,79 @@ fviz_pca_var(pca_result, col.var = "cos2",
 
 
 
+#### Functional group abundances (raw counts, all sites pooled) ----
+d <- readr::read_csv(
+  here::here("data", "n = 10 Tullgren Extracts - Week 1 + 2 Extracts.csv")
+) 
+#order samples by ID alphabetically
+d <- arrange(d, d["Sample ID"])
+d <- as.data.frame(d)
+#replace null (empty excell cell) with "0"
+d[is.na(d)] <- 0
+#order the sites as they should appear on the graph from west to east
+d$Site <- factor(d$Site, levels = c("Whiteside", "Haweswater", "Widdybanks", "Brimham Moor", "Scarth Wood Moor", "Bridestones"))
+d$Vegetation <- factor(d$Vegetation, levels = c("Bracken", "Heather"))
+#total mesofauna abundances
+d$`Total Mesofauna Catch`<- rowSums(d[,4:11])
+#total invertebrate abundances
+d$`Total Invertebrate Catch`<- rowSums(d[,4:27])
+
+print(sum(d$`Total Mesofauna Catch`))
+print(sum(d$`Total Invertebrate Catch`))
+
+#total mites
+mites_total <- sum(d$Mesostigmata) + sum(d$Oribatida) + sum(d$Astigmatina) + sum(d$Prostigmata)
+collembola_total <- sum(d$Symphypleona) + sum(d$Entomobryomorpha) + sum(d$Poduromorpha) + sum(d$Neelidae)         
+print(mites_total)
+print(collembola_total)
+total_mesofauna_catch <- sum(rowSums(d[,4:11]))
+
+# Load necessary libraries
+library(tidyverse)
+
+spe <- d[,c(1,2,3, 4,5,6,7,8,9,10,11)]
+
+# Identify species columns (exclude metadata)
+species_cols <- setdiff(names(spe), c("Sample ID", "Site", "Vegetation"))
+
+# pivot to long format
+df_long <- spe %>%
+  pivot_longer(cols = all_of(species_cols),
+               names_to = "Functional Group",
+               values_to = "Number of Individuals")
+
+# get totalfor each group, just between heather and bracken
+df_summary_veg <- df_long %>%
+  group_by(Vegetation) %>%
+  mutate(total_mesofauna_catch = sum(`Number of Individuals`, na.rm = TRUE)) %>%
+  group_by(Vegetation, `Functional Group`) %>%
+  summarise(
+    Total_Proportional_Abundance =
+      sum(`Number of Individuals`, na.rm = TRUE) / unique(total_mesofauna_catch),
+    .groups = "drop"
+  )
+
+df_summary_veg %>%
+  group_by(Vegetation) %>%
+  summarise(sum_prop = sum(Total_Proportional_Abundance))
+
+
+# Set custom species stacking order (bottom to top)
+df_summary_veg$`Functional Group` <- factor(df_summary_veg$`Functional Group`, levels = rev(c(
+  "Mesostigmata", "Oribatida", "Astigmatina", "Prostigmata", "Entomobryomorpha", "Poduromorpha", "Symphypleona",  "Neelidae")))
+
+plot_veg <- ggplot(df_summary_veg, aes(x = Vegetation, y = Total_Proportional_Abundance, fill = `Functional Group`)) +
+  geom_bar(stat = "identity") +
+  labs(x = "Habitat", y = "Total proportional abundance") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 0))
+
+show(plot_veg)
+
+# Save plots
+ggsave(path = "figures", paste0(Sys.Date(), "_total_proportional_abundances_groups_raw_veg.svg"),
+       plot = plot_veg, width = 7, height = 5, dpi = 300)
+
 #### Invertebrate catch percetnage breakdown ----
 d <- readr::read_csv(
   here::here("data", "n = 10 Tullgren Extracts - Week 1 + 2 Extracts.csv")
@@ -4770,7 +4843,7 @@ d <- readr::read_csv(
   here::here("data", "n = 10 Tullgren Extracts - Week 1 Extracts.csv")
 ) 
 #order samples by ID alphabetically
-d <- arrange(d, d["Sample ID"])
+d <- arrange(d, d["Vegetation"])
 d <- as.data.frame(d)
 #replace null (empty excell cell) with "0"
 d[is.na(d)] <- 0
@@ -4799,16 +4872,22 @@ plot(example_NMDS, col = "white")
 
 
 #assign the treatments to relevant rows of the dataframe
-treat=c(rep("Brimham Bracken",10),rep("Brimham Heath",10), rep("Bridestones Bracken",10),rep("Bridestones Heath",10), rep("Haweswater Bracken", 10), rep("Haweswater Heath", 10), rep("Widdybanks Bracken", 10), rep("Widdybanks Heath", 10), rep("Whiteside Bracken", 10), rep("Whiteside Heath", 10))
+treat=c(rep("Bracken",60),rep("Heather",60))
+
+#treat=c(rep("Brimham Bracken",10),rep("Brimham Heath",10), rep("Bridestones Bracken",10),rep("Bridestones Heath",10), rep("Haweswater Bracken", 10), rep("Haweswater Heath", 10), rep("Widdybanks Bracken", 10), rep("Widdybanks Heath", 10), rep("Whiteside Bracken", 10), rep("Whiteside Heath", 10))
 #set the colour for each treatment
 #colors =c(rep("#44AA99",5),rep("#117733",5), rep("#88CCEE",5),rep("#332288",5), rep("#AA4499", 5), rep("#882255", 5)) 
-colors =c(rep("#999999",10),rep("#E69F00",10), rep("#56B4E9",10),rep("#009E73",10), rep("#CC79A7", 10), rep("#0072B2", 10), rep("black",10),rep("green",10), rep("purple", 10), rep("red", 10)) 
+
+colors =c(rep("limegreen",60),rep("purple",60))
+#colors =c(rep("#999999",10),rep("#E69F00",10), rep("#56B4E9",10),rep("#009E73",10), rep("#CC79A7", 10), rep("#0072B2", 10), rep("black",10),rep("green",10), rep("purple", 10), rep("red", 10)) 
 #shapes for point codes
-pchs<- c(rep(15, 10), rep(0, 10), rep(16, 10), rep(1, 10), rep(17, 10), rep(2, 10), rep(18, 10), rep(3, 10), rep(19, 10), rep(4, 10))
+pchs<- c(rep(15, 60), rep(16, 60))
+
+#pchs<- c(rep(15, 10), rep(0, 10), rep(16, 10), rep(1, 10), rep(17, 10), rep(2, 10), rep(18, 10), rep(3, 10), rep(19, 10), rep(4, 10))
 #display the stress for all morphotypes
 #text(-0.8,1.4, paste("Stress = ", round(example_NMDS$stress, 3)))
 #display the stress for only mites and springtails
-text(-2,1.3, paste("Stress = ", round(example_NMDS$stress, 3)))
+text(-0.0,0.3, paste("Stress = ", round(example_NMDS$stress, 3)))
 #visualise the points and ellipses
 for(i in unique(treat)) {
   #we have added an if statement so we can chose which points and ellipses to plot at a time e.g. i == "Grassland Bracken".  If we want to plot all ellipses simultaneously, set i == i
