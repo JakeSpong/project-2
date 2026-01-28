@@ -6025,3 +6025,51 @@ write.csv(combined_df, "data/hydrological-data-1km-2014-to-2024-annual.csv")
 hydro <- as.data.frame(readr::read_csv(
   here::here("data", "hydrological-data-1km-2014-to-2024-annual.csv")
 ))
+#average of data from 2014-2024 inclusive
+ten_yr_data <- hydro
+
+ten_yr_avg <- aggregate(
+  ten_yr_data[, 5:9],
+  by = list(Site = ten_yr_data$Site),
+  FUN = mean,
+  na.rm = TRUE
+)
+
+#average of data from 2019-2024 inclusive
+five_yr_data <- hydro[c(31:66),]
+
+five_yr_avg <- aggregate(
+  five_yr_data[, 5:9],
+  by = list(Site = five_yr_data$Site),
+  FUN = mean,
+  na.rm = TRUE
+)
+
+#just the 2024 data
+data_2024 <- hydro[c(61:66),c(1,5,6,7,8,9)]
+
+
+#compare the values 
+
+combined <- bind_rows(
+  ten_yr_avg %>% mutate(Source = "10 yr avg"),
+  five_yr_avg %>% mutate(Source = "5 yr avg"),
+  data_2024 %>% mutate(Source = "2024 data")
+)
+
+#specify order
+combined$Site <- factor(
+  combined$Site,
+  levels = c("Bridestones", "Scarth Wood Moor", "Brimham Moor", "Widdybanks", "Haweswater", "Whiteside")
+)
+ggplot(combined, aes(x = Site, y = `Total rainfall (mm)`, color = Source)) +
+  geom_point(size = 3, position = position_dodge(width = 0.4)) +
+  labs(title = "Total Rainfall (mm))") +
+  theme_minimal()
+
+#save the different data sets
+#save the combined_df file
+write.csv(ten_yr_avg, "data/hydrological-data-1km-10_yr_avg-annual.csv")
+write.csv(five_yr_avg, "data/hydrological-data-1km-5_yr_avg-annual.csv")
+write.csv(data_2024, "data/hydrological-data-1km-2024_only-annual.csv")
+
