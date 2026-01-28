@@ -5834,3 +5834,194 @@ anova(dbrda_summary, by = "terms", perm.max = 500)
 
 
 
+
+#### 5 and 10 year average for hydrological data ----
+library("ncdf4") #for reading in .nc files
+library("lubridate") #for dealing with time
+library("dplyr")
+library("geosphere")
+library("ncdf4.helpers")
+
+
+#get the lat and long of each site
+all_data <- readr::read_csv(
+  here::here("data", "all-sites_field-data.csv"), show_col_types = FALSE
+)
+
+#extract the sample coordinates from the dataframe
+sample_coordinates <- data.frame(
+  Site = all_data$Site,
+  Vegetation = all_data$Vegetation,
+  Longitude = all_data$LongitudeE,
+  Latitude = all_data$LatitudeN
+)
+#the sample coordinates belonging to each site
+bridestones <- sample_coordinates[1:20, ]
+scarthwood <- sample_coordinates[21:40, ]
+brimham <- sample_coordinates[41:60, ]
+haweswater <- sample_coordinates[61:80,]
+whiteside <- sample_coordinates[81:100, ]
+widdybanks <- sample_coordinates[101:120,]
+
+#dataframe containing the average longitude and latitude of each site
+sites <- data.frame(
+  Site = c("Bridestones", "Scarth Wood Moor", "Brimham Moor", "Widdybanks", "Haweswater", "Whiteside"),
+  Latitude = c(mean(bridestones$Latitude), mean(scarthwood$Latitude), mean(brimham$Latitude), mean(widdybanks$Latitude), mean(haweswater$Latitude), mean(whiteside$Latitude)),
+  Longitude = c(mean(bridestones$Longitude), mean(scarthwood$Longitude), mean(brimham$Longitude), mean(widdybanks$Longitude), mean(haweswater$Longitude), mean(whiteside$Longitude))
+)
+
+
+
+#function to extract the data at the correct location
+extract_variable_at_sites <- function(ncfile_path, varname, sites_df) {
+  nc <- nc_open(ncfile_path)
+  
+  # Get variable
+  var <- ncvar_get(nc, varname)
+  
+  # Get dimensions of the variable
+  var_dims <- dim(var)
+  num_dims <- length(var_dims)
+  
+  # Get lat/lon grid
+  lat_grid <- ncvar_get(nc, "latitude")
+  lon_grid <- ncvar_get(nc, "longitude")
+  
+  # Get time (if it exists)
+  if ("time" %in% names(nc$dim)) {
+    time_vals <- ncvar_get(nc, "time")
+    time_units <- ncatt_get(nc, "time", "units")$value
+    origin_string <- sub(".*since ", "", time_units)
+    
+    # Handle "hours since"
+    if (grepl("hour", time_units, ignore.case = TRUE)) {
+      datetime <- as.POSIXct(time_vals * 3600, origin = origin_string, tz = "UTC")
+    } else if (grepl("day", time_units, ignore.case = TRUE)) {
+      datetime <- as.POSIXct(time_vals * 86400, origin = origin_string, tz = "UTC")
+    } else {
+      stop(paste("Unsupported time units:", time_units))
+    }
+    
+    # Get Date
+    date <- as.Date(datetime)
+  } else {
+    date <- as.Date("1970-01-01")  # fallback if no time dim
+  }
+  
+  
+  
+  # Fill value handling
+  fill_value <- ncatt_get(nc, varname, "_FillValue")
+  fill_value <- if (!is.null(fill_value$value)) fill_value$value else NA
+  
+  nc_close(nc)
+  
+  # Build grid mapping (X, Y, index)
+  grid_points <- data.frame(
+    X = as.vector(lon_grid),
+    Y = as.vector(lat_grid),
+    IndexX = rep(1:dim(lon_grid)[1], times = dim(lon_grid)[2]),
+    IndexY = rep(1:dim(lon_grid)[2], each = dim(lon_grid)[1])
+  )
+  
+  result <- data.frame()
+  
+  for (i in 1:nrow(sites_df)) {
+    site_lat <- sites_df$Latitude[i]
+    site_lon <- sites_df$Longitude[i]
+    
+    distances <- distHaversine(cbind(grid_points$X, grid_points$Y), c(site_lon, site_lat))
+    nearest <- which.min(distances)
+    ix <- grid_points$IndexX[nearest]
+    iy <- grid_points$IndexY[nearest]
+    
+    # Extract variable based on its dimensions
+    if (num_dims == 3) {
+      value <- var[ix, iy, 1]  # [X, Y, time]
+    } else if (num_dims == 2) {
+      value <- var[ix, iy]  # [X, Y]
+    } else {
+      stop(paste("Unsupported number of dimensions:", num_dims))
+    }
+    
+    if (!is.na(fill_value) && value == fill_value) {
+      value <- NA
+    }
+    
+    result <- rbind(result, data.frame(
+      Site = sites_df$Site[i],
+      Latitude = site_lat,
+      Longitude = site_lon,
+      Date = date,
+      Value = value
+    ))
+  }
+  
+  names(result)[ncol(result)] <- varname
+  return(result)
+}
+
+
+# the files we wish to load for our gradient
+#change data to generate the data
+files <- list(
+  `groundfrost` = here::here("CEDA data/Groundfrost 2014-2024/groundfrost_hadukgrid_uk_1km_ann_201401-201412.nc"),
+  `hurs` = here::here("CEDA data/Hurs 2014-2024/hurs_hadukgrid_uk_1km_ann_201401-201412.nc"),
+  `rainfall` = here::here("CEDA data/rainfall 2014-2024/rainfall_hadukgrid_uk_1km_ann_201401-201412.nc"),
+  `pv` = here::here("CEDA data/pv 2014-2024/pv_hadukgrid_uk_1km_ann_201401-201412.nc"),
+  `snowLying` = here::here("CEDA data/snow lying 2014-2024/snowLying_hadukgrid_uk_1km_ann_201401-201412.nc")
+)
+# Start with the first variable
+combined_df_2014 <- extract_variable_at_sites(files[[1]], names(files)[1], sites)
+
+# Join the rest
+for (i in 2:length(files)) {
+  varname <- names(files)[i]
+  filepath <- files[[i]]
+  
+  var_df <- extract_variable_at_sites(filepath, varname, sites)
+  
+  combined_df_2014 <- left_join(combined_df_2014, var_df, by = c("Site", "Latitude", "Longitude", "Date"))
+}
+
+
+#bind the dfs together
+combined_df <- bind_rows(
+  df1 = combined_df_2014,
+  df2 = combined_df_2015,
+  df3 = combined_df_2016,
+  df4 = combined_df_2017,
+  df5 = combined_df_2018,
+  df6 = combined_df_2019,
+  df7 = combined_df_2020,
+  df8 = combined_df_2021,
+  df9 = combined_df_2022,
+  df10 = combined_df_2023,
+  df11 = combined_df_2024,
+  .id = "source_df"
+)
+
+combined_df <- combined_df[-1]
+#get year only
+
+
+combined_df <- combined_df %>%
+  mutate(Date = year(Date))
+
+
+#rename the columns to something more useful
+# Rename by name
+names(combined_df)[names(combined_df) == "groundfrost"] <- "Groundfrost days"
+names(combined_df)[names(combined_df) == "hurs"] <- "Relative humidity (%)"
+names(combined_df)[names(combined_df) == "rainfall"] <- "Total rainfall (mm)"
+names(combined_df)[names(combined_df) == "pv"] <- "Partial pressure of water vapour (hPa)"
+names(combined_df)[names(combined_df) == "snowLying"] <- "Snow lying days"
+
+#save the combined_df file
+write.csv(combined_df, "data/hydrological-data-1km-2014-to-2024-annual.csv")
+
+#get 5 and 10 year averages for each site ----
+#load hydrological data
+hydro <- as.data.frame(readr::read_csv(
+  here::here("data", "hydrological-data-1km-2014-to-2024-annual.csv")
+))
