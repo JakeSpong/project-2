@@ -4462,7 +4462,10 @@ d <- readr::read_csv(
 d <- arrange(d, d["Sample ID"])
 d <- as.data.frame(d)
 #order the sites as they should appear on the graph from west to east
-d$Site <- factor(d$Site, levels = c("Whiteside", "Haweswater", "Widdybanks", "Brimham Moor", "Scarth Wood Moor", "Bridestones"))
+#d$Site <- factor(d$Site, levels = c("Whiteside", "Haweswater", "Widdybanks", "Brimham Moor", "Scarth Wood Moor", "Bridestones"))
+
+d$Vegetation <- factor(d$Vegetation, levels = c("Bracken", "Heather"))
+
 #replace null (empty excell cell) with "0"
 d[is.na(d)] <- 0
 #total mesofauna abundances
@@ -4473,10 +4476,172 @@ d$`Total Invertebrate Catch`<- rowSums(d[,4:27])
 d$`Mesofauna Shannon` <- diversity(d[,4:11], "shannon")
 #simpson diversity of the 8 mesofauna groups
 d$`Mesofauna Simpson` <- diversity(d[,4:11], "simpson")
+#richness (max of 8,as we have only 8 functional groups)
+d$`Mesofauna Group Richness` <- rowSums(d[, 4:11] > 0, na.rm = TRUE)
+d$`Mesofauna Group Evenness` <- d$`Mesofauna Shannon` / log(d$`Mesofauna Group Richness`)
+
+
+#graphing boxplots with bracken split from nonbracken
+shannon_bxp <-ggboxplot(d, x = "Vegetation", y = "Mesofauna Shannon", ylab = "Shannon Diversity", lwd = 0.75, color = "Vegetation",
+                        palette = c("limegreen", "#AA4499")) +
+
+  theme(
+  #remove x axis label
+  axis.title.x=element_blank(),
+  # Remove panel border
+  panel.border = element_blank(),  
+  # Remove panel grid lines
+  panel.grid.major = element_blank(),
+  panel.grid.minor = element_blank(),
+  # Remove panel background
+  panel.background = element_blank(),
+  # Add axis line
+  axis.line = element_line(colour = "black", linewidth = 0.5),
+  #change colour and thickness of axis ticks
+  axis.ticks = element_line(colour = "black", linewidth = 0.5),
+  #change axis labels colour
+  axis.title.y = element_text(colour = "black"),
+  #change tick labels colour
+  axis.text.y = element_text(colour = "black"),
+  legend.title = element_blank()
+) 
+
+show(shannon_bxp)
+
+
+
+#graphing boxplots with bracken split from nonbracken
+simpson_bxp <-ggboxplot(d, x = "Vegetation", y = "Mesofauna Simpson", ylab = "Simpson Diversity", lwd = 0.75,  add = "jitter",  add.params = list(size = 1.5,alpha = 1, width = 0.15), color = "Vegetation",
+                        palette = c("limegreen", "#AA4499")) +
+
+  theme(
+  #remove x axis label
+  axis.title.x=element_blank(),
+  # Remove panel border
+  panel.border = element_blank(),  
+  # Remove panel grid lines
+  panel.grid.major = element_blank(),
+  panel.grid.minor = element_blank(),
+  # Remove panel background
+  panel.background = element_blank(),
+  # Add axis line
+  axis.line = element_line(colour = "black", linewidth = 0.5),
+  #change colour and thickness of axis ticks
+  axis.ticks = element_line(colour = "black", linewidth = 0.5),
+  #change axis labels colour
+  axis.title.y = element_text(colour = "black"),
+  #change tick labels colour
+  axis.text.y = element_text(colour = "black"),
+  legend.title = element_blank()
+) 
+
+show(simpson_bxp)
+
+
+
+#graphing boxplots with bracken split from nonbracken
+richness_bxp <-ggboxplot(d, x = "Vegetation", y = "Mesofauna Group Richness", ylab = "Richness", lwd = 0.75,  add = "jitter",  add.params = list(size = 1.5,alpha = 1, width = 0.15), color = "Vegetation",
+                        palette = c("limegreen", "#AA4499")) +
+  
+  theme(
+    #remove x axis label
+    axis.title.x=element_blank(),
+    axis.text.x=element_blank(),
+    axis.ticks.x=element_blank(),
+    # Remove panel border
+    panel.border = element_blank(),  
+    # Remove panel grid lines
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    # Remove panel background
+    panel.background = element_blank(),
+    # Add axis line
+    axis.line = element_line(colour = "black", linewidth = 0.5),
+    #change colour and thickness of axis ticks
+    axis.ticks = element_line(colour = "black", linewidth = 0.5),
+    #change axis labels colour
+    axis.title.y = element_text(colour = "black"),
+    #change tick labels colour
+    axis.text.y = element_text(colour = "black"),
+    legend.title = element_blank()
+  ) 
+
+show(richness_bxp)
+
+
+
+#graphing boxplots with bracken split from nonbracken
+evenness_bxp <-ggboxplot(d, x = "Vegetation", y = "Mesofauna Group Evenness", ylab = "Pielou's Evenness", lwd = 0.75, add = "jitter",  add.params = list(size = 1.5,alpha = 1, width = 0.15), color = "Vegetation",
+                        palette = c("limegreen", "#AA4499")) +
+  
+  theme(
+    #remove x axis label
+    axis.title.x=element_blank(),
+    # Remove panel border
+    panel.border = element_blank(),  
+    # Remove panel grid lines
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    # Remove panel background
+    panel.background = element_blank(),
+    # Add axis line
+    axis.line = element_line(colour = "black", linewidth = 0.5),
+    #change colour and thickness of axis ticks
+    axis.ticks = element_line(colour = "black", linewidth = 0.5),
+    #change axis labels colour
+    axis.title.y = element_text(colour = "black"),
+    #change tick labels colour
+    axis.text.y = element_text(colour = "black"),
+    legend.title = element_blank()
+  ) 
+
+show(evenness_bxp)
+
+
+
+#graphing boxplots with bracken split from nonbracken
+catch_bxp <-ggboxplot(d, x = "Vegetation", y = "Total Mesofauna Catch", ylab = "Total Mesofauna Catch", lwd = 0.75, add = "jitter",  add.params = list(size = 1.5,alpha = 1, width = 0.15), color = "Vegetation",
+                        palette = c("limegreen", "#AA4499")) +
+  
+  theme(
+    #remove x axis label
+    axis.title.x=element_blank(),
+    axis.text.x=element_blank(),
+    axis.ticks.x=element_blank(),
+    # Remove panel border
+    panel.border = element_blank(),  
+    # Remove panel grid lines
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    # Remove panel background
+    panel.background = element_blank(),
+    # Add axis line
+    axis.line = element_line(colour = "black", linewidth = 0.5),
+    #change colour and thickness of axis ticks
+    axis.ticks = element_line(colour = "black", linewidth = 0.5),
+    #change axis labels colour
+    axis.title.y = element_text(colour = "black"),
+    #change tick labels colour
+    axis.text.y = element_text(colour = "black"),
+    legend.title = element_blank()
+  ) 
+
+show(catch_bxp)
+
+panel_fig <- ggarrange(catch_bxp, richness_bxp, evenness_bxp, simpson_bxp,
+                                      labels = c("A", "B", "C", "D"),
+                                      ncol = 2, nrow = 2,
+                                      widths = c(7,7),
+                                      common.legend = TRUE)
+show(panel_fig)
+
+#save our plot
+ggsave(path = "figures", paste0(Sys.Date(), "_mesofauna_alpha-diversity.svg"), width = 7, height= 7, panel_fig)
+
 
 #anova to see if key metrics differ between site/vegetation
 #anova
-anova <- aov(d$`Total Mesofauna Catch` ~ d$Vegetation * d$Site)
+anova <- aov(d$`Mesofauna Simpson` ~ d$Vegetation * d$Site)
 summary(anova)
 #tukey's test to identify significant interactions
 tukey <- TukeyHSD(anova)
@@ -4540,55 +4705,6 @@ cld <- multcompLetters4(anova, tukey)
 #compact letter display
 print(cld)
 
-
-#graphing boxplots with bracken split from nonbracken
-shannon_bxp <-ggboxplot(d, x = "Site", y = "Mesofauna Shannon", color = "Vegetation", ylab = "Shannon Diversity", palette = c("limegreen", "#AA4499"), lwd = 0.75) + theme(
-  #remove x axis label
-  axis.title.x=element_blank(),
-  # Remove panel border
-  panel.border = element_blank(),  
-  # Remove panel grid lines
-  panel.grid.major = element_blank(),
-  panel.grid.minor = element_blank(),
-  # Remove panel background
-  panel.background = element_blank(),
-  # Add axis line
-  axis.line = element_line(colour = "black", linewidth = 0.5),
-  #change colour and thickness of axis ticks
-  axis.ticks = element_line(colour = "black", linewidth = 0.5),
-  #change axis labels colour
-  axis.title.y = element_text(colour = "black"),
-  #change tick labels colour
-  axis.text.y = element_text(colour = "black"),
-  legend.title = element_blank()
-) 
-show(shannon_bxp)
-
-#save our plot
-ggsave(path = "figures", paste0(Sys.Date(), "_mesofauna_shannon.svg"), width = 10, height= 5, shannon_bxp)
-
-#graphing boxplots with bracken split from nonbracken
-simpson_bxp <-ggboxplot(d, x = "Site", y = "Mesofauna Simpson", color = "Vegetation", ylab = "Simpson Diversity", palette = c("limegreen", "#AA4499"), lwd = 0.75) + theme(
-  #remove x axis label
-  axis.title.x=element_blank(),
-  # Remove panel border
-  panel.border = element_blank(),  
-  # Remove panel grid lines
-  panel.grid.major = element_blank(),
-  panel.grid.minor = element_blank(),
-  # Remove panel background
-  panel.background = element_blank(),
-  # Add axis line
-  axis.line = element_line(colour = "black", linewidth = 0.5),
-  #change colour and thickness of axis ticks
-  axis.ticks = element_line(colour = "black", linewidth = 0.5),
-  #change axis labels colour
-  axis.title.y = element_text(colour = "black"),
-  #change tick labels colour
-  axis.text.y = element_text(colour = "black"),
-  legend.title = element_blank()
-) 
-show(simpson_bxp)
 
 #save our plot
 ggsave(path = "figures", paste0(Sys.Date(), "_mesofauna_simpson.svg"), width = 10, height= 5, simpson_bxp)
