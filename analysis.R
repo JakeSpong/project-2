@@ -2642,7 +2642,7 @@ fviz_pca_var(pca_result, col.var = "cos2",
 
 
 
-#### Functional group abundances (raw counts, all sites pooled) ----
+#### Functional group abundances (raw counts, all sites pooled) Figure 3 ----
 d <- readr::read_csv(
   here::here("data", "n = 10 Tullgren Extracts - Week 1 + 2 Extracts.csv")
 ) 
@@ -2663,10 +2663,10 @@ print(sum(d$`Total Mesofauna Catch`))
 print(sum(d$`Total Invertebrate Catch`))
 
 #total mites
-mites_total <- sum(d$Mesostigmata) + sum(d$Oribatida) + sum(d$Astigmatina) + sum(d$Prostigmata)
-collembola_total <- sum(d$Symphypleona) + sum(d$Entomobryomorpha) + sum(d$Poduromorpha) + sum(d$Neelidae)         
-print(mites_total)
-print(collembola_total)
+d$mites_total <- d$Mesostigmata + d$Oribatida + d$Astigmatina + d$Prostigmata
+d$collembola_total <- d$Symphypleona + d$Entomobryomorpha + d$Poduromorpha + d$Neelidae         
+print(sum(d$mites_total))
+print(sum(d$collembola_total))
 total_mesofauna_catch <- sum(rowSums(d[,4:11]))
 
 # Load necessary libraries
@@ -2714,6 +2714,148 @@ show(plot_veg)
 # Save plots
 ggsave(path = "figures", paste0(Sys.Date(), "_total_proportional_abundances_groups_raw_veg.svg"),
        plot = plot_veg, width = 7, height = 5, dpi = 300)
+
+df_wide <- df_summary_veg %>%
+  pivot_wider(
+    names_from = `Functional Group`,
+    values_from = Total_Proportional_Abundance
+  )
+
+df_wide$`Proportion Mites` <- df_wide$Mesostigmata + df_wide$Oribatida + df_wide$Astigmatina + df_wide$Prostigmata
+
+df_wide$`Proportional Springtail` <- df_wide$Entomobryomorpha + df_wide$Poduromorpha + df_wide$Symphypleona + df_wide$Neelidae
+
+df_wide$total <- df_wide$`Proportion Mites` + df_wide$`Proportional Springtail`
+
+#analyse the different between each group
+anova <- aov(df_wide$`Proportion Mites` ~ df_wide$Vegetation)
+summary(anova)
+#tukey's test to identify significant interactions
+tukey <- TukeyHSD(anova)
+print(tukey)
+#compact letter display
+cld <- multcompLetters4(anova, tukey)
+#compact letter display
+print(cld)
+
+#check homogeneity of variance
+plot(anova, 1)
+#levene test.  if p value < 0.05, there is evidence to suggest that the variance across groups is statistically significantly different.
+leveneTest(d$logmitestotal ~ d$Vegetation)
+#check normality.  
+plot(anova, 2)
+#conduct shapiro-wilk test on ANOVA residuals to test for normality
+#extract the residuals
+aov_residuals <- residuals(object = anova)
+#run shapiro-wilk test.  if p > 0.05 the data is normal
+shapiro.test(x = aov_residuals)
+
+
+
+
+#### Functional group proportional comparions, Kruskal and Dunn ----
+d <- readr::read_csv(
+  here::here("data", "n = 10 Tullgren Extracts - Week 1 + 2 Extracts.csv")
+) 
+#order samples by ID alphabetically
+d <- arrange(d, d["Sample ID"])
+d <- as.data.frame(d)
+#replace null (empty excell cell) with "0"
+d[is.na(d)] <- 0
+d <- d[c(1:11)]
+#order the sites as they should appear on the graph from west to east
+d$Site <- factor(d$Site, levels = c("Whiteside", "Haweswater", "Widdybanks", "Brimham Moor", "Scarth Wood Moor", "Bridestones"))
+d$Vegetation <- factor(d$Vegetation, levels = c("Bracken", "Heather"))
+#total mesofauna abundances
+d$`Total Mesofauna Catch`<- rowSums(d[,4:11])
+
+
+print(sum(d$`Total Mesofauna Catch`))
+
+
+#total mites
+d$mites_total <- d$Mesostigmata + d$Oribatida + d$Astigmatina + d$Prostigmata
+d$collembola_total <- d$Symphypleona + d$Entomobryomorpha + d$Poduromorpha + d$Neelidae         
+print(sum(d$mites_total))
+print(sum(d$collembola_total))
+total_mesofauna_catch <- sum(rowSums(d[,4:11]))
+
+#proportion for each group
+d$`Prop_Mesostigmata` <- d$Mesostigmata/d$`Total Mesofauna Catch`
+d$`Prop_Oribatida` <- d$Oribatida/d$`Total Mesofauna Catch`
+d$`Prop_Astigmatina` <- d$Astigmatina/d$`Total Mesofauna Catch`
+d$`Prop_Prostigmata` <- d$Prostigmata/d$`Total Mesofauna Catch`
+d$`Prop_Entomobryomorpha` <- d$Entomobryomorpha/d$`Total Mesofauna Catch`
+d$`Prop_Poduromorpha` <- d$Poduromorpha/d$`Total Mesofauna Catch`
+d$`Prop_Symphypleona` <- d$Symphypleona/d$`Total Mesofauna Catch`
+d$`Prop_Neelidae` <- d$Neelidae/d$`Total Mesofauna Catch`
+d$`Prop_Mites` <- d$mites_total/d$`Total Mesofauna Catch`
+d$`Prop_Collembola` <- d$collembola_total/d$`Total Mesofauna Catch`
+#check we've done it correctly
+d$total <- d$Prop_Collembola + d$Prop_Mites
+d$total2 <- d$Prop_Mesostigmata + d$Prop_Oribatida + d$Prop_Astigmatina + d$Prop_Prostigmata + d$Prop_Entomobryomorpha + d$Prop_Poduromorpha + d$Prop_Symphypleona + d$Prop_Neelidae
+
+hist(log(d$Prop_Mesostigmata))
+
+#analyse the different between each group
+anova <- aov(d$Prop_Neelidae ~ d$Vegetation)
+#extract the residuals
+aov_residuals <- residuals(object = anova)
+#run shapiro-wilk test.  if p > 0.05 the data is normal
+shapiro.test(x = aov_residuals)
+#levene test.  if p value < 0.05, there is evidence to suggest that the variance across groups is statistically significantly different.
+leveneTest(d$Prop_Neelidae ~ d$Vegetation)
+
+
+
+#Prop_Mesostigmata fails Shapiro, passes Levene - so Kruskal-Wallis
+kruskal.test(Prop_Mesostigmata ~ Vegetation, data = d)
+#Prop_Oribatida passes both - ANOVA
+kruskal.test(Prop_Oribatida ~ Vegetation, data = d)
+#Prop_Astigmatina fails both - Kruskal too?
+kruskal.test(Prop_Astigmatina ~ Vegetation, data = d)
+#Prop_Prostigmata fails Shapiro, passes Levene - so Kruskal Wallis
+kruskal.test(Prop_Prostigmata ~ Vegetation, data = d)
+
+#Prop_Entomobryomorpha fails both
+kruskal.test(Prop_Entomobryomorpha ~ Vegetation, data = d)
+#Prop_Poduromorpha fails both - Kruskal too?
+kruskal.test(Prop_Poduromorpha ~ Vegetation, data = d)
+#Prop_Symphypleona fails Shapiro, passes Levene - so Kruskal Wallis
+kruskal.test(Prop_Symphypleona ~ Vegetation, data = d)
+#Prop_Neelidae fails Shapiro, passes Levene - so Kruskal Wallis
+kruskal.test(Prop_Neelidae ~ Vegetation, data = d)
+
+#Prop_Mites fails both - Kruskal too?
+kruskal.test(Prop_Mites ~ Vegetation, data = d)
+#Prop_Collembola fails both - Kruskall too?
+kruskal.test(Prop_Collembola ~ Vegetation, data = d)
+
+#Dunn tests now...
+
+summary(anova)
+#tukey's test to identify significant interactions
+tukey <- TukeyHSD(anova)
+print(tukey)
+#compact letter display
+cld <- multcompLetters4(anova, tukey)
+#compact letter display
+print(cld)
+
+#check homogeneity of variance
+plot(anova, 1)
+#levene test.  if p value < 0.05, there is evidence to suggest that the variance across groups is statistically significantly different.
+leveneTest(d$logmitestotal ~ d$Vegetation)
+#check normality.  
+plot(anova, 2)
+#conduct shapiro-wilk test on ANOVA residuals to test for normality
+#extract the residuals
+aov_residuals <- residuals(object = anova)
+#run shapiro-wilk test.  if p > 0.05 the data is normal
+shapiro.test(x = aov_residuals)
+
+
+
 
 #### Invertebrate catch percetnage breakdown ----
 d <- readr::read_csv(
@@ -4641,7 +4783,7 @@ ggsave(path = "figures", paste0(Sys.Date(), "_mesofauna_alpha-diversity.svg"), w
 
 #anova to see if key metrics differ between site/vegetation
 #anova
-anova <- aov(d$`Mesofauna Simpson` ~ d$Vegetation * d$Site)
+anova <- aov(d$`Total Mesofauna Catch` ~ d$Vegetation * d$Site)
 summary(anova)
 #tukey's test to identify significant interactions
 tukey <- TukeyHSD(anova)
@@ -4654,7 +4796,7 @@ print(cld)
 #check homogeneity of variance
 plot(anova, 1)
 #levene test.  if p value < 0.05, there is evidence to suggest that the variance across groups is statistically significantly different.
-leveneTest(d$`Total Mesofauna Catch` ~ d$Vegetation*d$Site)
+leveneTest(d$`Total Mesofauna Catch` ~ d$Vegetation)
 #check normality.  
 plot(anova, 2)
 #conduct shapiro-wilk test on ANOVA residuals to test for normality
@@ -4662,7 +4804,6 @@ plot(anova, 2)
 aov_residuals <- residuals(object = anova)
 #run shapiro-wilk test.  if p > 0.05 the data is normal
 shapiro.test(x = aov_residuals)
-
 
 
 anova <- aov(d$`Total Invertebrate Catch` ~ d$Vegetation * d$Site)
