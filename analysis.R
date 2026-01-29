@@ -2896,20 +2896,25 @@ ggsave(path = "figures", paste0(Sys.Date(), "_mesofauna_abundance_raw.svg"), wid
 
 #### glmms of mesofauna function groups in response to vegetation and latitude (needs previous tab to work) ----
 
-
 #df containing just sample code and longitude
 d <- as.data.frame(readr::read_csv(
-  here::here("data", "2025-10-21_all-variables_masterfile.csv")
+  here::here("data", "2026-01-29_all-variables_masterfile.csv")
 ))
 #add in dash to sample IDs to ensure consisting formatting
 df_long$`Sample ID` <- gsub(" ", "-", df_long$`Sample ID`)
-df_longitude <- d[, c(2,23)]
+#df_longitude <- d[, c(2,23)]
+#use total rainfall rather than longitude
+df_longitude <- d[, c(2,81)]
 #append longitude column for east-west gradient
 df_long <- left_join(df_long, df_longitude, by  = c("Sample ID"))
+#rename Total rainfall (mm)
+colnames(df_long)[colnames(df_long) == "Total rainfall (mm)"] <- "rainfall"
 #our GLMM can't handle 0s and 1s, so adjust the data slightly
 #df_long$Percentage_of_total_mesofauna_catch[df_long$Percentage_of_total_mesofauna_catch == 0] <- 0.001
 #df_long$Percentage_of_total_mesofauna_catch[df_long$Percentage_of_total_mesofauna_catch == 1] <- 0.999
 
+#scale the rainfall and see if this makes models work
+df_long$rainfall <- scale(df_long$rainfall)
 
 #a dataframe for each functional group
 df_meso <- df_long %>% filter(`Functional Group` == "Mesostigmata")
@@ -2924,17 +2929,17 @@ df_neel <- df_long %>% filter(`Functional Group` == "Neelidae")
 library(glmmTMB)
 library(ggeffects)
 meso_model <- glmmTMB(
-  Percentage_of_total_mesofauna_catch ~ LongitudeE*Vegetation,
+  Percentage_of_total_mesofauna_catch ~ rainfall*Vegetation,
   data = df_meso,
   family = beta_family(link = "logit"),
   ziformula = ~1  # models the zero-inflation part
 )
 summary(meso_model)
 meso_model
-pred <- ggpredict(meso_model, terms = c("LongitudeE [all]", "Vegetation"))
+pred <- ggpredict(meso_model, terms = c("rainfall [all]", "Vegetation"))
 
 meso_plot <- ggplot(pred, aes(x, predicted, colour = group)) +
-  geom_point(data = df_meso, aes(x = LongitudeE, y = Percentage_of_total_mesofauna_catch,
+  geom_point(data = df_meso, aes(x = rainfall, y = Percentage_of_total_mesofauna_catch,
                             colour = Vegetation),
              alpha = 0.4, size = 2, position = position_jitter(width = 0.03, height = 0)) +
   geom_line(size = 1.2) +
@@ -2943,8 +2948,8 @@ meso_plot <- ggplot(pred, aes(x, predicted, colour = group)) +
   scale_colour_manual(values = c("Bracken" = "#228B22", "Heather" = "#800080")) +
   scale_fill_manual(values = c("Bracken" = "#228B22", "Heather" = "#800080")) +
   labs(
-    x = "Longitude",
-    y = "Mesostigmata",
+    x = "Scaled total annual rainfall",
+    y = "Mesostigmata \nproportional abundance",
     colour = "Vegetation",
     fill = "Vegetation") +
   theme_minimal(base_size = 14)  +
@@ -2956,16 +2961,17 @@ meso_plot <- ggplot(pred, aes(x, predicted, colour = group)) +
 show(meso_plot)
 
 orib_model <- glmmTMB(
-  Percentage_of_total_mesofauna_catch ~ LongitudeE * Vegetation,
+  Percentage_of_total_mesofauna_catch ~ rainfall * Vegetation,
   data = df_orib,
   family = beta_family(link = "logit"),
   ziformula = ~1  # models the zero-inflation part
 )
 summary(orib_model)
-pred <- ggpredict(orib_model, terms = c("LongitudeE [all]", "Vegetation"))
+
+pred <- ggpredict(orib_model, terms = c("rainfall [all]", "Vegetation"))
 
 orib_plot <- ggplot(pred, aes(x, predicted, colour = group)) +
-  geom_point(data = df_orib, aes(x = LongitudeE, y = Percentage_of_total_mesofauna_catch,
+  geom_point(data = df_orib, aes(x = rainfall, y = Percentage_of_total_mesofauna_catch,
                                  colour = Vegetation),
              alpha = 0.4, size = 2, position = position_jitter(width = 0.03, height = 0)) +
   geom_line(size = 1.2) +
@@ -2974,8 +2980,8 @@ orib_plot <- ggplot(pred, aes(x, predicted, colour = group)) +
   scale_colour_manual(values = c("Bracken" = "#228B22", "Heather" = "#800080")) +
   scale_fill_manual(values = c("Bracken" = "#228B22", "Heather" = "#800080")) +
   labs(
-    x = "Longitude",
-    y = "Oribatida",
+    x = "Scaled total rainfall (mm)",
+    y = "Oribatida \nproportional abundance",
     colour = "Vegetation",
     fill = "Vegetation") +
   theme_minimal(base_size = 14)  +
@@ -2987,16 +2993,16 @@ show(orib_plot)
 
 
 asti_model <- glmmTMB(
-  Percentage_of_total_mesofauna_catch ~ LongitudeE * Vegetation,
+  Percentage_of_total_mesofauna_catch ~ rainfall * Vegetation,
   data = df_asti,
   family = beta_family(link = "logit"),
   ziformula = ~1  # models the zero-inflation part
 )
 summary(asti_model)
-pred <- ggpredict(asti_model, terms = c("LongitudeE [all]", "Vegetation"))
+pred <- ggpredict(asti_model, terms = c("rainfall [all]", "Vegetation"))
 
 asti_plot <- ggplot(pred, aes(x, predicted, colour = group)) +
-  geom_point(data = df_asti, aes(x = LongitudeE, y = Percentage_of_total_mesofauna_catch,
+  geom_point(data = df_asti, aes(x = rainfall, y = Percentage_of_total_mesofauna_catch,
                                  colour = Vegetation),
              alpha = 0.4, size = 2, position = position_jitter(width = 0.03, height = 0)) +
   geom_line(size = 1.2) +
@@ -3005,8 +3011,8 @@ asti_plot <- ggplot(pred, aes(x, predicted, colour = group)) +
   scale_colour_manual(values = c("Bracken" = "#228B22", "Heather" = "#800080")) +
   scale_fill_manual(values = c("Bracken" = "#228B22", "Heather" = "#800080")) +
   labs(
-    x = "Longitude",
-    y = "Astigmatina",
+    x = "Scaled total rainfall (mm)",
+    y = "Astigmatina \nproportional abundance",
     colour = "Vegetation",
     fill = "Vegetation") +
   theme_minimal(base_size = 14)  +
@@ -3018,16 +3024,16 @@ asti_plot <- ggplot(pred, aes(x, predicted, colour = group)) +
 show(asti_plot)
 
 pros_model <- glmmTMB(
-  Percentage_of_total_mesofauna_catch ~ LongitudeE * Vegetation,
+  Percentage_of_total_mesofauna_catch ~ rainfall * Vegetation,
   data = df_pros,
   family = beta_family(link = "logit"),
   ziformula = ~1  # models the zero-inflation part
 )
-#summary(model)
-pred <- ggpredict(pros_model, terms = c("LongitudeE [all]", "Vegetation"))
+summary(pros_model)
+pred <- ggpredict(pros_model, terms = c("rainfall [all]", "Vegetation"))
 
 pros_plot <- ggplot(pred, aes(x, predicted, colour = group)) +
-  geom_point(data = df_pros, aes(x = LongitudeE, y = Percentage_of_total_mesofauna_catch,
+  geom_point(data = df_pros, aes(x = rainfall, y = Percentage_of_total_mesofauna_catch,
                                  colour = Vegetation),
              alpha = 0.4, size = 2, position = position_jitter(width = 0.03, height = 0)) +
   geom_line(size = 1.2) +
@@ -3036,8 +3042,8 @@ pros_plot <- ggplot(pred, aes(x, predicted, colour = group)) +
   scale_colour_manual(values = c("Bracken" = "#228B22", "Heather" = "#800080")) +
   scale_fill_manual(values = c("Bracken" = "#228B22", "Heather" = "#800080")) +
   labs(
-    x = "Longitude",
-    y = "Prostigmata",
+    x = "Scaled total rainfall (mm)",
+    y = "Prostigmata \nproportional abundance",
     colour = "Vegetation",
     fill = "Vegetation") +
   theme_minimal(base_size = 14)  +
@@ -3048,16 +3054,16 @@ pros_plot <- ggplot(pred, aes(x, predicted, colour = group)) +
 show(pros_plot)
 
 ento_model <- glmmTMB(
-  Percentage_of_total_mesofauna_catch ~ LongitudeE * Vegetation,
+  Percentage_of_total_mesofauna_catch ~ rainfall * Vegetation,
   data = df_ento,
   family = beta_family(link = "logit"),
   ziformula = ~1  # models the zero-inflation part
 )
-#summary(model)
-pred <- ggpredict(ento_model, terms = c("LongitudeE [all]", "Vegetation"))
+summary(ento_model)
+pred <- ggpredict(ento_model, terms = c("rainfall [all]", "Vegetation"))
 
 ento_plot <- ggplot(pred, aes(x, predicted, colour = group)) +
-  geom_point(data = df_ento, aes(x = LongitudeE, y = Percentage_of_total_mesofauna_catch,
+  geom_point(data = df_ento, aes(x = rainfall, y = Percentage_of_total_mesofauna_catch,
                                  colour = Vegetation),
              alpha = 0.4, size = 2, position = position_jitter(width = 0.03, height = 0)) +
   geom_line(size = 1.2) +
@@ -3066,8 +3072,8 @@ ento_plot <- ggplot(pred, aes(x, predicted, colour = group)) +
   scale_colour_manual(values = c("Bracken" = "#228B22", "Heather" = "#800080")) +
   scale_fill_manual(values = c("Bracken" = "#228B22", "Heather" = "#800080")) +
   labs(
-    x = "Longitude",
-    y = "Entomobryomorpha",
+    x = "Scaled total rainfall (mm)",
+    y = "Entomobryomorpha \nproportional abundance",
     colour = "Vegetation",
     fill = "Vegetation") +
   theme_minimal(base_size = 14)  +
@@ -3078,16 +3084,16 @@ ento_plot <- ggplot(pred, aes(x, predicted, colour = group)) +
 show(ento_plot)
 
 podu_model <- glmmTMB(
-  Percentage_of_total_mesofauna_catch ~ LongitudeE * Vegetation,
+  Percentage_of_total_mesofauna_catch ~ rainfall * Vegetation,
   data = df_podu,
   family = beta_family(link = "logit"),
   ziformula = ~1  # models the zero-inflation part
 )
 summary(podu_model)
-pred <- ggpredict(podu_model, terms = c("LongitudeE [all]", "Vegetation"))
+pred <- ggpredict(podu_model, terms = c("rainfall [all]", "Vegetation"))
 
 podu_plot <- ggplot(pred, aes(x, predicted, colour = group)) +
-  geom_point(data = df_podu, aes(x = LongitudeE, y = Percentage_of_total_mesofauna_catch,
+  geom_point(data = df_podu, aes(x = rainfall, y = Percentage_of_total_mesofauna_catch,
                                  colour = Vegetation),
              alpha = 0.4, size = 2, position = position_jitter(width = 0.03, height = 0)) +
   geom_line(size = 1.2) +
@@ -3096,8 +3102,8 @@ podu_plot <- ggplot(pred, aes(x, predicted, colour = group)) +
   scale_colour_manual(values = c("Bracken" = "#228B22", "Heather" = "#800080")) +
   scale_fill_manual(values = c("Bracken" = "#228B22", "Heather" = "#800080")) +
   labs(
-    x = "Longitude",
-    y = "Poduromorpha",
+    x = "Scaled total rainfall (mm)",
+    y = "Poduromorpha \nproportional abundance",
     colour = "Vegetation",
     fill = "Vegetation") +
   theme_minimal(base_size = 14)  +
@@ -3108,16 +3114,16 @@ podu_plot <- ggplot(pred, aes(x, predicted, colour = group)) +
 show(podu_plot)
 
 symp_model <- glmmTMB(
-  Percentage_of_total_mesofauna_catch ~ LongitudeE * Vegetation,
+  Percentage_of_total_mesofauna_catch ~ rainfall * Vegetation,
   data = df_symp,
   family = beta_family(link = "logit"),
   ziformula = ~1  # models the zero-inflation part
 )
-#summary(model)
-pred <- ggpredict(symp_model, terms = c("LongitudeE [all]", "Vegetation"))
+summary(symp_model)
+pred <- ggpredict(symp_model, terms = c("rainfall [all]", "Vegetation"))
 
 symp_plot <- ggplot(pred, aes(x, predicted, colour = group)) +
-  geom_point(data = df_symp, aes(x = LongitudeE, y = Percentage_of_total_mesofauna_catch,
+  geom_point(data = df_symp, aes(x = rainfall, y = Percentage_of_total_mesofauna_catch,
                                  colour = Vegetation),
              alpha = 0.4, size = 2, position = position_jitter(width = 0.03, height = 0)) +
   geom_line(size = 1.2) +
@@ -3126,8 +3132,8 @@ symp_plot <- ggplot(pred, aes(x, predicted, colour = group)) +
   scale_colour_manual(values = c("Bracken" = "#228B22", "Heather" = "#800080")) +
   scale_fill_manual(values = c("Bracken" = "#228B22", "Heather" = "#800080")) +
   labs(
-    x = "Longitude",
-    y = "Symphypleona",
+    x = "Scaled total rainfall (mm)",
+    y = "Symphypleona \nproportional abundance",
     colour = "Vegetation",
     fill = "Vegetation") +
   theme_minimal(base_size = 14)  +
@@ -3138,16 +3144,16 @@ symp_plot <- ggplot(pred, aes(x, predicted, colour = group)) +
 show(symp_plot)
 
 neel_model <- glmmTMB(
-  Percentage_of_total_mesofauna_catch ~ LongitudeE * Vegetation,
+  Percentage_of_total_mesofauna_catch ~ rainfall * Vegetation,
   data = df_neel,
   family = beta_family(link = "logit"),
   ziformula = ~1  # models the zero-inflation part
 )
-#summary(model)
-pred <- ggpredict(neel_model, terms = c("LongitudeE [all]", "Vegetation"))
+summary(neel_model)
+pred <- ggpredict(neel_model, terms = c("rainfall [all]", "Vegetation"))
 
 neel_plot <- ggplot(pred, aes(x, predicted, colour = group)) +
-  geom_point(data = df_neel, aes(x = LongitudeE, y = Percentage_of_total_mesofauna_catch,
+  geom_point(data = df_neel, aes(x = rainfall, y = Percentage_of_total_mesofauna_catch,
                                  colour = Vegetation),
              alpha = 0.4, size = 2, position = position_jitter(width = 0.03, height = 0)) +
   geom_line(size = 1.2) +
@@ -3156,8 +3162,8 @@ neel_plot <- ggplot(pred, aes(x, predicted, colour = group)) +
   scale_colour_manual(values = c("Bracken" = "#228B22", "Heather" = "#800080")) +
   scale_fill_manual(values = c("Bracken" = "#228B22", "Heather" = "#800080")) +
   labs(
-    x = "Longitude",
-    y = "Neelidae",
+    x = "Scaled total rainfall (mm)",
+    y = "Neelidae \nproportional abundance",
     colour = "Vegetation",
     fill = "Vegetation") +
   theme_minimal(base_size = 14)  +
@@ -3189,7 +3195,7 @@ poster_models <- ggarrange(ento_plot, podu_plot, symp_plot, neel_plot, meso_plot
                            widths = c(8,8),
                            common.legend = TRUE)
 
-show(poster_models)
+show(mite_models)
 
 #save the figure- 
 ggsave("figures/poster_models.pdf", plot = poster_models, width = 8, height = 7, dpi = 300)
@@ -3198,8 +3204,8 @@ ggsave("figures/poster_models.pdf", plot = poster_models, width = 8, height = 7,
 show(mite_models)
 show(springtail_models)
 #save the figure- 
-ggsave("figures/mite_models.pdf", plot = mite_models, width = 7.5, height = 6, dpi = 300)
-ggsave("figures/springtail_models.pdf", plot = springtail_models, width = 7.5, height = 6, dpi = 300)
+ggsave("figures/rainfall_mite_models.svg", plot = mite_models, width = 7.5, height = 6, dpi = 300)
+ggsave("figures/rainfall_springtail_models.svg", plot = springtail_models, width = 7.5, height = 6, dpi = 300)
 
 ####analyse mesofauna abundance per 100g dry soil ----
 hist(d$`Total Mesofauna Catch`)
@@ -5538,20 +5544,26 @@ write.csv(combined_df, "data/hydrological-data-2024-annual-average.csv")
 d <- as.data.frame(readr::read_csv(
   here::here("data", "2025-08-19_dbRDA_masterfile.csv")
 ))
-#load hydrological data
+#load hydrological data - 2024 data only
+#hydro <- as.data.frame(readr::read_csv( here::here("data", "hydrological-data-2024-annual-average.csv")))
+#hydro <- hydro[, c(2,6,7,8,9,10)]
+
+#5 year 2019-2024 avg data
 hydro <- as.data.frame(readr::read_csv(
-  here::here("data", "hydrological-data-2024-annual-average.csv")
+  here::here("data", "hydrological-data-1km-5_yr_avg-annual.csv")
 ))
-hydro <- hydro[, c(2,6,7,8,9,10)]
 
 #combine
 df_joined <- left_join(d, hydro, by = "Site")
 #save
-write.csv(df_joined, "data/2025-10-21_all-variables_masterfile.csv")
+write.csv(df_joined, "data/2026-01-29_all-variables_masterfile.csv")
 
 #### analyse the hydrological gradient ----
+#2024 only hydro data
+#d <- as.data.frame(readr::read_csv(  here::here("data", "2025-10-21_all-variables_masterfile.csv")))
+#use 5 year average hydro data
 d <- as.data.frame(readr::read_csv(
-  here::here("data", "2025-10-21_all-variables_masterfile.csv")
+  here::here("data", "2026-01-29_all-variables_masterfile.csv")
 ))
 #trim off first column
 d <- d[-1]
@@ -5632,7 +5644,7 @@ ggplot() +
 
 #### PCA and dbRDA (figures 2 and 3) ----
 d <- as.data.frame(readr::read_csv(
-  here::here("data", "2025-10-21_all-variables_masterfile.csv")
+  here::here("data", "2026-01-29_all-variables_masterfile.csv")
 ))
 d <- d[-1]
 #make sure our variables are coded as factors
@@ -5743,7 +5755,7 @@ ggplot() +
   labs(x = paste0("PC1 (", pca_var_explained[1], "%)"),
     y = paste0("PC2 (", pca_var_explained[2], "%)"),
     color = "Vegetation"
-  ) + scale_color_manual(values = c("Bracken" = "forestgreen", "Heather" = "purple")) +
+  ) + scale_color_manual(values = c("Bracken" = "forestgreen", "Heather" = "purple")) + 
   theme_minimal()
 
 
