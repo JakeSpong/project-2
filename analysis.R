@@ -2795,44 +2795,452 @@ d$`Prop_Collembola` <- d$collembola_total/d$`Total Mesofauna Catch`
 d$total <- d$Prop_Collembola + d$Prop_Mites
 d$total2 <- d$Prop_Mesostigmata + d$Prop_Oribatida + d$Prop_Astigmatina + d$Prop_Prostigmata + d$Prop_Entomobryomorpha + d$Prop_Poduromorpha + d$Prop_Symphypleona + d$Prop_Neelidae
 
-hist(log(d$Prop_Mesostigmata))
+
+
+#graphing boxplots with bracken split from nonbracken
+mites_bxp <-ggboxplot(d, x = "Vegetation", y = "mites_total", ylab = "Total acari catch", lwd = 0.75,  add = "jitter",  add.params = list(size = 1.5,alpha = 1, width = 0.15), color = "Vegetation",
+                        palette = c("limegreen", "#AA4499")) +
+  
+  theme(
+    #remove x axis label
+    axis.title.x=element_blank(),
+    axis.text.x=element_blank(),
+    axis.ticks.x=element_blank(),
+    # Remove panel border
+    panel.border = element_blank(),  
+    # Remove panel grid lines
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    # Remove panel background
+    panel.background = element_blank(),
+    # Add axis line
+    axis.line = element_line(colour = "black", linewidth = 0.5),
+    #change colour and thickness of axis ticks
+    axis.ticks = element_line(colour = "black", linewidth = 0.5),
+    #change axis labels colour
+    axis.title.y = element_text(colour = "black"),
+    #change tick labels colour
+    axis.text.y = element_text(colour = "black"),
+    legend.title = element_blank()
+  ) 
+
+show(mites_bxp)
+
+
+
+#graphing boxplots with bracken split from nonbracken
+collembola_bxp <-ggboxplot(d, x = "Vegetation", y = "collembola_total", ylab = "Total collembola catch", lwd = 0.75,  add = "jitter",  add.params = list(size = 1.5,alpha = 1, width = 0.15), color = "Vegetation",
+                         palette = c("limegreen", "#AA4499")) +
+  
+  theme(
+    #remove x axis label
+    axis.title.x=element_blank(),
+    axis.text.x=element_blank(),
+    axis.ticks.x=element_blank(),
+    # Remove panel border
+    panel.border = element_blank(),  
+    # Remove panel grid lines
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    # Remove panel background
+    panel.background = element_blank(),
+    # Add axis line
+    axis.line = element_line(colour = "black", linewidth = 0.5),
+    #change colour and thickness of axis ticks
+    axis.ticks = element_line(colour = "black", linewidth = 0.5),
+    #change axis labels colour
+    axis.title.y = element_text(colour = "black"),
+    #change tick labels colour
+    axis.text.y = element_text(colour = "black"),
+    legend.title = element_blank()
+  ) 
+
+show(collembola_bxp)
+
+
+
+#graphing boxplots with bracken split from nonbracken
+mesostig_bxp <-ggboxplot(d, x = "Vegetation", y = "Mesostigmata", ylab = "Mesostigmata", lwd = 0.75, add = "jitter",  add.params = list(size = 1.5,alpha = 1, width = 0.15), color = "Vegetation",
+                         palette = c("limegreen", "#AA4499")) +
+  
+  theme(
+    #remove x axis label
+    axis.title.x=element_blank(),
+    axis.text.x=element_blank(),
+    axis.ticks.x=element_blank(),
+    # Remove panel border
+    panel.border = element_blank(),  
+    # Remove panel grid lines
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    # Remove panel background
+    panel.background = element_blank(),
+    # Add axis line
+    axis.line = element_line(colour = "black", linewidth = 0.5),
+    #change colour and thickness of axis ticks
+    axis.ticks = element_line(colour = "black", linewidth = 0.5),
+    #change axis labels colour
+    axis.title.y = element_text(colour = "black"),
+    #change tick labels colour
+    axis.text.y = element_text(colour = "black"),
+    legend.title = element_blank()
+  ) 
+
+show(mesostig_bxp)
+
+
+
+#graphing boxplots with bracken split from nonbracken
+oribatid_bxp <-ggboxplot(d, x = "Vegetation", y = "Oribatida", ylab = "Oribatida", lwd = 0.75, add = "jitter",  add.params = list(size = 1.5,alpha = 1, width = 0.15), color = "Vegetation",
+                      palette = c("limegreen", "#AA4499")) +
+  
+  theme(
+    #remove x axis label
+    axis.title.x=element_blank(),
+    axis.text.x=element_blank(),
+    axis.ticks.x=element_blank(),
+    # Remove panel border
+    panel.border = element_blank(),  
+    # Remove panel grid lines
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    # Remove panel background
+    panel.background = element_blank(),
+    # Add axis line
+    axis.line = element_line(colour = "black", linewidth = 0.5),
+    #change colour and thickness of axis ticks
+    axis.ticks = element_line(colour = "black", linewidth = 0.5),
+    #change axis labels colour
+    axis.title.y = element_text(colour = "black"),
+    #change tick labels colour
+    axis.text.y = element_text(colour = "black"),
+    legend.title = element_blank()
+  ) 
+
+show(oribatid_bxp)
+
+
+
+#graphing boxplots with bracken split from nonbracken
+astig_bxp <-ggboxplot(d, x = "Vegetation", y = "Astigmatina", ylab = "Astigmatina", lwd = 0.75, add = "jitter",  add.params = list(size = 1.5,alpha = 1, width = 0.15), color = "Vegetation",
+                         palette = c("limegreen", "#AA4499")) +
+  
+  theme(
+    #remove x axis label
+    axis.title.x=element_blank(),
+    # Remove panel border
+    panel.border = element_blank(),  
+    # Remove panel grid lines
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    # Remove panel background
+    panel.background = element_blank(),
+    # Add axis line
+    axis.line = element_line(colour = "black", linewidth = 0.5),
+    #change colour and thickness of axis ticks
+    axis.ticks = element_line(colour = "black", linewidth = 0.5),
+    #change axis labels colour
+    axis.title.y = element_text(colour = "black"),
+    #change tick labels colour
+    axis.text.y = element_text(colour = "black"),
+    legend.title = element_blank()
+  ) 
+
+show(astig_bxp)
+
+
+
+#graphing boxplots with bracken split from nonbracken
+prostig_bxp <-ggboxplot(d, x = "Vegetation", y = "Prostigmata", ylab = "Prostigmata", lwd = 0.75, add = "jitter",  add.params = list(size = 1.5,alpha = 1, width = 0.15), color = "Vegetation",
+                         palette = c("limegreen", "#AA4499")) +
+  
+  theme(
+    #remove x axis label
+    axis.title.x=element_blank(),
+    # Remove panel border
+    panel.border = element_blank(),  
+    # Remove panel grid lines
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    # Remove panel background
+    panel.background = element_blank(),
+    # Add axis line
+    axis.line = element_line(colour = "black", linewidth = 0.5),
+    #change colour and thickness of axis ticks
+    axis.ticks = element_line(colour = "black", linewidth = 0.5),
+    #change axis labels colour
+    axis.title.y = element_text(colour = "black"),
+    #change tick labels colour
+    axis.text.y = element_text(colour = "black"),
+    legend.title = element_blank()
+  ) 
+
+show(prostig_bxp)
+
+
+#graphing boxplots with bracken split from nonbracken
+entomo_bxp <-ggboxplot(d, x = "Vegetation", y = "Entomobryomorpha", ylab = "Entomobryomorpha", lwd = 0.75, add = "jitter",  add.params = list(size = 1.5,alpha = 1, width = 0.15), color = "Vegetation",
+                         palette = c("limegreen", "#AA4499")) +
+  
+  theme(
+    #remove x axis label
+    axis.title.x=element_blank(),
+    axis.text.x=element_blank(),
+    axis.ticks.x=element_blank(),
+    # Remove panel border
+    panel.border = element_blank(),  
+    # Remove panel grid lines
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    # Remove panel background
+    panel.background = element_blank(),
+    # Add axis line
+    axis.line = element_line(colour = "black", linewidth = 0.5),
+    #change colour and thickness of axis ticks
+    axis.ticks = element_line(colour = "black", linewidth = 0.5),
+    #change axis labels colour
+    axis.title.y = element_text(colour = "black"),
+    #change tick labels colour
+    axis.text.y = element_text(colour = "black"),
+    legend.title = element_blank()
+  ) 
+
+show(entomo_bxp)
+
+
+
+#graphing boxplots with bracken split from nonbracken
+poduro_bxp <-ggboxplot(d, x = "Vegetation", y = "Poduromorpha", ylab = "Poduromorpha", lwd = 0.75, add = "jitter",  add.params = list(size = 1.5,alpha = 1, width = 0.15), color = "Vegetation",
+                         palette = c("limegreen", "#AA4499")) +
+  
+  theme(
+    #remove x axis label
+    axis.title.x=element_blank(),
+    axis.text.x=element_blank(),
+    axis.ticks.x=element_blank(),
+    # Remove panel border
+    panel.border = element_blank(),  
+    # Remove panel grid lines
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    # Remove panel background
+    panel.background = element_blank(),
+    # Add axis line
+    axis.line = element_line(colour = "black", linewidth = 0.5),
+    #change colour and thickness of axis ticks
+    axis.ticks = element_line(colour = "black", linewidth = 0.5),
+    #change axis labels colour
+    axis.title.y = element_text(colour = "black"),
+    #change tick labels colour
+    axis.text.y = element_text(colour = "black"),
+    legend.title = element_blank()
+  ) 
+
+show(poduro_bxp)
+
+
+
+#graphing boxplots with bracken split from nonbracken
+symph_bxp <-ggboxplot(d, x = "Vegetation", y = "Symphypleona", ylab = "Symphypleona", lwd = 0.75, add = "jitter",  add.params = list(size = 1.5,alpha = 1, width = 0.15), color = "Vegetation",
+                      palette = c("limegreen", "#AA4499")) +
+  
+  theme(
+    #remove x axis label
+    axis.title.x=element_blank(),
+    axis.text.x=element_blank(),
+    axis.ticks.x=element_blank(),
+    # Remove panel border
+    panel.border = element_blank(),  
+    # Remove panel grid lines
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    # Remove panel background
+    panel.background = element_blank(),
+    # Add axis line
+    axis.line = element_line(colour = "black", linewidth = 0.5),
+    #change colour and thickness of axis ticks
+    axis.ticks = element_line(colour = "black", linewidth = 0.5),
+    #change axis labels colour
+    axis.title.y = element_text(colour = "black"),
+    #change tick labels colour
+    axis.text.y = element_text(colour = "black"),
+    legend.title = element_blank()
+  ) 
+
+show(symph_bxp)
+
+
+
+#graphing boxplots with bracken split from nonbracken
+neel_bxp <-ggboxplot(d, x = "Vegetation", y = "Neelidae", ylab = "Neelidae", lwd = 0.75, add = "jitter",  add.params = list(size = 1.5,alpha = 1, width = 0.15), color = "Vegetation",
+                        palette = c("limegreen", "#AA4499")) +
+  
+  theme(
+    #remove x axis label
+    axis.title.x=element_blank(),
+    # Remove panel border
+    panel.border = element_blank(),  
+    # Remove panel grid lines
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    # Remove panel background
+    panel.background = element_blank(),
+    # Add axis line
+    axis.line = element_line(colour = "black", linewidth = 0.5),
+    #change colour and thickness of axis ticks
+    axis.ticks = element_line(colour = "black", linewidth = 0.5),
+    #change axis labels colour
+    axis.title.y = element_text(colour = "black"),
+    #change tick labels colour
+    axis.text.y = element_text(colour = "black"),
+    legend.title = element_blank()
+  ) 
+
+show(neel_bxp)
+
+mites_fig <- ggarrange(mites_bxp, mesostig_bxp, oribatid_bxp, astig_bxp, prostig_bxp,
+                       labels = c("A", "B", "C", "D", "E"),
+                       ncol = 2, nrow = 3,
+                       widths = c(7,7),
+                       common.legend = TRUE)
+
+collembola_fig <- ggarrange(collembola_bxp, entomo_bxp, poduro_bxp, symph_bxp, neel_bxp,
+                       labels = c("A", "B", "C", "D", "E"),
+                       ncol = 2, nrow = 3,
+                       widths = c(7,7),
+                       common.legend = TRUE)
+show(mites_fig)
+show(collembola_fig)
+
+#save our plot
+ggsave(path = "figures", paste0(Sys.Date(), "_acari-counts-bxps.svg"), width = 7, height= 7, mites_fig)
+ggsave(path = "figures", paste0(Sys.Date(), "_collembola-counts-bxps.svg"), width = 7, height= 7, collembola_fig)
+
+hist((d$Poduromorpha))
+
+#add small amount (0.001) to avoid -inf
+d$`Lnmitestotal` <- log(d$mites_total + 0.001)
+d$`LnMesostigmata` <- log(d$Mesostigmata + 0.001)
+d$`LnOribatida` <- log(d$Oribatida + 0.001)
+d$`LnAstigmatina` <- log(d$Astigmatina + 0.001)
+d$`LnProstigmata` <- log(d$Prostigmata + 0.001)
+
+d$`Lncollembolatotal` <- log(d$collembola_total + 0.001)
+d$`LnEntomobryomorpha` <- log(d$Entomobryomorpha + 0.001)
+d$`LnPoduromorpha` <- log(d$Poduromorpha + 0.001)
+d$`LnSymphypleona` <- log(d$Symphypleona + 0.001)
+d$`LnNeelidae` <- log(d$Neelidae + 0.001)
 
 #analyse the different between each group
-anova <- aov(d$Prop_Neelidae ~ d$Vegetation)
+anova <- aov(d$LnNeelidae ~ d$Vegetation)
+summary(anova)
 #extract the residuals
 aov_residuals <- residuals(object = anova)
+
+#check normality
+plot(anova, 2)
 #run shapiro-wilk test.  if p > 0.05 the data is normal
 shapiro.test(x = aov_residuals)
+
+#check homogeneity of variance
+plot(anova, 1)
 #levene test.  if p value < 0.05, there is evidence to suggest that the variance across groups is statistically significantly different.
-leveneTest(d$Prop_Neelidae ~ d$Vegetation)
+leveneTest(d$LnNeelidae ~ d$Vegetation)
 
+#use ANOVA on total mesofauna catch
+hist(d$`Total Mesofauna Catch`)
 
+library(glmmTMB)
+library(ggeffects)
+model <- glmmTMB(
+  Mesostigmata ~ Vegetation + (1|Site),
+  data = d,
+  family = poisson
+)
+summary(model)
+
+#for post-hoc Dunn test
+
+library(PMCMRplus)
 
 #Prop_Mesostigmata fails Shapiro, passes Levene - so Kruskal-Wallis
-kruskal.test(Prop_Mesostigmata ~ Vegetation, data = d)
+kruskal.test(Poduromorpha ~ Vegetation, data = d)
+kwAllPairsDunnTest(Poduromorpha ~ Vegetation,
+                   data = d,
+                   p.adjust.method = "BH")
+#proporition mesostigmata lower under bracken
+
+
 #Prop_Oribatida passes both - ANOVA
 kruskal.test(Prop_Oribatida ~ Vegetation, data = d)
+kwAllPairsDunnTest(Prop_Oribatida ~ Vegetation,
+                   data = d,
+                   p.adjust.method = "BH")
+#no differences in oribatida
+
 #Prop_Astigmatina fails both - Kruskal too?
 kruskal.test(Prop_Astigmatina ~ Vegetation, data = d)
+kwAllPairsDunnTest(Prop_Astigmatina ~ Vegetation,
+                   data = d,
+                   p.adjust.method = "BH")
+#no differences in astigmatina
+
 #Prop_Prostigmata fails Shapiro, passes Levene - so Kruskal Wallis
 kruskal.test(Prop_Prostigmata ~ Vegetation, data = d)
+kwAllPairsDunnTest(Prop_Prostigmata ~ Vegetation,
+                   data = d,
+                   p.adjust.method = "BH")
+#no differences in prostigmata
+
 
 #Prop_Entomobryomorpha fails both
 kruskal.test(Prop_Entomobryomorpha ~ Vegetation, data = d)
+kwAllPairsDunnTest(Prop_Entomobryomorpha ~ Vegetation,
+                   data = d,
+                   p.adjust.method = "BH")
+
+#no differences in entomobryomorpha
+
 #Prop_Poduromorpha fails both - Kruskal too?
 kruskal.test(Prop_Poduromorpha ~ Vegetation, data = d)
+
+kwAllPairsDunnTest(Prop_Poduromorpha ~ Vegetation,
+                   data = d,
+                   p.adjust.method = "BH")
+
+#poduromorpha lower under bracken 
+
 #Prop_Symphypleona fails Shapiro, passes Levene - so Kruskal Wallis
 kruskal.test(Prop_Symphypleona ~ Vegetation, data = d)
+kwAllPairsDunnTest(Prop_Symphypleona ~ Vegetation,
+                   data = d,
+                   p.adjust.method = "BH")
+#no differences in symphypleona
+
 #Prop_Neelidae fails Shapiro, passes Levene - so Kruskal Wallis
 kruskal.test(Prop_Neelidae ~ Vegetation, data = d)
+kwAllPairsDunnTest(Prop_Neelidae ~ Vegetation,
+                   data = d,
+                   p.adjust.method = "BH")
+#no differences in neelidae
 
 #Prop_Mites fails both - Kruskal too?
 kruskal.test(Prop_Mites ~ Vegetation, data = d)
+kwAllPairsDunnTest(Prop_Mites ~ Vegetation,
+                   data = d,
+                   p.adjust.method = "BH")
+#prop-mites lower under bracken than heather
+
 #Prop_Collembola fails both - Kruskall too?
 kruskal.test(Prop_Collembola ~ Vegetation, data = d)
 
-#Dunn tests now...
+kwAllPairsDunnTest(Prop_Collembola ~ Vegetation,
+                   data = d,
+                   p.adjust.method = "BH")
 
+#springtails lower under bracken 
+
+anova <- aov(d$Prop_Oribatida ~ d$Vegetation)
 summary(anova)
 #tukey's test to identify significant interactions
 tukey <- TukeyHSD(anova)
@@ -4783,7 +5191,7 @@ ggsave(path = "figures", paste0(Sys.Date(), "_mesofauna_alpha-diversity.svg"), w
 
 #anova to see if key metrics differ between site/vegetation
 #anova
-anova <- aov(d$`Total Mesofauna Catch` ~ d$Vegetation * d$Site)
+anova <- aov(d$`Mesofauna Simpson` ~ d$Vegetation)
 summary(anova)
 #tukey's test to identify significant interactions
 tukey <- TukeyHSD(anova)
@@ -4796,7 +5204,7 @@ print(cld)
 #check homogeneity of variance
 plot(anova, 1)
 #levene test.  if p value < 0.05, there is evidence to suggest that the variance across groups is statistically significantly different.
-leveneTest(d$`Total Mesofauna Catch` ~ d$Vegetation)
+leveneTest(d$`Mesofauna Simpson` ~ d$Vegetation)
 #check normality.  
 plot(anova, 2)
 #conduct shapiro-wilk test on ANOVA residuals to test for normality
